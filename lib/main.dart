@@ -1,6 +1,7 @@
+import 'package:coopaz_app/cash_register.dart';
+import 'package:coopaz_app/products.dart';
 import 'package:flutter/material.dart';
 
-import 'cash_register.dart';
 import 'logger.dart';
 
 void main() {
@@ -64,19 +65,29 @@ class HomePage extends StatelessWidget {
               child: const Text('Caisse'),
             ),
             TextButton(
-                onPressed: () => {log('Reception Clicked !')},
+                onPressed: () {
+                  log('Reception Clicked !');
+                },
                 style: buttonStyle,
                 child: const Text('Reception')),
             TextButton(
-                onPressed: () => {log('Products Clicked !')},
+                onPressed: () {
+                  log('Products Clicked !');
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const ProductsScreen(),
+                    ),
+                  );
+                },
                 style: buttonStyle,
                 child: const Text('Produits')),
             TextButton(
-                onPressed: () => {log('Adherents Clicked !')},
+                onPressed: () {
+                  log('Adherents Clicked !');
+                },
                 style: buttonStyle,
                 child: const Text('Adhérents')),
           ],
         )));
   }
 }
-

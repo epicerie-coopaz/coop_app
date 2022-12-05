@@ -9,7 +9,7 @@ class CashRegisterScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    log('build cash register screen');
+    log('build screen $title');
 
     return Scaffold(
         appBar: AppBar(

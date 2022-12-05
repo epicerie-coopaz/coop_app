@@ -1,11 +1,12 @@
-import 'dart:developer' as developer;
-
 import 'package:flutter/material.dart';
 
+import 'cash_register.dart';
+import 'logger.dart';
+
 void main() {
-  developer.log('Starting Coopaz app...');
+  log('Starting Coopaz app...');
   runApp(const CoopazApp());
-  developer.log('App started !');
+  log('App started !');
 }
 
 class CoopazApp extends StatelessWidget {
@@ -50,27 +51,32 @@ class HomePage extends StatelessWidget {
           runSpacing: 10.0, // gap between lines
           children: <Widget>[
             TextButton(
-              onPressed: onPressed,
+              onPressed: () {
+                log('Cash register Clicked !');
+
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const CashRegisterScreen(),
+                  ),
+                );
+              },
               style: buttonStyle,
               child: const Text('Caisse'),
             ),
             TextButton(
-                onPressed: onPressed,
+                onPressed: () => {log('Reception Clicked !')},
                 style: buttonStyle,
                 child: const Text('Reception')),
             TextButton(
-                onPressed: onPressed,
+                onPressed: () => {log('Products Clicked !')},
                 style: buttonStyle,
                 child: const Text('Produits')),
             TextButton(
-                onPressed: onPressed,
+                onPressed: () => {log('Adherents Clicked !')},
                 style: buttonStyle,
                 child: const Text('Adhérents')),
           ],
         )));
   }
-
-  void onPressed() {
-    developer.log('Clicked !');
-  }
 }
+

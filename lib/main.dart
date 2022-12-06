@@ -2,7 +2,7 @@ import 'package:coopaz_app/cash_register.dart';
 import 'package:coopaz_app/products.dart';
 import 'package:flutter/material.dart';
 
-import 'logger.dart';
+import 'package:coopaz_app/logger.dart';
 
 void main() {
   log('Starting Coopaz app...');

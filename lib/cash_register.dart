@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'logger.dart';
+import 'package:coopaz_app/logger.dart';
 
 class CashRegisterScreen extends StatelessWidget {
   const CashRegisterScreen({super.key});

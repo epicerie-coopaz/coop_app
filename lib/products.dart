@@ -1,15 +1,31 @@
+import 'package:coopaz_app/constants.dart';
+import 'package:coopaz_app/logger.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
-import 'logger.dart';
-
-class ProductsScreen extends StatelessWidget {
+class ProductsScreen extends StatefulWidget {
   const ProductsScreen({super.key});
 
+  @override
+  State<ProductsScreen> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<ProductsScreen> {
   final String title = 'Produits';
+
+  late Future<List<String>> products;
+
+  @override
+  void initState() {
+    log('Init screen $title...');
+    super.initState();
+    products = fetchProducts();
+    log('Init screen $title finish');
+  }
 
   @override
   Widget build(BuildContext context) {
-    log('build screen $title');
+    log('Build screen $title');
 
     List<Widget> childs = List.from([
       const Center(
@@ -70,5 +86,19 @@ class ProductsScreen extends StatelessWidget {
         children: childs,
       ),
     );
+  }
+
+  Future<List<String>> fetchProducts() async {
+    final response = await http.get(Uri.parse(
+        "$googleApiUrl/$googleSpreadsheetId/values/'produits'!A2:S2"));
+
+    if (response.statusCode == 200) {
+      // If the server did return a 200 OK response,
+      // then parse the JSON.
+      return [response.body];
+    } else {
+      log('Fails to fetch products: [${response.statusCode}] ${response.body}');
+      throw Exception('Failed to load products');
+    }
   }
 }

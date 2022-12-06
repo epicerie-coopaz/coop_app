@@ -1,5 +1,6 @@
 import 'package:coopaz_app/constants.dart';
 import 'package:coopaz_app/logger.dart';
+import 'package:coopaz_app/secrets.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -89,8 +90,13 @@ class _MyAppState extends State<ProductsScreen> {
   }
 
   Future<List<String>> fetchProducts() async {
-    final response = await http.get(Uri.parse(
-        "$googleApiUrl/$googleSpreadsheetId/values/'produits'!A2:S2"));
+    var googleApiKey = await getApiKey();
+    final response = await http.get(
+        Uri.parse(
+            "$googleApiUrl/$googleSpreadsheetId/values/'produits'!A2:S2?key=$googleApiKey"),
+        headers: {
+          "Accept": "application/json",
+        });
 
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,

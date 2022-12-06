@@ -1,16 +1,17 @@
-# coopaz_app
+# Coopaz app
 
-A new Flutter project.
+## Google shits
+### Google sheets API
+Overview: https://developers.google.com/sheets/api/guides/concepts
 
-## Getting Started
+Rest API: https://developers.google.com/sheets/api/reference/rest
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
+### Google Auth
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+To properly function we need to setup some things to allow the app to comunicate to the cash register google sheets:
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+1) Create a Google project: https://developers.google.com/workspace/guides/get-started
+2) Activate Google Sheets API: https://developers.google.com/workspace/guides/enable-apis
+3) Create an API key
+4) Pass this API key to the copaz app

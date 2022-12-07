@@ -1,5 +1,5 @@
 import 'package:coopaz_app/cash_register.dart';
-import 'package:coopaz_app/products.dart';
+import 'package:coopaz_app/products_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'package:coopaz_app/logger.dart';

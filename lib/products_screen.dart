@@ -71,11 +71,18 @@ class _ProductScreenState extends State<ProductsScreen> {
       List<List<String>> values = List<dynamic>.from(body['values'])
           .map((e) => List<String>.from(e))
           .toList();
-      var products = values.where((element) => element.length > 11).map((l) {
+      var products = values.where((element) {
+        var isOk = element.length > 11;
+        if (!isOk) {
+          log('Bad line: $element');
+        }
+        return isOk;
+      }).map((l) {
         Units unit;
-        if (l[4].trim().toLowerCase() == 'kilo') {
+        var unitString = l[4].trim().toLowerCase();
+        if (unitString == 'kilo') {
           unit = Units.kg;
-        } else if (l[4].trim().toLowerCase() == 'litre') {
+        } else if (unitString == 'litre') {
           unit = Units.liter;
         } else {
           unit = Units.piece;
@@ -91,8 +98,6 @@ class _ProductScreenState extends State<ProductsScreen> {
             buyer: l[8].trim(),
             price: double.tryParse(l[9].replaceAll('€', '').trim()) ?? 0.0,
             stock: double.tryParse(l[11].trim()) ?? 0.0);
-
-        log('Product parsed: $product');
 
         return product;
       }).toList();

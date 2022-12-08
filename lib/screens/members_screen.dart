@@ -81,7 +81,7 @@ class _MembersScreenState extends State<MembersScreen> {
                             Row(
                               children: [
                                 Expanded(
-                                    flex: 3,
+                                    flex: 1,
                                     child:
                                         Text(p.name, style: styleBody)),
                                 Expanded(

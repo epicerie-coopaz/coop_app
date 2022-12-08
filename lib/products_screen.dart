@@ -40,13 +40,52 @@ class _ProductScreenState extends State<ProductsScreen> {
           future: futureProducts,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              var childs = snapshot.data!.map((e) {
-                return Center(child: Text(e.name));
-              }).toList();
-              return GridView.count(
-                crossAxisCount: 9,
-                children: childs,
-              ); //Text(snapshot.data!.title);
+              var styleHeaders = Theme.of(context)
+                  .primaryTextTheme
+                  .titleMedium
+                  ?.apply(color: Colors.blue);
+              return Scrollbar(
+                  child: ListView(children: [
+                DataTable(
+                  columns: const [
+                    'Désignation',
+                    'Nom',
+                    'Famille',
+                    'Fournisseur',
+                    'Unité',
+                    'Code barres',
+                    'Ref.',
+                    'Acheteur',
+                    'Prix',
+                    'Stock'
+                  ]
+                      .map((e) => DataColumn(
+                            label: Expanded(
+                              child: Text(
+                                e,
+                                style: styleHeaders,
+                              ),
+                            ),
+                          ))
+                      .toList(),
+                  rows: snapshot.data!.map((p) {
+                    return DataRow(
+                      cells: <DataCell>[
+                        DataCell(Text(p.designation)),
+                        DataCell(Text(p.name)),
+                        DataCell(Text(p.family)),
+                        DataCell(Text(p.supplier)),
+                        DataCell(Text(p.unit.name)),
+                        DataCell(Text(p.barreCode)),
+                        DataCell(Text(p.reference)),
+                        DataCell(Text(p.buyer)),
+                        DataCell(Text('${p.price}€')),
+                        DataCell(Text(p.stock.toString())),
+                      ],
+                    );
+                  }).toList(),
+                )
+              ])); //Text(snapshot.data!.title);
             } else if (snapshot.hasError) {
               return Text('${snapshot.error}');
             }
@@ -89,7 +128,8 @@ class _ProductScreenState extends State<ProductsScreen> {
         }
 
         var product = Product(
-            name: l[0].trim(),
+            designation: l[0].trim(),
+            name: l[1].trim(),
             family: l[2].trim(),
             supplier: l[3].trim(),
             unit: unit,
@@ -101,10 +141,12 @@ class _ProductScreenState extends State<ProductsScreen> {
 
         return product;
       }).toList();
+
       return products;
     } else {
-      log('Fails to fetch products: [${response.statusCode}] ${response.body}');
-      throw Exception('Failed to load products');
+      log('Failed to load products: [${response.statusCode}] ${response.body}');
+      throw Exception(
+          'Failed to load products: [${response.statusCode}] ${response.body}');
     }
   }
 }

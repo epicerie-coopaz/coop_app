@@ -3,8 +3,9 @@
 import 'package:coopaz_app/podo/units.dart';
 
 class Product {
-  Product(
-    {required this.name,
+  Product({
+    required this.designation,
+    required this.name,
     required this.family,
     required this.supplier,
     required this.unit,
@@ -12,9 +13,10 @@ class Product {
     required this.reference,
     this.buyer = '',
     required this.price,
-    required this.stock,}
-  );
+    required this.stock,
+  });
 
+  final String designation;
   final String name;
   final String family;
   final String supplier;

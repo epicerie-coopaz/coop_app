@@ -1,5 +1,3 @@
-// ignore_for_file: unnecessary_brace_in_string_interps
-
 import 'package:coopaz_app/podo/units.dart';
 
 class Product {
@@ -29,6 +27,6 @@ class Product {
 
   @override
   String toString() {
-    return '{name: ${name}, family: ${family}, supplier: ${supplier}, unit: ${unit}, barreCode: ${barreCode}, reference: ${reference}, buyer: ${buyer}, price: ${price}, stock: ${stock}, }';
+    return '{name: $name, family: $family, supplier: $supplier, unit: $unit, barreCode: $barreCode, reference: $reference, buyer: $buyer, price: $price, stock: $stock, }';
   }
 }

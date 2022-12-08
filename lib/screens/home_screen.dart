@@ -1,9 +1,9 @@
 import 'package:coopaz_app/screens/cash_register_screen.dart';
+import 'package:coopaz_app/screens/members_screen.dart';
 import 'package:coopaz_app/screens/products_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'package:coopaz_app/logger.dart';
-
 
 class CoopazApp extends StatelessWidget {
   const CoopazApp({super.key});
@@ -78,7 +78,12 @@ class HomeScreen extends StatelessWidget {
                 child: const Text('Produits')),
             TextButton(
                 onPressed: () {
-                  log('Adherents Clicked !');
+                  log('Members Clicked !');
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const MembersScreen(),
+                    ),
+                  );
                 },
                 style: buttonStyle,
                 child: const Text('Adhérents')),

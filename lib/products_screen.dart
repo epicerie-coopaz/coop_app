@@ -4,6 +4,7 @@ import 'package:coopaz_app/constants.dart';
 import 'package:coopaz_app/logger.dart';
 import 'package:coopaz_app/podo/product.dart';
 import 'package:coopaz_app/podo/units.dart';
+import 'package:coopaz_app/podo/utils.dart';
 import 'package:coopaz_app/secrets.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -44,48 +45,89 @@ class _ProductScreenState extends State<ProductsScreen> {
                   .primaryTextTheme
                   .titleMedium
                   ?.apply(color: Colors.blue);
-              return Scrollbar(
-                  child: ListView(children: [
-                DataTable(
-                  columns: const [
-                    'Désignation',
-                    'Nom',
-                    'Famille',
-                    'Fournisseur',
-                    'Unité',
-                    'Code barres',
-                    'Ref.',
-                    'Acheteur',
-                    'Prix',
-                    'Stock'
-                  ]
-                      .map((e) => DataColumn(
-                            label: Expanded(
-                              child: Text(
-                                e,
-                                style: styleHeaders,
-                              ),
+              var styleBody = Theme.of(context)
+                  .primaryTextTheme
+                  .bodyMedium
+                  ?.apply(color: Colors.black);
+              return Column(
+                children: [
+                  Expanded(
+                      flex: 0,
+                      child: Row(
+                          children: [
+                        Pair('Désignation', 3),
+                        Pair('Nom', 1),
+                        Pair('Famille', 1),
+                        Pair('Fournisseur', 1),
+                        Pair('Unité', 1),
+                        Pair('Code barres', 1),
+                        Pair('Ref.', 1),
+                        Pair('Acheteur', 1),
+                        Pair('Prix', 1),
+                        Pair('Stock', 1)
+                      ]
+                              .map(
+                                (e) => Expanded(
+                                  flex: e.b,
+                                  child: Text(
+                                    e.a,
+                                    style: styleHeaders,
+                                  ),
+                                ),
+                              )
+                              .toList())),
+                  const Divider(
+                    thickness: 2,
+                  ),
+                  Expanded(
+                      flex: 1,
+                      child: ListView(
+                        addAutomaticKeepAlives: false,
+                        children: snapshot.data!.map((p) {
+                          return Column(children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                    flex: 3,
+                                    child:
+                                        Text(p.designation, style: styleBody)),
+                                Expanded(
+                                    flex: 1,
+                                    child: Text(p.name, style: styleBody)),
+                                Expanded(
+                                    flex: 1,
+                                    child: Text(p.family, style: styleBody)),
+                                Expanded(
+                                    flex: 1,
+                                    child: Text(p.supplier, style: styleBody)),
+                                Expanded(
+                                    flex: 1,
+                                    child: Text(p.unit.name, style: styleBody)),
+                                Expanded(
+                                    flex: 1,
+                                    child: Text(p.barreCode, style: styleBody)),
+                                Expanded(
+                                    flex: 1,
+                                    child: Text(p.reference, style: styleBody)),
+                                Expanded(
+                                    flex: 1,
+                                    child: Text(p.buyer, style: styleBody)),
+                                Expanded(
+                                    flex: 1,
+                                    child:
+                                        Text('${p.price}€', style: styleBody)),
+                                Expanded(
+                                    flex: 1,
+                                    child: Text(p.stock.toString(),
+                                        style: styleBody)),
+                              ],
                             ),
-                          ))
-                      .toList(),
-                  rows: snapshot.data!.map((p) {
-                    return DataRow(
-                      cells: <DataCell>[
-                        DataCell(Text(p.designation)),
-                        DataCell(Text(p.name)),
-                        DataCell(Text(p.family)),
-                        DataCell(Text(p.supplier)),
-                        DataCell(Text(p.unit.name)),
-                        DataCell(Text(p.barreCode)),
-                        DataCell(Text(p.reference)),
-                        DataCell(Text(p.buyer)),
-                        DataCell(Text('${p.price}€')),
-                        DataCell(Text(p.stock.toString())),
-                      ],
-                    );
-                  }).toList(),
-                )
-              ])); //Text(snapshot.data!.title);
+                            const Divider()
+                          ]);
+                        }).toList(),
+                      ))
+                ],
+              ); //Text(snapshot.data!.title);
             } else if (snapshot.hasError) {
               return Text('${snapshot.error}');
             }

@@ -1,5 +1,17 @@
 # Coopaz app
 
+## Release
+
+Can't cross compile, you need to be on the platform you want to build it on...
+
+Go to the github actions to have a downloadable release by platforms
+
+### Linux
+> flutter build linux --release
+
+### Windows
+> flutter build windows --release
+
 ## Google shits
 ### Google sheets API
 Overview: https://developers.google.com/sheets/api/guides/concepts

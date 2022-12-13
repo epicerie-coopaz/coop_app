@@ -12,12 +12,18 @@ Go to the github actions to have a downloadable release by platforms
 ### Windows
 > flutter build windows --release
 
+
 ## Google shits
+
 ### Google sheets API
 Overview: https://developers.google.com/sheets/api/guides/concepts
 
-Rest API: https://developers.google.com/sheets/api/reference/rest
+REST: https://developers.google.com/sheets/api/reference/rest
 
+### Google Apps Scripts API
+Overview: https://developers.google.com/apps-script/guides/sheets/macros
+
+REST: https://developers.google.com/apps-script/api/reference/rest/
 
 ### Google Auth
 

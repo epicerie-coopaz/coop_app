@@ -1,4 +1,4 @@
-import 'package:coopaz_app/screens/cash_register_screen.dart';
+import 'package:coopaz_app/screens/cash_register/cash_register_screen.dart';
 import 'package:coopaz_app/screens/members_screen.dart';
 import 'package:coopaz_app/screens/products_screen.dart';
 import 'package:flutter/material.dart';

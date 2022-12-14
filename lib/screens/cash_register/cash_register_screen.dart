@@ -15,10 +15,14 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
   final String title = 'Caisse';
   final DateFormat formatter = DateFormat('yyyy-MM-dd HH:mm:ss');
   static const List<String> list = <String>['CB', 'Cheque', 'Virement'];
+  NumberFormat numberFormat = NumberFormat("#,##0.00");
 
   //Form data
   String dropdownValue = list.first;
   DateTime date = DateTime.now();
+
+  double quantity = 0.0;
+  double unitPrice = 0.0;
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +79,7 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
                             ),
                             validator: (String? value) {
                               if (value == null || value.isEmpty) {
-                                return 'Please enter some text';
+                                return 'Produit invalide';
                               }
                               return null;
                             },
@@ -87,18 +91,39 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
                               hintText: 'Quantité',
                             ),
                             validator: (String? value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter some text';
+                              if (value == null ||
+                                  value.isEmpty ||
+                                  double.tryParse(value) == null) {
+                                return 'Quantité invalide';
                               }
                               return null;
                             },
+                            onChanged: (String value) {
+                              _setQuantity(double.tryParse(value) ?? 0.0);
+                            },
                           )),
-                      const Expanded(
+                      Expanded(
                           flex: 1,
-                          child: Text('18.0 €')),
-                      const Expanded(
+                          child: TextFormField(
+                            decoration: const InputDecoration(
+                              hintText: 'Prix unitaire',
+                            ),
+                            validator: (String? value) {
+                              if (value == null ||
+                                  value.isEmpty ||
+                                  double.tryParse(value) == null) {
+                                return 'Prix invalide';
+                              }
+                              return null;
+                            },
+                            onChanged: (String value) {
+                              _setUnitPrice(double.tryParse(value) ?? 0.0);
+                            },
+                          )),
+                      Expanded(
                           flex: 1,
-                          child: Text('126.0 €'))
+                          child: Text(
+                              '${numberFormat.format(unitPrice * quantity)} €'))
                     ])
                   ],
                 )),
@@ -156,7 +181,7 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
                     ]),
                     Center(
                         child: ElevatedButton(
-                      onPressed: validate,
+                      onPressed: _validate,
                       child: const Text('Submit'),
                     ))
                   ],
@@ -165,16 +190,32 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
         ));
   }
 
-  bool validate() {
+  bool _validate() {
     log(_formKey.currentState.toString());
     if (_formKey.currentState!.validate()) {
       // send data to macro
 
       // reset form
       _formKey.currentState?.reset();
+      setState(() {
+        unitPrice = 0.0;
+        quantity = 0.0;
+      });
 
       return true;
     }
     return false;
+  }
+
+  void _setUnitPrice(unitPrice) {
+    setState(() {
+      this.unitPrice = unitPrice;
+    });
+  }
+
+  void _setQuantity(quantity) {
+    setState(() {
+      this.quantity = quantity;
+    });
   }
 }

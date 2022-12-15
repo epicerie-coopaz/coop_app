@@ -48,29 +48,30 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
                   children: [
                     Row(children: <Widget>[
                       Expanded(
-                          flex: 4,
+                          flex: 8,
                           child: Text(
                             "Produit",
                             style: styleHeaders,
                           )),
                       Expanded(
-                          flex: 1,
+                          flex: 2,
                           child: Text(
                             "Quantité",
                             style: styleHeaders,
                           )),
                       Expanded(
-                          flex: 1,
+                          flex: 2,
                           child: Text(
                             "Prix unitaire",
                             style: styleHeaders,
                           )),
                       Expanded(
-                          flex: 1,
+                          flex: 2,
                           child: Text(
                             "Total",
                             style: styleHeaders,
                           )),
+                      Expanded(flex: 1, child: Container()),
                     ]),
                     Column(children: productLineWidgets),
                     Align(
@@ -84,7 +85,7 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
                               productLines = productLines;
                             });
                           },
-                          child: const Text('+'),
+                          child: const Icon(Icons.add),
                         ))
                   ],
                 )),
@@ -181,12 +182,6 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
     return false;
   }
 
-  void _setProduct(int index, ProductLine product) {
-    setState(() {
-      productLines[index] = product;
-    });
-  }
-
   List<Widget> _createProductLineWidgets() {
     List<Widget> products = [];
     for (var entry in productLines.asMap().entries) {
@@ -203,7 +198,7 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
     }
     var productWidget = Row(children: <Widget>[
       Expanded(
-          flex: 4,
+          flex: 8,
           child: TextFormField(
             initialValue: product.name,
             decoration: const InputDecoration(
@@ -217,11 +212,13 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
             },
             onChanged: (String value) {
               product.name = value;
-              _setProduct(index, product);
+              setState(() {
+                productLines[index] = product;
+              });
             },
           )),
       Expanded(
-          flex: 1,
+          flex: 2,
           child: TextFormField(
             initialValue: '${product.qty ?? ""}',
             decoration: const InputDecoration(
@@ -237,11 +234,13 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
             },
             onChanged: (String value) {
               product.qty = double.tryParse(value) ?? 0.0;
-              _setProduct(index, product);
+              setState(() {
+                productLines[index] = product;
+              });
             },
           )),
       Expanded(
-          flex: 1,
+          flex: 2,
           child: TextFormField(
             initialValue: '${product.unitPrice ?? ""}',
             decoration: const InputDecoration(
@@ -257,10 +256,23 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
             },
             onChanged: (String value) {
               product.unitPrice = double.tryParse(value) ?? 0.0;
-              _setProduct(index, product);
+              setState(() {
+                productLines[index] = product;
+              });
             },
           )),
-      Expanded(flex: 1, child: Text(total))
+      Expanded(flex: 2, child: Text(total)),
+      Expanded(
+          flex: 1,
+          child: ElevatedButton(
+            onPressed: () {
+              log('Delete line pressed');
+              setState(() {
+                productLines.remove(product);
+              });
+            },
+            child: const Icon(Icons.delete),
+          ))
     ]);
 
     return productWidget;

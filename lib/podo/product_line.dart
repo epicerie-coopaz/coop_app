@@ -11,6 +11,6 @@ class ProductLine {
 
   @override
   String toString() {
-    return '{name: $name, family: $qty, supplier: $unitPrice,}';
+    return '{name: $name, qty: $qty, unitPrice: $unitPrice,}';
   }
 }

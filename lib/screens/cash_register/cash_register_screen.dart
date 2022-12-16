@@ -33,7 +33,7 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
         .titleLarge
         ?.apply(color: Colors.blue);
 
-    List<Widget> productLineWidgets = _createProductLineWidgets();
+    List<Row> productLineWidgets = _createProductLineWidgets();
 
     return Scaffold(
         appBar: AppBar(
@@ -182,8 +182,8 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
     return false;
   }
 
-  List<Widget> _createProductLineWidgets() {
-    List<Widget> products = [];
+  List<Row> _createProductLineWidgets() {
+    List<Row> products = [];
     for (var entry in productLines.asMap().entries) {
       var product = _createProductLineWidget(entry.key, entry.value);
       products.add(product);
@@ -191,11 +191,11 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
     return products;
   }
 
-  Widget _createProductLineWidget(int index, ProductLine product) {
+  Row _createProductLineWidget(int index, ProductLine product) {
     var total = '';
     double? unitPrice = double.tryParse(product.unitPrice ?? '');
     double? qty = double.tryParse(product.qty ?? '');
-    if ( unitPrice != null && qty != null) {
+    if (unitPrice != null && qty != null) {
       total = '${numberFormat.format(unitPrice * qty)} €';
     }
 
@@ -204,8 +204,8 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
           flex: 8,
           child: TextFormField(
             controller: TextEditingController(text: product.name)
-              ..selection = TextSelection.collapsed(
-                  offset: (product.name ?? "").length),
+              ..selection =
+                  TextSelection.collapsed(offset: (product.name ?? "").length),
             decoration: const InputDecoration(
               hintText: 'Produit',
             ),
@@ -226,8 +226,8 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
           flex: 2,
           child: TextFormField(
             controller: TextEditingController(text: product.qty ?? "")
-              ..selection = TextSelection.collapsed(
-                  offset: (product.qty ?? "").length),
+              ..selection =
+                  TextSelection.collapsed(offset: (product.qty ?? "").length),
             decoration: const InputDecoration(
               hintText: 'Quantité',
             ),
@@ -249,8 +249,7 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
       Expanded(
           flex: 2,
           child: TextFormField(
-            controller:
-                TextEditingController(text: product.unitPrice ?? "")
+            controller: TextEditingController(text: product.unitPrice ?? "")
               ..selection = TextSelection.collapsed(
                   offset: (product.unitPrice ?? "").length),
             decoration: const InputDecoration(

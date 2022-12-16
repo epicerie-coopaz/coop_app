@@ -193,14 +193,19 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
 
   Widget _createProductLineWidget(int index, ProductLine product) {
     var total = '';
-    if (product.unitPrice != null && product.qty != null) {
-      total = '${numberFormat.format(product.unitPrice! * product.qty!)} €';
+    double? unitPrice = double.tryParse(product.unitPrice ?? '');
+    double? qty = double.tryParse(product.qty ?? '');
+    if ( unitPrice != null && qty != null) {
+      total = '${numberFormat.format(unitPrice * qty)} €';
     }
+
     var productWidget = Row(children: <Widget>[
       Expanded(
           flex: 8,
           child: TextFormField(
-            initialValue: product.name,
+            controller: TextEditingController(text: product.name)
+              ..selection = TextSelection.collapsed(
+                  offset: (product.name ?? "").length),
             decoration: const InputDecoration(
               hintText: 'Produit',
             ),
@@ -220,7 +225,9 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
       Expanded(
           flex: 2,
           child: TextFormField(
-            initialValue: '${product.qty ?? ""}',
+            controller: TextEditingController(text: product.qty ?? "")
+              ..selection = TextSelection.collapsed(
+                  offset: (product.qty ?? "").length),
             decoration: const InputDecoration(
               hintText: 'Quantité',
             ),
@@ -233,7 +240,7 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
               return null;
             },
             onChanged: (String value) {
-              product.qty = double.tryParse(value) ?? 0.0;
+              product.qty = value;
               setState(() {
                 productLines[index] = product;
               });
@@ -242,7 +249,10 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
       Expanded(
           flex: 2,
           child: TextFormField(
-            initialValue: '${product.unitPrice ?? ""}',
+            controller:
+                TextEditingController(text: product.unitPrice ?? "")
+              ..selection = TextSelection.collapsed(
+                  offset: (product.unitPrice ?? "").length),
             decoration: const InputDecoration(
               hintText: 'Prix unitaire',
             ),
@@ -255,7 +265,7 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
               return null;
             },
             onChanged: (String value) {
-              product.unitPrice = double.tryParse(value) ?? 0.0;
+              product.unitPrice = value;
               setState(() {
                 productLines[index] = product;
               });

@@ -6,8 +6,8 @@ class ProductLine {
   });
 
   String? name;
-  double? qty;
-  double? unitPrice;
+  String? qty;
+  String? unitPrice;
 
   @override
   String toString() {

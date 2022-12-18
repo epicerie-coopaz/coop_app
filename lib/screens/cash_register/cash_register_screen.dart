@@ -1,7 +1,11 @@
+import 'dart:convert';
+
+import 'package:coopaz_app/constants.dart';
 import 'package:coopaz_app/podo/product_line.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:coopaz_app/logger.dart';
+import 'package:http/http.dart' as http;
 
 class CashRegisterScreen extends StatefulWidget {
   const CashRegisterScreen({super.key});
@@ -16,13 +20,37 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
   final String title = 'Caisse';
   final DateFormat formatter = DateFormat('yyyy-MM-dd HH:mm:ss');
   static const List<String> list = <String>['CB', 'Cheque', 'Virement'];
-  NumberFormat numberFormat = NumberFormat("#,##0.00");
+  NumberFormat numberFormat = NumberFormat('#,##0.00');
 
   //Form data
   String dropdownValue = list.first;
   DateTime date = DateTime.now();
 
   List<ProductLine> productLines = [ProductLine()];
+
+  Future sendToBackend() async {
+
+    final response = await http.post(
+        Uri.parse('$googleScriptApiUrl/$googleScriptId:run'),
+        headers: {
+          'Accept': 'application/json',
+          'content-type': 'application/json',
+        },
+        body: '''{
+        "function": "validerCaisseExternal",
+        "parameters": [],
+        "devMode": true
+      }''');
+
+    if (response.statusCode == 200) {
+      var body = jsonDecode(response.body);
+      log(body);
+    } else {
+      log('Failed to call macro: [${response.statusCode}] ${response.body}');
+      throw Exception(
+          'Failed to load products: [${response.statusCode}] ${response.body}');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,25 +78,25 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
                       Expanded(
                           flex: 8,
                           child: Text(
-                            "Produit",
+                            'Produit',
                             style: styleHeaders,
                           )),
                       Expanded(
                           flex: 2,
                           child: Text(
-                            "Quantité",
+                            'Quantité',
                             style: styleHeaders,
                           )),
                       Expanded(
                           flex: 2,
                           child: Text(
-                            "Prix unitaire",
+                            'Prix unitaire',
                             style: styleHeaders,
                           )),
                       Expanded(
                           flex: 2,
                           child: Text(
-                            "Total",
+                            'Total',
                             style: styleHeaders,
                           )),
                       Expanded(flex: 1, child: Container()),
@@ -167,19 +195,14 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
     return false;
   }
 
-  bool _sendForm() {
-    if (_formKey.currentState!.validate()) {
-      // send data to macro
-
-      // reset form
-      _formKey.currentState?.reset();
-      setState(() {
-        productLines = [ProductLine()];
-      });
-
-      return true;
-    }
-    return false;
+  _sendForm() async {
+    // send data to macro
+    await sendToBackend();
+    // reset form
+    _formKey.currentState?.reset();
+    setState(() {
+      productLines = [ProductLine()];
+    });
   }
 
   List<Row> _createProductLineWidgets() {
@@ -205,7 +228,7 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
           child: TextFormField(
             controller: TextEditingController(text: product.name)
               ..selection =
-                  TextSelection.collapsed(offset: (product.name ?? "").length),
+                  TextSelection.collapsed(offset: (product.name ?? '').length),
             decoration: const InputDecoration(
               hintText: 'Produit',
             ),
@@ -225,9 +248,9 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
       Expanded(
           flex: 2,
           child: TextFormField(
-            controller: TextEditingController(text: product.qty ?? "")
+            controller: TextEditingController(text: product.qty ?? '')
               ..selection =
-                  TextSelection.collapsed(offset: (product.qty ?? "").length),
+                  TextSelection.collapsed(offset: (product.qty ?? '').length),
             decoration: const InputDecoration(
               hintText: 'Quantité',
             ),
@@ -249,9 +272,9 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
       Expanded(
           flex: 2,
           child: TextFormField(
-            controller: TextEditingController(text: product.unitPrice ?? "")
+            controller: TextEditingController(text: product.unitPrice ?? '')
               ..selection = TextSelection.collapsed(
-                  offset: (product.unitPrice ?? "").length),
+                  offset: (product.unitPrice ?? '').length),
             decoration: const InputDecoration(
               hintText: 'Prix unitaire',
             ),

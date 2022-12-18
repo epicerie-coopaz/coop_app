@@ -5,7 +5,7 @@ import 'package:coopaz_app/logger.dart';
 import 'package:coopaz_app/podo/product.dart';
 import 'package:coopaz_app/podo/units.dart';
 import 'package:coopaz_app/podo/utils.dart';
-import 'package:coopaz_app/secrets.dart';
+import 'package:coopaz_app/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -139,10 +139,10 @@ class _ProductScreenState extends State<ProductsScreen> {
   }
 
   Future<List<Product>> fetchProducts() async {
-    var googleApiKey = await getApiKey();
+    var googleApiKey = await AuthManager().getApiKey();
     final response = await http.get(
         Uri.parse(
-            "$googleApiUrl/$googleSpreadsheetId/values/'produits'!A3:S?majorDimension=ROWS&prettyPrint=false&key=$googleApiKey"),
+            "$googleSheetsApiUrl/$googleSpreadsheetId/values/'produits'!A3:S?majorDimension=ROWS&prettyPrint=false&key=$googleApiKey"),
         headers: {
           "Accept": "application/json",
         });

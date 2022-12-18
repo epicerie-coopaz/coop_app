@@ -4,7 +4,7 @@ import 'package:coopaz_app/constants.dart';
 import 'package:coopaz_app/logger.dart';
 import 'package:coopaz_app/podo/member.dart';
 import 'package:coopaz_app/podo/utils.dart';
-import 'package:coopaz_app/secrets.dart';
+import 'package:coopaz_app/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -112,10 +112,10 @@ class _MembersScreenState extends State<MembersScreen> {
   }
 
   Future<List<Member>> fetchMembers() async {
-    var googleApiKey = await getApiKey();
+    var googleApiKey = await AuthManager().getApiKey();
     final response = await http.get(
         Uri.parse(
-            "$googleApiUrl/$googleSpreadsheetId/values/'ImportMembres'!A:D?majorDimension=ROWS&prettyPrint=false&key=$googleApiKey"),
+            "$googleSheetsApiUrl/$googleSpreadsheetId/values/'ImportMembres'!A:D?majorDimension=ROWS&prettyPrint=false&key=$googleApiKey"),
         headers: {
           "Accept": "application/json",
         });

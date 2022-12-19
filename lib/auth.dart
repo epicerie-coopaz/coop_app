@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:coopaz_app/constants.dart';
+import 'package:coopaz_app/conf.dart';
 import 'package:crypto/crypto.dart';
 import 'package:coopaz_app/logger.dart';
 import 'package:http/http.dart';
@@ -8,13 +8,10 @@ import 'dart:math';
 import 'package:url_launcher/url_launcher.dart';
 
 class AuthManager {
-  AuthManager(
-      {this.apiKeyFilePath = './secrets/api_key',
-      this.authFilePath = './secrets/google.oauth.json'});
+  AuthManager({required this.conf});
 
-  String apiKeyFilePath;
+  Conf conf;
 
-  String authFilePath;
   String? authCode;
   String? clientId;
   String? clientSecret;
@@ -26,14 +23,10 @@ class AuthManager {
   // String codeChallenge = generateChallenge();
   // String codeChallengeMethod = 'S256';
 
-  Future initManager() async {
-
-    String authFile = await File(authFilePath).readAsString();
-    var authJson = jsonDecode(authFile);
-
-    clientId = authJson['installed']['client_id'];
-    clientSecret = authJson['installed']['client_secret'];
-    redirectUri = authJson['installed']['redirect_uris'][0];
+  Future init() async {
+    clientId = conf.clientId;
+    clientSecret = conf.clientSecret;
+    redirectUri = conf.urls.redirectUris;
   }
 
   Future<String> getAccessToken() async {
@@ -41,7 +34,7 @@ class AuthManager {
       await _getRefreshToken();
     }
     if (accessToken == null) {
-      final response = await post(Uri.parse(googleTokenUrl),
+      final response = await post(Uri.parse(conf.urls.tokenUri),
           headers: {
             "Accept": "application/json",
           },
@@ -66,7 +59,7 @@ class AuthManager {
     if (authCode == null) {
       await _getAuth();
     }
-    final response = await post(Uri.parse(googleTokenUrl), headers: {
+    final response = await post(Uri.parse(conf.urls.tokenUri), headers: {
       "Accept": "application/json",
     }, body: {
       'code': authCode,
@@ -114,7 +107,7 @@ class AuthManager {
   Future<String> getAuthUrl() async {
     // String url = '$googleAuthUrl?scope=$scope&response_type=$responseType&redirect_uri=$redirectUri&client_id=$clientId&code_challenge=$codeChallenge&code_challenge_method=$codeChallengeMethod';
     String url =
-        '$googleAuthUrl?scope=$scope&response_type=$responseType&redirect_uri=$redirectUri&client_id=$clientId';
+        '${conf.urls.authUri}?scope=$scope&response_type=$responseType&redirect_uri=$redirectUri&client_id=$clientId';
 
     return url;
   }

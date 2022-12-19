@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:coopaz_app/constants.dart';
+import 'package:coopaz_app/conf.dart';
 import 'package:coopaz_app/logger.dart';
 import 'package:coopaz_app/podo/product.dart';
 import 'package:coopaz_app/podo/units.dart';
@@ -10,9 +10,11 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class ProductsScreen extends StatefulWidget {
-  const ProductsScreen({super.key, required this.authManager});
+  const ProductsScreen(
+      {super.key, required this.conf, required this.authManager});
 
   final AuthManager authManager;
+  final Conf conf;
 
   @override
   State<ProductsScreen> createState() => _ProductScreenState();
@@ -143,10 +145,11 @@ class _ProductScreenState extends State<ProductsScreen> {
   Future<List<Product>> fetchProducts() async {
     final response = await http.get(
         Uri.parse(
-            "$googleSheetsApiUrl/$googleSpreadsheetId/values/'produits'!A3:S?majorDimension=ROWS&prettyPrint=false"),
+            "${widget.conf.urls.googleSheetsApi}/${widget.conf.spreadSheetId}/values/'produits'!A3:S?majorDimension=ROWS&prettyPrint=false"),
         headers: {
           "Accept": "application/json",
-          'Authorization': 'Bearer ${await widget.authManager.getAccessToken()}',
+          'Authorization':
+              'Bearer ${await widget.authManager.getAccessToken()}',
         });
 
     if (response.statusCode == 200) {

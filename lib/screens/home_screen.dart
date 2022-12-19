@@ -1,4 +1,5 @@
 import 'package:coopaz_app/auth.dart';
+import 'package:coopaz_app/conf.dart';
 import 'package:coopaz_app/screens/cash_register/cash_register_screen.dart';
 import 'package:coopaz_app/screens/members_screen.dart';
 import 'package:coopaz_app/screens/products_screen.dart';
@@ -7,8 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:coopaz_app/logger.dart';
 
 class CoopazApp extends StatelessWidget {
-  const CoopazApp({super.key, required this.authManager});
+  const CoopazApp({super.key, required this.conf, required this.authManager});
   final AuthManager authManager;
+  final Conf conf;
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +20,7 @@ class CoopazApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: HomeScreen(
+        conf: conf,
         authManager: authManager,
       ),
       debugShowCheckedModeBanner: false,
@@ -26,9 +29,10 @@ class CoopazApp extends StatelessWidget {
 }
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key, required this.authManager});
+  const HomeScreen({super.key, required this.conf, required this.authManager});
 
   final AuthManager authManager;
+  final Conf conf;
 
   final String title = 'Logiciel Coopaz';
 
@@ -58,7 +62,8 @@ class HomeScreen extends StatelessWidget {
 
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => CashRegisterScreen(authManager: authManager),
+                    builder: (context) => CashRegisterScreen(
+                        conf: conf, authManager: authManager),
                   ),
                 );
               },
@@ -77,7 +82,7 @@ class HomeScreen extends StatelessWidget {
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (context) =>
-                          ProductsScreen(authManager: authManager),
+                          ProductsScreen(conf: conf, authManager: authManager),
                     ),
                   );
                 },
@@ -89,7 +94,7 @@ class HomeScreen extends StatelessWidget {
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (context) =>
-                          MembersScreen(authManager: authManager),
+                          MembersScreen(conf: conf, authManager: authManager),
                     ),
                   );
                 },

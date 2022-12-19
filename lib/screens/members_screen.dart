@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:coopaz_app/constants.dart';
+import 'package:coopaz_app/conf.dart';
 import 'package:coopaz_app/logger.dart';
 import 'package:coopaz_app/podo/member.dart';
 import 'package:coopaz_app/podo/utils.dart';
@@ -9,17 +9,17 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class MembersScreen extends StatefulWidget {
-  const MembersScreen({super.key, required this.authManager});
+  const MembersScreen(
+      {super.key, required this.conf, required this.authManager});
 
   final AuthManager authManager;
+  final Conf conf;
 
   @override
-  State<MembersScreen> createState() =>
-      _MembersScreenState();
+  State<MembersScreen> createState() => _MembersScreenState();
 }
 
 class _MembersScreenState extends State<MembersScreen> {
-
   final String title = 'Adhérents';
 
   late Future<List<Member>> futureMembers;
@@ -118,9 +118,10 @@ class _MembersScreenState extends State<MembersScreen> {
   Future<List<Member>> fetchMembers() async {
     final response = await http.get(
         Uri.parse(
-            "$googleSheetsApiUrl/$googleSpreadsheetId/values/'ImportMembres'!A:D?majorDimension=ROWS&prettyPrint=false"),
+            "${widget.conf.urls.googleSheetsApi}/${widget.conf.spreadSheetId}/values/'ImportMembres'!A:D?majorDimension=ROWS&prettyPrint=false"),
         headers: {
-          'Authorization': 'Bearer ${await widget.authManager.getAccessToken()}',
+          'Authorization':
+              'Bearer ${await widget.authManager.getAccessToken()}',
           'Accept': 'application/json',
         });
 

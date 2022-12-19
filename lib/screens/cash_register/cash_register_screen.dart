@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:coopaz_app/auth.dart';
-import 'package:coopaz_app/constants.dart';
+import 'package:coopaz_app/conf.dart';
 import 'package:coopaz_app/podo/product_line.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -9,9 +9,11 @@ import 'package:coopaz_app/logger.dart';
 import 'package:http/http.dart' as http;
 
 class CashRegisterScreen extends StatefulWidget {
-  const CashRegisterScreen({super.key, required this.authManager});
+  const CashRegisterScreen(
+      {super.key, required this.conf, required this.authManager});
 
   final AuthManager authManager;
+  final Conf conf;
 
   @override
   State<CashRegisterScreen> createState() => _CashRegisterScreenState();
@@ -32,12 +34,16 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
   List<ProductLine> productLines = [ProductLine()];
 
   Future sendToBackend() async {
-    final response = await http
-        .post(Uri.parse('$googleScriptApiUrl/$googleScriptId:run'), headers: {
-      'Accept': 'application/json',
-      'content-type': 'application/json',
-      'Authorization': 'Bearer ${await widget.authManager.getAccessToken()}',
-    }, body: '''{
+    final response = await http.post(
+        Uri.parse(
+            '${widget.conf.urls.googleAppsScriptApi}/${widget.conf.appsScriptId}:run'),
+        headers: {
+          'Accept': 'application/json',
+          'content-type': 'application/json',
+          'Authorization':
+              'Bearer ${await widget.authManager.getAccessToken()}',
+        },
+        body: '''{
         "function": "validerCaisseExternal",
         "parameters": [],
         "devMode": true
@@ -45,7 +51,7 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
 
     if (response.statusCode == 200) {
       var body = jsonDecode(response.body);
-      log(body);
+      log('$body');
     } else {
       log('Failed to call macro: [${response.statusCode}] ${response.body}');
       throw Exception(

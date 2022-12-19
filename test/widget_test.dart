@@ -6,12 +6,16 @@
 // tree, read text, and verify that the values of widget properties are correct.
 
 import 'package:coopaz_app/auth.dart';
+import 'package:coopaz_app/conf.dart';
 import 'package:coopaz_app/screens/home_screen.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(CoopazApp(authManager: AuthManager(),));
+    await tester.pumpWidget(CoopazApp(
+      conf: Conf(),
+      authManager: AuthManager(conf: Conf()),
+    ));
   });
 }

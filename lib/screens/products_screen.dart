@@ -10,7 +10,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class ProductsScreen extends StatefulWidget {
-  const ProductsScreen({super.key});
+  const ProductsScreen({super.key, required this.authManager});
+
+  final AuthManager authManager;
 
   @override
   State<ProductsScreen> createState() => _ProductScreenState();
@@ -139,12 +141,12 @@ class _ProductScreenState extends State<ProductsScreen> {
   }
 
   Future<List<Product>> fetchProducts() async {
-    var googleApiKey = await AuthManager().getApiKey();
     final response = await http.get(
         Uri.parse(
-            "$googleSheetsApiUrl/$googleSpreadsheetId/values/'produits'!A3:S?majorDimension=ROWS&prettyPrint=false&key=$googleApiKey"),
+            "$googleSheetsApiUrl/$googleSpreadsheetId/values/'produits'!A3:S?majorDimension=ROWS&prettyPrint=false"),
         headers: {
           "Accept": "application/json",
+          'Authorization': 'Bearer ${await widget.authManager.getAccessToken()}',
         });
 
     if (response.statusCode == 200) {

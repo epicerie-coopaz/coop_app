@@ -8,9 +8,9 @@ Future<void> main() async {
   log('Get auth...');
 
   var authManager = AuthManager();
-  await authManager.getAuth();
-  
+  await authManager.initManager();
+
   log('Starting Coopaz app...');
-  runApp(const CoopazApp());
+  runApp(CoopazApp(authManager: authManager));
   log('App started !');
 }

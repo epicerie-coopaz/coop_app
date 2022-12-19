@@ -1,3 +1,4 @@
+import 'package:coopaz_app/auth.dart';
 import 'package:coopaz_app/screens/cash_register/cash_register_screen.dart';
 import 'package:coopaz_app/screens/members_screen.dart';
 import 'package:coopaz_app/screens/products_screen.dart';
@@ -6,7 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:coopaz_app/logger.dart';
 
 class CoopazApp extends StatelessWidget {
-  const CoopazApp({super.key});
+  const CoopazApp({super.key, required this.authManager});
+  final AuthManager authManager;
 
   @override
   Widget build(BuildContext context) {
@@ -15,14 +17,18 @@ class CoopazApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const HomeScreen(),
+      home: HomeScreen(
+        authManager: authManager,
+      ),
       debugShowCheckedModeBanner: false,
     );
   }
 }
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({super.key, required this.authManager});
+
+  final AuthManager authManager;
 
   final String title = 'Logiciel Coopaz';
 
@@ -52,7 +58,7 @@ class HomeScreen extends StatelessWidget {
 
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => const CashRegisterScreen(),
+                    builder: (context) => CashRegisterScreen(authManager: authManager),
                   ),
                 );
               },
@@ -70,7 +76,8 @@ class HomeScreen extends StatelessWidget {
                   log('Products Clicked !');
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => const ProductsScreen(),
+                      builder: (context) =>
+                          ProductsScreen(authManager: authManager),
                     ),
                   );
                 },
@@ -81,7 +88,8 @@ class HomeScreen extends StatelessWidget {
                   log('Members Clicked !');
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => const MembersScreen(),
+                      builder: (context) =>
+                          MembersScreen(authManager: authManager),
                     ),
                   );
                 },

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:coopaz_app/constants.dart';
 import 'package:crypto/crypto.dart';
 import 'package:coopaz_app/logger.dart';
+import 'package:http/http.dart';
 import 'dart:math';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -11,17 +12,88 @@ class AuthManager {
       {this.apiKeyFilePath = './secrets/api_key',
       this.authFilePath = './secrets/google.oauth.json'});
 
-  String authFilePath;
   String apiKeyFilePath;
-  String? authCode;
 
-  Future getAuth() async {
+  String authFilePath;
+  String? authCode;
+  String? clientId;
+  String? clientSecret;
+  String? redirectUri;
+  String responseType = 'code';
+  String scope = 'https://www.googleapis.com/auth/spreadsheets';
+  String? refreshToken;
+  String? accessToken;
+  // String codeChallenge = generateChallenge();
+  // String codeChallengeMethod = 'S256';
+
+  Future initManager() async {
+
+    String authFile = await File(authFilePath).readAsString();
+    var authJson = jsonDecode(authFile);
+
+    clientId = authJson['installed']['client_id'];
+    clientSecret = authJson['installed']['client_secret'];
+    redirectUri = authJson['installed']['redirect_uris'][0];
+  }
+
+  Future<String> getAccessToken() async {
+    if (refreshToken == null) {
+      await _getRefreshToken();
+    }
+    if (accessToken == null) {
+      final response = await post(Uri.parse(googleTokenUrl),
+          headers: {
+            "Accept": "application/json",
+          },
+          body:
+              'client_id=$clientId&client_secret=$clientSecret&grant_type=refresh_token&refresh_token=$refreshToken');
+
+      if (response.statusCode != 200) {
+        throw Exception(
+            'Failed to get access token: [${response.statusCode}] ${response.body}');
+      }
+
+      var body = jsonDecode(response.body);
+
+      accessToken = body['access_token'];
+      log('New access token received: $accessToken');
+    }
+
+    return accessToken!;
+  }
+
+  Future _getRefreshToken() async {
+    if (authCode == null) {
+      await _getAuth();
+    }
+    final response = await post(Uri.parse(googleTokenUrl), headers: {
+      "Accept": "application/json",
+    }, body: {
+      'code': authCode,
+      'client_id': clientId,
+      'client_secret': clientSecret,
+      'redirect_uri': redirectUri,
+      'grant_type': 'authorization_code'
+    });
+
+    if (response.statusCode != 200) {
+      throw Exception(
+          'Failed to get refresh token: [${response.statusCode}] ${response.body}');
+    }
+    var body = jsonDecode(response.body);
+
+    accessToken = body['access_token'];
+    refreshToken = body['refresh_token'];
+    log('New refresh token received: $refreshToken');
+    log('New access token received: $accessToken');
+  }
+
+  Future _getAuth() async {
     final url = await getAuthUrl();
     log('Get auth url: $url');
 
     final uri = Uri.parse(url);
     await launchUrl(uri);
-
 
     var server = await HttpServer.bind(InternetAddress.anyIPv6, 8080);
     var requestFromGoogle = await server.first;
@@ -30,6 +102,7 @@ class AuthManager {
     if (authCode != null) {
       requestFromGoogle.response
           .write('Auth ok! Tu peux fermer cette fenêtre mon lapin. <3');
+      log('New auth code received: $authCode');
     } else {
       requestFromGoogle.response
           .write('Auth ko... Pas de code d\'auth reçu... :(');
@@ -38,9 +111,12 @@ class AuthManager {
     requestFromGoogle.response.close();
   }
 
-  Future<String> getApiKey() {
-    Future<String> contents = File(apiKeyFilePath).readAsString();
-    return contents;
+  Future<String> getAuthUrl() async {
+    // String url = '$googleAuthUrl?scope=$scope&response_type=$responseType&redirect_uri=$redirectUri&client_id=$clientId&code_challenge=$codeChallenge&code_challenge_method=$codeChallengeMethod';
+    String url =
+        '$googleAuthUrl?scope=$scope&response_type=$responseType&redirect_uri=$redirectUri&client_id=$clientId';
+
+    return url;
   }
 
   String generateChallenge() {
@@ -61,22 +137,5 @@ class AuthManager {
 
     return String.fromCharCodes(Iterable.generate(
         length, (_) => chars.codeUnitAt(rnd.nextInt(chars.length))));
-  }
-
-  Future<String> getAuthUrl() async {
-    String authFile = await File(authFilePath).readAsString();
-    var authJson = jsonDecode(authFile);
-
-    String clientId = authJson['installed']['client_id'];
-    String redirectUri = authJson['installed']['redirect_uris'][0];
-    String responseType = 'code';
-    String scope = 'https://www.googleapis.com/auth/spreadsheets';
-    // String codeChallenge = generateChallenge();
-    // String codeChallengeMethod = 'S256';
-    // String url = '$googleAuthUrl?scope=$scope&response_type=$responseType&redirect_uri=$redirectUri&client_id=$clientId&code_challenge=$codeChallenge&code_challenge_method=$codeChallengeMethod';
-    String url =
-        '$googleAuthUrl?scope=$scope&response_type=$responseType&redirect_uri=$redirectUri&client_id=$clientId';
-
-    return url;
   }
 }

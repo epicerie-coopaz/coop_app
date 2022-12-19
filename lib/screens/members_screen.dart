@@ -9,13 +9,17 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class MembersScreen extends StatefulWidget {
-  const MembersScreen({super.key});
+  const MembersScreen({super.key, required this.authManager});
+
+  final AuthManager authManager;
 
   @override
-  State<MembersScreen> createState() => _MembersScreenState();
+  State<MembersScreen> createState() =>
+      _MembersScreenState();
 }
 
 class _MembersScreenState extends State<MembersScreen> {
+
   final String title = 'Adhérents';
 
   late Future<List<Member>> futureMembers;
@@ -82,8 +86,7 @@ class _MembersScreenState extends State<MembersScreen> {
                               children: [
                                 Expanded(
                                     flex: 1,
-                                    child:
-                                        Text(p.name, style: styleBody)),
+                                    child: Text(p.name, style: styleBody)),
                                 Expanded(
                                     flex: 1,
                                     child: Text(p.email, style: styleBody)),
@@ -92,7 +95,8 @@ class _MembersScreenState extends State<MembersScreen> {
                                     child: Text(p.phone, style: styleBody)),
                                 Expanded(
                                     flex: 1,
-                                    child: Text(p.score.toString(), style: styleBody)),
+                                    child: Text(p.score.toString(),
+                                        style: styleBody)),
                               ],
                             ),
                             const Divider()
@@ -112,12 +116,12 @@ class _MembersScreenState extends State<MembersScreen> {
   }
 
   Future<List<Member>> fetchMembers() async {
-    var googleApiKey = await AuthManager().getApiKey();
     final response = await http.get(
         Uri.parse(
-            "$googleSheetsApiUrl/$googleSpreadsheetId/values/'ImportMembres'!A:D?majorDimension=ROWS&prettyPrint=false&key=$googleApiKey"),
+            "$googleSheetsApiUrl/$googleSpreadsheetId/values/'ImportMembres'!A:D?majorDimension=ROWS&prettyPrint=false"),
         headers: {
-          "Accept": "application/json",
+          'Authorization': 'Bearer ${await widget.authManager.getAccessToken()}',
+          'Accept': 'application/json',
         });
 
     if (response.statusCode == 200) {

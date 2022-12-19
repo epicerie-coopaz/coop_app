@@ -4,3 +4,4 @@ const googleScriptId = '1SncC8k5n9PEPZgJxtwewRg6lLoUdm3b2zRVVGEygiG7NLYvQppeK8yK
 const googleSheetsApiUrl = 'https://sheets.googleapis.com/v4/spreadsheets';
 const googleScriptApiUrl = 'https://script.googleapis.com/v1/scripts';
 const googleAuthUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
+const googleTokenUrl = 'https://oauth2.googleapis.com/token';

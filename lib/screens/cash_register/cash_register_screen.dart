@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:coopaz_app/auth.dart';
 import 'package:coopaz_app/constants.dart';
 import 'package:coopaz_app/podo/product_line.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +9,9 @@ import 'package:coopaz_app/logger.dart';
 import 'package:http/http.dart' as http;
 
 class CashRegisterScreen extends StatefulWidget {
-  const CashRegisterScreen({super.key});
+  const CashRegisterScreen({super.key, required this.authManager});
+
+  final AuthManager authManager;
 
   @override
   State<CashRegisterScreen> createState() => _CashRegisterScreenState();
@@ -29,14 +32,12 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
   List<ProductLine> productLines = [ProductLine()];
 
   Future sendToBackend() async {
-
-    final response = await http.post(
-        Uri.parse('$googleScriptApiUrl/$googleScriptId:run'),
-        headers: {
-          'Accept': 'application/json',
-          'content-type': 'application/json',
-        },
-        body: '''{
+    final response = await http
+        .post(Uri.parse('$googleScriptApiUrl/$googleScriptId:run'), headers: {
+      'Accept': 'application/json',
+      'content-type': 'application/json',
+      'Authorization': 'Bearer ${await widget.authManager.getAccessToken()}',
+    }, body: '''{
         "function": "validerCaisseExternal",
         "parameters": [],
         "devMode": true

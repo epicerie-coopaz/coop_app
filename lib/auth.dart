@@ -1,10 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:coopaz_app/conf.dart';
-import 'package:crypto/crypto.dart';
 import 'package:coopaz_app/logger.dart';
 import 'package:http/http.dart';
-import 'dart:math';
 import 'package:url_launcher/url_launcher.dart';
 
 class AuthManager {
@@ -20,26 +18,30 @@ class AuthManager {
   String scope = 'https://www.googleapis.com/auth/spreadsheets';
   String? refreshToken;
   String? accessToken;
-  // String codeChallenge = generateChallenge();
-  // String codeChallengeMethod = 'S256';
+  DateTime? accessTokenValidUntil;
 
   Future init() async {
     clientId = conf.clientId;
     clientSecret = conf.clientSecret;
-    redirectUri = conf.urls.redirectUris;
+    redirectUri = conf.urls.redirectUri;
   }
 
   Future<String> getAccessToken() async {
     if (refreshToken == null) {
       await _getRefreshToken();
     }
-    if (accessToken == null) {
-      final response = await post(Uri.parse(conf.urls.tokenUri),
-          headers: {
-            "Accept": "application/json",
-          },
-          body:
-              'client_id=$clientId&client_secret=$clientSecret&grant_type=refresh_token&refresh_token=$refreshToken');
+    // If the access token is not here of expire soon we request a new one
+    if (accessToken == null ||
+        (accessTokenValidUntil?.difference(DateTime.now()).inSeconds ?? 0) <
+            10) {
+      final response = await post(Uri.parse(conf.urls.tokenUri), headers: {
+        "Accept": "application/json",
+      }, body: {
+        'client_id': clientId,
+        'client_secret': clientSecret,
+        'grant_type': 'refresh_token',
+        'refresh_token': refreshToken
+      });
 
       if (response.statusCode != 200) {
         throw Exception(
@@ -50,9 +52,15 @@ class AuthManager {
 
       accessToken = body['access_token'];
       log('New access token received: $accessToken');
+      accessTokenValidUntil =
+          DateTime.now().add(Duration(seconds: body['expires_in']));
+      log('New token valid until : $accessTokenValidUntil');
     }
 
-    return accessToken!;
+    log('Token : $accessToken');
+    log('Access token valid until: $accessTokenValidUntil');
+
+    return accessToken ?? '';
   }
 
   Future _getRefreshToken() async {
@@ -76,9 +84,13 @@ class AuthManager {
     var body = jsonDecode(response.body);
 
     accessToken = body['access_token'];
+
     refreshToken = body['refresh_token'];
     log('New refresh token received: $refreshToken');
     log('New access token received: $accessToken');
+    accessTokenValidUntil =
+        DateTime.now().add(Duration(seconds: body['expires_in']));
+    log('New token valid until : $accessTokenValidUntil');
   }
 
   Future _getAuth() async {
@@ -110,25 +122,5 @@ class AuthManager {
         '${conf.urls.authUri}?scope=$scope&response_type=$responseType&redirect_uri=$redirectUri&client_id=$clientId';
 
     return url;
-  }
-
-  String generateChallenge() {
-    String codeVerifier = generateCodeVerifier();
-    List<int> aciiBytes = ascii.encode(codeVerifier);
-    List<int> hash = sha256.convert(aciiBytes).bytes;
-    String challenge = base64Encode(hash).toString();
-    return challenge;
-  }
-
-  String generateCodeVerifier() {
-    Random rnd = Random();
-
-    // Generate a random length between 43 and 128
-    int length = rnd.nextInt(85) + 43;
-    const chars =
-        'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890-._~';
-
-    return String.fromCharCodes(Iterable.generate(
-        length, (_) => chars.codeUnitAt(rnd.nextInt(chars.length))));
   }
 }

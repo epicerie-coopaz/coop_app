@@ -25,7 +25,7 @@ class Conf {
       tokenUri: confJson['urls']['token_uri'],
       googleSheetsApi: confJson['urls']['google_sheets_api'],
       googleAppsScriptApi: confJson['urls']['google_apps_script_api'],
-      redirectUris: confJson['urls']['redirect_uris'],
+      redirectUri: confJson['urls']['redirect_uri'],
       authProviderX509CertUrl: confJson['urls']['auth_provider_x509_cert_url'],
     );
   }
@@ -36,7 +36,7 @@ class Urls {
   String tokenUri;
   String googleSheetsApi;
   String googleAppsScriptApi;
-  String redirectUris;
+  String redirectUri;
   String authProviderX509CertUrl;
 
   Urls({
@@ -44,7 +44,7 @@ class Urls {
     required this.tokenUri,
     required this.googleSheetsApi,
     required this.googleAppsScriptApi,
-    required this.redirectUris,
+    required this.redirectUri,
     required this.authProviderX509CertUrl,
   });
 }

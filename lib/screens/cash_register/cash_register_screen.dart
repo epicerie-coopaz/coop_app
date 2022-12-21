@@ -34,6 +34,21 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
   List<ProductLine> productLines = [ProductLine()];
 
   Future sendToBackend() async {
+    var body = {
+      "function": "processInvoice",
+      "parameters": [
+        "laurie.besinet@gmail.com",
+        "CB",
+        productLines
+            .map((p) =>
+                {"product": p.name, "qty": double.tryParse(p.qty ?? '0')})
+            .toList(),
+      ],
+      // Set to true work on the last saved Apps Script. Set to false to work only on the last deployed Apps Script.
+      "devMode": true
+    };
+
+    var bodyJson = jsonEncode(body);
     final response = await http.post(
         Uri.parse(
             '${widget.conf.urls.googleAppsScriptApi}/${widget.conf.appsScriptId}:run'),
@@ -43,15 +58,11 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
           'Authorization':
               'Bearer ${await widget.authManager.getAccessToken()}',
         },
-        body: '''{
-        "function": "validerCaisseExternal",
-        "parameters": [],
-        "devMode": true
-      }''');
+        body: bodyJson);
 
     if (response.statusCode == 200) {
       var body = jsonDecode(response.body);
-      log('$body');
+      log('Response: $body');
     } else {
       log('Failed to call macro: [${response.statusCode}] ${response.body}');
       throw Exception(

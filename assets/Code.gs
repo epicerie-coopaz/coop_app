@@ -28,9 +28,9 @@ var sheetEtiquette = ss.getSheetByName('PrintEtiquette');
 
 /**
 * Verifier qu'il y a bien un nom et un mode de paiement renseigné avant de valider
-* Retourne true si erreur, false si ça s'est bien passé
+* Retourne true si erreur, false si ça s'est bienp passé
 */
-function _isInputsValid() {
+function isFormulaireInvalide() {
   var clientRow = SpreadsheetApp.getActiveSheet().getRange('F11').getValue();
   var PaimentModeRow = SpreadsheetApp.getActiveSheet().getRange('G17').getValue();
 
@@ -51,19 +51,8 @@ function validerCaisse02() {
 }
 
 function validerCaisseExternal() {
-  var totalrange = 'A2:D37' //range de la facture
-  var totalsheet = 'facture' + numCaisse //page de la facture
-  var sourcerange = 'A2:N9999' //range des produits
-  var sourcesheet = 'produits' //page des produits
-
-  if (_isInputsValid()) {
-    return; // stoppe la validation s'il manque un nom ou un mode de paiement
-  }
-
-  var newSheet = copySheet(date, numCaisse); //copier la facture dans une page au nom du client
-  _sendEmail(newSheet); //envoyer le mail
-  valid(totalsheet, totalrange, sourcesheet, sourcerange)
-  reinitialiser(numCaisse); // reinitialiser la facture
+  var cell = ss.getSheetByName('facture01').getRange("F1");
+  cell.setValue('Foo');
 }
 
 function validerCaisse(numCaisse) {
@@ -77,12 +66,12 @@ function validerCaisse(numCaisse) {
   var sourcerange = 'A2:N9999' //range des produits
   var sourcesheet = 'produits' //page des produits
 
-  if (_isInputsValid()) {
+  if (isFormulaireInvalide()) {
     return; // stoppe la validation s'il manque un nom ou un mode de paiement
   }
 
   var newSheet = copySheet(date, numCaisse); //copier la facture dans une page au nom du client
-  _sendEmail(newSheet); //envoyer le mail
+  sendEmail(newSheet); //envoyer le mail
   valid(totalsheet, totalrange, sourcesheet, sourcerange)
   reinitialiser(numCaisse); // reinitialiser la facture
 }
@@ -171,7 +160,7 @@ function copySheet(date, numCaisse) {
 
 
 // // Envoyer mail
-function _sendEmail(newSheet) {
+function sendEmail(newSheet) {
 
   // var ss = SpreadsheetApp.getActive();
 
@@ -262,8 +251,8 @@ function valid(tsheet, trange, ssheet, srange) {
       //Browser.msgBox('produit=' + tproduct + ' quantite=' + tquantity)
       var srow = findCell(tproduct, ssheet, srange);
       //Browser.msgBox('Row in sourcetab=' + srow)
-      _updateSourceCell(ssheet, srange, srow, 12, tquantity)
-      _updateSourceCell(ssheet, srange, srow, 11, tquantity)
+      updateSourceCell(ssheet, srange, srow, 12, tquantity)
+      updateSourceCell(ssheet, srange, srow, 11, tquantity)
     }
   }
 }
@@ -291,7 +280,7 @@ function findCell(containingValue, sheetname, range) {
   return lv_cell
 }
 //Function pour incrementer quand un produit est vendu dans les ventes et décrémenter dans le stock actuel
-function _updateSourceCell(sheet, range, row, col, val) {
+function updateSourceCell(sheet, range, row, col, val) {
   var ss = SpreadsheetApp.getActive();
   var ts = ss.getSheetByName(sheet);
   var r = ts.getRange(range)

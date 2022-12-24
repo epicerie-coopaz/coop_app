@@ -1,4 +1,4 @@
-const DATE_FORMAT = "yyyy-MM-dd'_'HH:mm:ss";
+const DATE_FORMAT = 'yyyy-MM-dd\'_\'HH:mm:ss';
 
 const ALL_PRODUCTS_SHEET_NAME = 'produits' // product sheet
 const MEMBERS_SHEET_NAME = 'ImportMembres' // members sheet
@@ -10,9 +10,9 @@ const RANGE_MEMBERS = 'A1:B9999' //range des produits
 
 const CARD_FEE_RATE = 0.00553;
 
-const FOLDER_ID = "1N97mrKpTYFa9zOD2Ilp9-tLO26vOWOEQ"; // Folder id to save in a Drive folder.
+const FOLDER_ID = '1N97mrKpTYFa9zOD2Ilp9-tLO26vOWOEQ'; // Folder id to save in a Drive folder.
 
-const EMAIL_FROM = "guilhem.radonde@gmail.com"
+const EMAIL_FROM = 'guilhem.radonde@gmail.com'
 
 
 /**
@@ -21,7 +21,7 @@ const EMAIL_FROM = "guilhem.radonde@gmail.com"
  * Change the parameters to whatever is needed for testing
  */
 function testProcessInvoice() {
-  processOrder("laurie.besinet@gmail.com", "CB", [{ "product": "GRENADE FRUITS BIO PAYS LANDAIS KILO 806", "qty": 5.2 }], "718718718-3");
+  processOrder('laurie.besinet@gmail.com', 'CB', [{ 'product': 'GRENADE FRUITS BIO PAYS LANDAIS KILO 806', 'qty': 5.2 }], '718718718-4');
 }
 
 /**
@@ -31,13 +31,13 @@ function testProcessInvoice() {
  * 
  * Parameters:
  *  String emailAddress: a valid email address Should be referenced in members sheet
- *  String paymentMethod: "CB", "virement" or "cheque"
+ *  String paymentMethod: 'CB', 'virement' or 'cheque'
  *  List<Product> orderProducts: List of product objects for the current order. 
- *    A product object should have this fields: {"product": "GRENADE FRUITS BIO PAYS LANDAIS KILO 806", "qty": 5.2}
- *  String chequeNumber: the cheque number. Can be set to "" if paymentMethod != "cheque"
+ *    A product object should have this fields: {'product': 'GRENADE FRUITS BIO PAYS LANDAIS KILO 806', 'qty': 5.2}
+ *  String chequeNumber: the cheque number. Can be set to '' if paymentMethod != 'cheque'
  */
 function processOrder(emailAddress, paymentMethod, orderProducts, chequeNumber) {
-  Logger.log(`Starting script at ${Utilities.formatDate(new Date(), Session.getTimeZone(), DATE_FORMAT)}`);
+  Logger.log(`Starting script...`);
 
   let date = Utilities.formatDate(new Date(), Session.getTimeZone(), DATE_FORMAT)
 
@@ -58,16 +58,15 @@ function processOrder(emailAddress, paymentMethod, orderProducts, chequeNumber) 
   let allProductsValues = allProductsRange.getValues();
 
   // Verify that the given inputs are valid. If so do nothing. Throw an error otherwise.
-  if (emailAddress == "" || !emailAddress.includes("@") || memberName == undefined) {
+  if (emailAddress == '' || !emailAddress.includes('@') || memberName == undefined) {
     throw `Email address invalid: ${emailAddress}`;
   }
-  if (paymentMethod != "CB" && paymentMethod != "virement" && paymentMethod != "cheque") {
+  if (paymentMethod != 'CB' && paymentMethod != 'virement' && paymentMethod != 'cheque') {
     throw `Payment method invalid: ${paymentMethod}`;
   }
   if (orderProducts == undefined || orderProducts == null || !(orderProducts.length > 0)) {
     throw `Order product list invalid: ${orderProducts}`;
   }
-
 
   let [orderAmount, cardFees, orderProductsWithTotal] = _updateStock(orderProducts, allProductsRange, allProductsValues, CARD_FEE_RATE, paymentMethod);
 
@@ -81,9 +80,13 @@ function processOrder(emailAddress, paymentMethod, orderProducts, chequeNumber) 
 
   Logger.log(`Invoice ticket created`);
 
-  _sendEmail(invoiceTicket, emailAddress);
+  _createPdfAndSendEmail(invoiceTicket, emailAddress);
 
-  Logger.log(`Email sent ! Finished at ${Utilities.formatDate(new Date(), Session.getTimeZone(), DATE_FORMAT)}`);
+  Logger.log(`Email sent !`);
+
+  ss.deleteSheet(invoiceTicket);
+
+  Logger.log(`Temp sheet deleted. Script finished`);
 }
 
 /**
@@ -164,12 +167,12 @@ function _updateStock(orderProducts, allProductsRange, allProductsValues, cardFe
 
   for (let i = 0; i < orderProducts.length; i++) {
 
-    let productName = orderProducts[i]["product"].trim();
-    let quantity = Number(orderProducts[i]["qty"]);
+    let productName = orderProducts[i]['product'].trim();
+    let quantity = Number(orderProducts[i]['qty']);
 
 
     // If there is no product name or quantity we ignore this invalid input.
-    if (productName == "" || !(quantity > 0.0)) {
+    if (productName == '' || !(quantity > 0.0)) {
       break
     } else {
 
@@ -207,14 +210,14 @@ function _updateStock(orderProducts, allProductsRange, allProductsValues, cardFe
     }
   }
 
-  if (paymentMethod == "CB") {
+  if (paymentMethod == 'CB') {
     fees = orderSum * cardFeeRate;
   }
 
   return [orderSum, fees, orderProductsWithTotal];
 }
 
-function _sendEmail(tempInvoiceSheet, emailAddress) {
+function _createPdfAndSendEmail(tempInvoiceSheet, emailAddress) {
 
   // SAved PDF destination
   let folder = DriveApp.getFolderById(FOLDER_ID);
@@ -253,8 +256,6 @@ function _sendEmail(tempInvoiceSheet, emailAddress) {
     });
 
   folder.createFile(pdf);
-
-  ss.deleteSheet(tempInvoiceSheet);
 }
 
 

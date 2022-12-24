@@ -1,40 +1,60 @@
+const DATE_FORMAT = "yyyy-MM-dd'_'HH:mm:ss";
+
+const ALL_PRODUCTS_SHEET_NAME = 'produits' // product sheet
+const MEMBERS_SHEET_NAME = 'ImportMembres' // members sheet
+const TEMPLATE_SHEET_NAME = 'Template' // members sheet
+const HISTORY_SHEET_NAME = 'Recap' // members sheet
+
+const RANGE_ALL_PRODUCTS = 'A2:N9999' //range des produits
+const RANGE_MEMBERS = 'A1:B9999' //range des produits
+
+const CARD_FEE_RATE = 0.00553;
+
+const FOLDER_ID = "1N97mrKpTYFa9zOD2Ilp9-tLO26vOWOEQ"; // Folder id to save in a Drive folder.
+
+const EMAIL_FROM = "guilhem.radonde@gmail.com"
+
+
 /**
+ * DO NOT USE FOR ANYTHING OTHER THAN TESTING !
+ * 
+ * Change the parameters to whatever is needed for testing
+ */
+function testProcessInvoice() {
+  processOrder("laurie.besinet@gmail.com", "CB", [{ "product": "GRENADE FRUITS BIO PAYS LANDAIS KILO 806", "qty": 5.2 }], "718718718-3");
+}
+
+/**
+ * Public
+ * 
  * Process the invoice sent by the coopaz client
  * 
  * Parameters:
  *  String emailAddress: a valid email address Should be referenced in members sheet
  *  String paymentMethod: "CB", "virement" or "cheque"
- *  List<Product>: List of product objects for the current order. 
+ *  List<Product> orderProducts: List of product objects for the current order. 
  *    A product object should have this fields: {"product": "GRENADE FRUITS BIO PAYS LANDAIS KILO 806", "qty": 5.2}
+ *  String chequeNumber: the cheque number. Can be set to "" if paymentMethod != "cheque"
  */
 function processOrder(emailAddress, paymentMethod, orderProducts, chequeNumber) {
+  Logger.log(`Starting script at ${Utilities.formatDate(new Date(), Session.getTimeZone(), DATE_FORMAT)}`);
 
-  var date = Utilities.formatDate(new Date(), Session.getTimeZone(), "yyyy-MM-dd'_'HH:mm:ss")
-
-  let cardFeeRate = 0.00553;
-  let allProductsSheetName = 'produits' // product sheet
-  let membersSheetName = 'ImportMembres' // members sheet
-  let templateSheetName = 'ImportMembres' // members sheet
-  let historySheetName = 'Recap' // members sheet
-
-  let rangeAllProducts = 'A2:N9999' //range des produits
-  let rangeMembersEmails = 'A1:B9999' //range des produits
+  let date = Utilities.formatDate(new Date(), Session.getTimeZone(), DATE_FORMAT)
 
   emailAddress = emailAddress.trim();
 
   let ss = SpreadsheetApp.getActive();
 
-  let templateSheet = ss.getSheetByName(templateSheetName);
+  let templateSheet = ss.getSheetByName(TEMPLATE_SHEET_NAME);
+  let historySheet = ss.getSheetByName(HISTORY_SHEET_NAME);
+  let membersSheet = ss.getSheetByName(MEMBERS_SHEET_NAME);
 
-  let historySheet = ss.getSheetByName(historySheetName);
-
-  let sheetMembers = ss.getSheetByName(membersSheetName);
-  let membersEmailRange = sheetMembers.getRange(rangeMembersEmails);
+  let membersEmailRange = membersSheet.getRange(RANGE_MEMBERS);
   let member = membersEmailRange.getValues().find((email) => email[1].trim() == emailAddress);
   let memberName = member[0];
 
-  let sheetAllProducts = ss.getSheetByName(allProductsSheetName);
-  let allProductsRange = sheetAllProducts.getRange(rangeAllProducts);
+  let sheetAllProducts = ss.getSheetByName(ALL_PRODUCTS_SHEET_NAME);
+  let allProductsRange = sheetAllProducts.getRange(RANGE_ALL_PRODUCTS);
   let allProductsValues = allProductsRange.getValues();
 
   // Verify that the given inputs are valid. If so do nothing. Throw an error otherwise.
@@ -48,52 +68,99 @@ function processOrder(emailAddress, paymentMethod, orderProducts, chequeNumber) 
     throw `Order product list invalid: ${orderProducts}`;
   }
 
-  let orderAmount = _updateStock(orderProducts, allProductsRange, allProductsValues);
 
-  let fees = 0.0;
-  if (paymentMethod == "CB") {
-    fees = orderAmount * cardFeeRate;
-  }
+  let [orderAmount, cardFees, orderProductsWithTotal] = _updateStock(orderProducts, allProductsRange, allProductsValues, CARD_FEE_RATE, paymentMethod);
 
-  _addToHistory(date, historySheet, memberName, orderAmount, fees, paymentMethod, chequeNumber);
+  Logger.log(`Updating stock done. orderAmount=${orderAmount}, cardFees=${cardFees}`);
 
-  // TODO: let invoiceTicket = _createInvoiceticket();
-  // TODO: _sendEmail(invoiceTicket);
+  _addToHistory(date, historySheet, memberName, orderAmount, cardFees, paymentMethod, chequeNumber);
 
+  Logger.log(`Add to history sheet done`);
+
+  let invoiceTicket = _createInvoiceTicket(ss, templateSheet, date, memberName, orderProductsWithTotal, chequeNumber, paymentMethod, cardFees);
+
+  Logger.log(`Invoice ticket created`);
+
+  _sendEmail(invoiceTicket, emailAddress);
+
+  Logger.log(`Email sent ! Finished at ${Utilities.formatDate(new Date(), Session.getTimeZone(), DATE_FORMAT)}`);
 }
 
 /**
-* Add to History sheet
-*/
+ * Private
+ * Create an invoice ticket in a dedicated sheet
+ */
+function _createInvoiceTicket(spreadSheet, templateSheet, date, clientName, orderProducts, chequeNumber, paymentMethod, cardFees) {
+
+  let newSheetName = date + '_' + clientName;
+  let newSheet = templateSheet.copyTo(spreadSheet).setName(newSheetName);
+
+  let orderLines = orderProducts.map((p) => {
+    return [p['product'], p['qty'], p['unitPrice'], p['total']]
+  });
+
+  for (let i = 0; i < orderLines.length; i++) {
+    let orderLine = orderLines[i];
+    let pasteData = newSheet.getRange(7 + i, 2, 1, 4);
+    pasteData.setValues([orderLine]);
+  }
+
+
+  let pastePaiement = newSheet.getRange(46, 2, 1, 1);
+  pastePaiement.setValue(paymentMethod);
+
+  let pasteNumeroCheque = newSheet.getRange(47, 2, 1, 1);
+  pasteNumeroCheque.setValue(chequeNumber);
+
+  let pasteCardFees = newSheet.getRange(47, 5, 1, 1);
+  pasteCardFees.setValue(cardFees);
+
+  let pasteName = newSheet.getRange(4, 3, 1, 1);
+  pasteName.setValue(clientName);
+
+  let pasteDate = newSheet.getRange(2, 3, 1, 1);
+  pasteDate.setValue(date);
+
+  return newSheet;
+}
+
+/**
+ * Private
+ * Add to History sheet
+ */
 function _addToHistory(date, historySheet, memberName, orderAmount, fees, paymentMethod, chequeNumber) {
 
-  var recapFirstEmptyRow = historySheet.getLastRow() + 1;
+  let recapFirstEmptyRow = historySheet.getLastRow() + 1;
 
   historySheet.getRange(recapFirstEmptyRow, 1, 1, 1).setValue(date);
 
-  var pasteNameOnly = historySheet.getRange(recapFirstEmptyRow, 2, 1, 1);
+  let pasteNameOnly = historySheet.getRange(recapFirstEmptyRow, 2, 1, 1);
   pasteNameOnly.setValue(memberName);
 
-  var pasteMontant = historySheet.getRange(recapFirstEmptyRow, 3, 1, 1);
+  let pasteMontant = historySheet.getRange(recapFirstEmptyRow, 3, 1, 1);
   pasteMontant.setValue(orderAmount);
 
-  var pasteFrais = historySheet.getRange(recapFirstEmptyRow, 4, 1, 1);
+  let pasteFrais = historySheet.getRange(recapFirstEmptyRow, 4, 1, 1);
   pasteFrais.setValue(fees);
 
-  var pasteRecaPaiement = historySheet.getRange(recapFirstEmptyRow, 5, 1, 1);
+  let pasteRecaPaiement = historySheet.getRange(recapFirstEmptyRow, 5, 1, 1);
   pasteRecaPaiement.setValue(paymentMethod);
 
-  var pasteNumeroCheque = historySheet.getRange(recapFirstEmptyRow, 6, 1, 1);
+  let pasteNumeroCheque = historySheet.getRange(recapFirstEmptyRow, 6, 1, 1);
   pasteNumeroCheque.setValue(chequeNumber);
 
 }
 
 /**
-* Update stock in products sheet
-*/
-function _updateStock(orderProducts, allProductsRange, allProductsValues) {
+ * Private
+ * Update stock in products sheet
+ * Return the total sum of the order and the bank fees if using a credit card
+ */
+function _updateStock(orderProducts, allProductsRange, allProductsValues, cardFeeRate, paymentMethod) {
   // Update the products sheet based on the products in the invoice and return the total sum of the invoice
   let orderSum = 0.0;
+  let fees = 0.0;
+  let orderProductsWithTotal = [];
 
   for (let i = 0; i < orderProducts.length; i++) {
 
@@ -114,8 +181,16 @@ function _updateStock(orderProducts, allProductsRange, allProductsValues) {
       }
 
       let unitPrice = Number(allProductsRange.getCell(productIndex, 10).getValue());
+      let total = unitPrice * quantity;
 
-      orderSum += unitPrice * quantity;
+      orderSum += total;
+
+      orderProductsWithTotal.push({
+        'product': productName,
+        'qty': quantity,
+        'unitPrice': unitPrice,
+        'total': total
+      });
 
       // Update current stock
       let quantityCurrentStockCell = allProductsRange.getCell(productIndex, 12);
@@ -132,11 +207,54 @@ function _updateStock(orderProducts, allProductsRange, allProductsValues) {
     }
   }
 
-  return orderSum;
+  if (paymentMethod == "CB") {
+    fees = orderSum * cardFeeRate;
+  }
+
+  return [orderSum, fees, orderProductsWithTotal];
 }
 
+function _sendEmail(tempInvoiceSheet, emailAddress) {
 
-function testProcessInvoice() {
-  processOrder("laurie.besinet@gmail.com", "CB", [{ "product": "GRENADE FRUITS BIO PAYS LANDAIS KILO 806", "qty": 5.2 }], "718718718");
+  // SAved PDF destination
+  let folder = DriveApp.getFolderById(FOLDER_ID);
+
+  // URL à appeler pour récupérer une version PDF de la sheet
+  const url = `https://docs.google.com/spreadsheets/d/${ss.getId()}/export?`;
+  const exportOptions =
+    'exportFormat=pdf&format=pdf' + // export as pdf / csv / xls / xlsx
+    '&size=A4' + // paper size legal / letter / A4
+    '&portrait=true' + // orientation, false for landscape
+    '&fitw=true&source=false' + //labnol fit to page width, false for actual size
+    '&sheetnames=false&printtitle=false' + // hide optional headers and footers
+    '&pagenumbers=false&gridlines=false' + // hide page numbers and gridlines
+    '&fzr=true' + // do not repeat row headers (frozen rows) on each page
+    '&gid='; // the sheet's Id
+
+  // le token d'authentification
+  const token = ScriptApp.getOAuthToken();
+
+  const clientSheetUrl = url + exportOptions + tempInvoiceSheet.getSheetId();
+
+  SpreadsheetApp.flush();
+
+  const sheetResponse = UrlFetchApp.fetch(clientSheetUrl, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  const pdf = sheetResponse.getBlob().setName(tempInvoiceSheet.getName() + '.pdf');
+
+  // If allowed to send emails, send the email with the PDF attachment
+  if (MailApp.getRemainingDailyQuota() > 0)
+    GmailApp.sendEmail(emailAddress, 'Votre commande Coop Az', 'Veuillez trouver ci joint la facture de votre dernière commande', {
+      attachments: [pdf], from: EMAIL_FROM
+    });
+
+  folder.createFile(pdf);
+
+  ss.deleteSheet(tempInvoiceSheet);
 }
+
 

@@ -72,7 +72,7 @@ class HomeScreen extends StatelessWidget {
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) =>
-                        CashRegisterScreen(orderDao: orderDao),
+                        CashRegisterScreen(orderDao: orderDao, memberDao: memberDao,),
                   ),
                 );
               },

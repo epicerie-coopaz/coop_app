@@ -1,13 +1,17 @@
+import 'package:coopaz_app/dao/memberDao.dart';
 import 'package:coopaz_app/dao/orderDao.dart';
+import 'package:coopaz_app/podo/member.dart';
 import 'package:coopaz_app/podo/product_line.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:coopaz_app/logger.dart';
 
 class CashRegisterScreen extends StatefulWidget {
-  const CashRegisterScreen({super.key, required this.orderDao});
+  const CashRegisterScreen(
+      {super.key, required this.orderDao, required this.memberDao});
 
   final OrderDao orderDao;
+  final MemberDao memberDao;
 
   @override
   State<CashRegisterScreen> createState() => _CashRegisterScreenState();
@@ -18,15 +22,29 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
 
   final String title = 'Caisse';
   final DateFormat formatter = DateFormat('yyyy-MM-dd HH:mm:ss');
-  static const List<String> list = <String>['CB', 'Cheque', 'Virement'];
+  static const List<String> paymentMethodList = <String>[
+    'CB',
+    'Cheque',
+    'Virement'
+  ];
   NumberFormat numberFormat = NumberFormat('#,##0.00');
 
+  late Future<List<Member>> futureMembers;
+
   //Form data
-  String dropdownValue = list.first;
+  String paymentmethodSelected = paymentMethodList.first;
   DateTime date = DateTime.now();
 
   List<ProductLine> productLines = [ProductLine()];
-  String? clientMail;
+  Member? selectedMember;
+
+  @override
+  initState() {
+    log('Init screen $title...');
+    super.initState();
+    futureMembers = widget.memberDao.getMembers();
+    log('Init screen $title finish');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -98,33 +116,21 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
                 flex: 1,
                 child: Column(
                   children: [
-                    Row(children: const [
-                      Expanded(
-                          child: Align(
-                              alignment: Alignment.topLeft,
-                              child: Text("Nom de l'adérent: "))),
-                      Expanded(
-                          child: Align(
-                              alignment: Alignment.topLeft, child: Text('-')))
+                    Row(children: [
+                      Expanded(child: Autocomplete<Member>(
+                        displayStringForOption: (Member m) => '${m.name} : ${m.email}',
+                        optionsBuilder: (TextEditingValue textEditingValue) async {
+                          if (textEditingValue.text == '') {
+                            return const Iterable<Member>.empty();
+                          }
+                          return (await futureMembers).where((Member m) {
+                            return m
+                                .toString()
+                                .contains(textEditingValue.text.toLowerCase());
+                          });
+                        },
+                      )),
                     ]),
-                    Align(
-                        alignment: Alignment.topLeft,
-                        child: TextFormField(
-                          decoration: const InputDecoration(
-                            hintText: 'email client',
-                          ),
-                          validator: (String? value) {
-                            if (value == null || value.isEmpty) {
-                              return 'email client invalide';
-                            }
-                            return null;
-                          },
-                          onChanged: (String value) {
-                            setState(() {
-                              clientMail = value;
-                            });
-                          },
-                        )),
                     Row(children: [
                       const Expanded(
                           child: Align(
@@ -142,16 +148,16 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
                               child: Text('Mode de paiment: '))),
                       Expanded(
                           child: DropdownButton<String>(
-                        value: dropdownValue,
+                        value: paymentmethodSelected,
                         elevation: 16,
                         onChanged: (String? value) {
                           // This is called when the user selects an item.
                           setState(() {
-                            dropdownValue = value!;
+                            paymentmethodSelected = value!;
                           });
                         },
-                        items:
-                            list.map<DropdownMenuItem<String>>((String value) {
+                        items: paymentMethodList
+                            .map<DropdownMenuItem<String>>((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
                             child: Text(value),
@@ -187,7 +193,8 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
 
   _sendForm() async {
     // send data to macro
-    await widget.orderDao.createOrder(clientMail ?? '', productLines);
+    await widget.orderDao
+        .createOrder(selectedMember?.email ?? '', productLines);
     // reset form
     _formKey.currentState?.reset();
     setState(() {

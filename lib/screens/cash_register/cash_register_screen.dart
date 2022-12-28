@@ -32,12 +32,13 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
   DateTime date = DateTime.now();
 
   List<ProductLine> productLines = [ProductLine()];
+  String? clientMail;
 
   Future sendToBackend() async {
     var body = {
       "function": "processOrder",
       "parameters": [
-        "laurie.besinet@gmail.com",
+        clientMail ?? '',
         "CB",
         productLines
             .map((p) =>
@@ -148,12 +149,26 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
                               child: Text("Nom de l'adérent: "))),
                       Expanded(
                           child: Align(
-                              alignment: Alignment.topLeft,
-                              child: Text('Besinet Laurie')))
+                              alignment: Alignment.topLeft, child: Text('-')))
                     ]),
-                    const Align(
+                    Align(
                         alignment: Alignment.topLeft,
-                        child: Text('lilou@gmail.com')),
+                        child: TextFormField(
+                          decoration: const InputDecoration(
+                            hintText: 'email client',
+                          ),
+                          validator: (String? value) {
+                            if (value == null || value.isEmpty) {
+                              return 'email client invalide';
+                            }
+                            return null;
+                          },
+                          onChanged: (String value) {
+                            setState(() {
+                              clientMail = value;
+                            });
+                          },
+                        )),
                     Row(children: [
                       const Expanded(
                           child: Align(

@@ -1,19 +1,13 @@
-import 'dart:convert';
-
-import 'package:coopaz_app/auth.dart';
-import 'package:coopaz_app/conf.dart';
+import 'package:coopaz_app/dao/orderDao.dart';
 import 'package:coopaz_app/podo/product_line.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:coopaz_app/logger.dart';
-import 'package:http/http.dart' as http;
 
 class CashRegisterScreen extends StatefulWidget {
-  const CashRegisterScreen(
-      {super.key, required this.conf, required this.authManager});
+  const CashRegisterScreen({super.key, required this.orderDao});
 
-  final AuthManager authManager;
-  final Conf conf;
+  final OrderDao orderDao;
 
   @override
   State<CashRegisterScreen> createState() => _CashRegisterScreenState();
@@ -33,44 +27,6 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
 
   List<ProductLine> productLines = [ProductLine()];
   String? clientMail;
-
-  Future sendToBackend() async {
-    var body = {
-      "function": "processOrder",
-      "parameters": [
-        clientMail ?? '',
-        "CB",
-        productLines
-            .map((p) =>
-                {"product": p.name, "qty": double.tryParse(p.qty ?? '0')})
-            .toList(),
-        "456123789"
-      ],
-      // Set to true work on the last saved Apps Script. Set to false to work only on the last deployed Apps Script.
-      "devMode": true
-    };
-
-    var bodyJson = jsonEncode(body);
-    final response = await http.post(
-        Uri.parse(
-            '${widget.conf.urls.googleAppsScriptApi}/${widget.conf.appsScriptId}:run'),
-        headers: {
-          'Accept': 'application/json',
-          'content-type': 'application/json',
-          'Authorization':
-              'Bearer ${await widget.authManager.getAccessToken()}',
-        },
-        body: bodyJson);
-
-    if (response.statusCode == 200) {
-      var body = jsonDecode(response.body);
-      log('Response: $body');
-    } else {
-      log('Failed to call macro: [${response.statusCode}] ${response.body}');
-      throw Exception(
-          'Failed to load products: [${response.statusCode}] ${response.body}');
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -231,7 +187,7 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
 
   _sendForm() async {
     // send data to macro
-    await sendToBackend();
+    await widget.orderDao.createOrder(clientMail ?? '', productLines);
     // reset form
     _formKey.currentState?.reset();
     setState(() {

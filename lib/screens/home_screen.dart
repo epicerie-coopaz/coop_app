@@ -1,5 +1,6 @@
-import 'package:coopaz_app/auth.dart';
-import 'package:coopaz_app/conf.dart';
+import 'package:coopaz_app/dao/memberDao.dart';
+import 'package:coopaz_app/dao/orderDao.dart';
+import 'package:coopaz_app/dao/productDao.dart';
 import 'package:coopaz_app/screens/cash_register/cash_register_screen.dart';
 import 'package:coopaz_app/screens/members_screen.dart';
 import 'package:coopaz_app/screens/products_screen.dart';
@@ -8,9 +9,14 @@ import 'package:flutter/material.dart';
 import 'package:coopaz_app/logger.dart';
 
 class CoopazApp extends StatelessWidget {
-  const CoopazApp({super.key, required this.conf, required this.authManager});
-  final AuthManager authManager;
-  final Conf conf;
+  const CoopazApp(
+      {super.key,
+      required this.memberDao,
+      required this.productDao,
+      required this.orderDao});
+  final MemberDao memberDao;
+  final ProductDao productDao;
+  final OrderDao orderDao;
 
   @override
   Widget build(BuildContext context) {
@@ -20,19 +26,22 @@ class CoopazApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: HomeScreen(
-        conf: conf,
-        authManager: authManager,
-      ),
+          memberDao: memberDao, productDao: productDao, orderDao: orderDao),
       debugShowCheckedModeBanner: false,
     );
   }
 }
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key, required this.conf, required this.authManager});
+  const HomeScreen(
+      {super.key,
+      required this.memberDao,
+      required this.productDao,
+      required this.orderDao});
 
-  final AuthManager authManager;
-  final Conf conf;
+  final MemberDao memberDao;
+  final ProductDao productDao;
+  final OrderDao orderDao;
 
   final String title = 'Logiciel Coopaz';
 
@@ -62,8 +71,8 @@ class HomeScreen extends StatelessWidget {
 
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => CashRegisterScreen(
-                        conf: conf, authManager: authManager),
+                    builder: (context) =>
+                        CashRegisterScreen(orderDao: orderDao),
                   ),
                 );
               },
@@ -82,7 +91,7 @@ class HomeScreen extends StatelessWidget {
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (context) =>
-                          ProductsScreen(conf: conf, authManager: authManager),
+                          ProductsScreen(productDao: productDao),
                     ),
                   );
                 },
@@ -93,8 +102,7 @@ class HomeScreen extends StatelessWidget {
                   log('Members Clicked !');
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) =>
-                          MembersScreen(conf: conf, authManager: authManager),
+                      builder: (context) => MembersScreen(memberDao: memberDao),
                     ),
                   );
                 },

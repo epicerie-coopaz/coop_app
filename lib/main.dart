@@ -15,6 +15,7 @@ Future<void> main() async {
 
   var authManager = AuthManager(conf: conf);
   await authManager.init();
+  await authManager.getRefreshToken();
 
   var memberDao = MemberDao(
       googleSheetUrlApi: conf.urls.googleSheetsApi,

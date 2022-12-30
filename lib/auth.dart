@@ -28,7 +28,7 @@ class AuthManager {
 
   Future<String> getAccessToken() async {
     if (refreshToken == null) {
-      await _getRefreshToken();
+      await getRefreshToken();
     }
     // If the access token is not here of expire soon we request a new one
     if (accessToken == null ||
@@ -63,9 +63,32 @@ class AuthManager {
     return accessToken ?? '';
   }
 
-  Future _getRefreshToken() async {
+  Future getAuth() async {
+    final url = await _getAuthUrl();
+    log('Get auth url: $url');
+
+    final uri = Uri.parse(url);
+    await launchUrl(uri);
+
+    var server = await HttpServer.bind(InternetAddress.anyIPv6, 8080);
+    var requestFromGoogle = await server.first;
+
+    authCode = requestFromGoogle.uri.queryParameters['code'];
+    if (authCode != null) {
+      requestFromGoogle.response
+          .write('Auth ok! \n\nTu peux fermer cette fenêtre mon lapin. <3');
+      log('New auth code received: $authCode');
+    } else {
+      requestFromGoogle.response
+          .write('Auth ko... Pas de code d\'auth reçu... :(');
+    }
+
+    requestFromGoogle.response.close();
+  }
+
+  Future getRefreshToken() async {
     if (authCode == null) {
-      await _getAuth();
+      await getAuth();
     }
     final response = await post(Uri.parse(conf.urls.tokenUri), headers: {
       "Accept": "application/json",
@@ -93,30 +116,7 @@ class AuthManager {
     log('New token valid until : $accessTokenValidUntil');
   }
 
-  Future _getAuth() async {
-    final url = await getAuthUrl();
-    log('Get auth url: $url');
-
-    final uri = Uri.parse(url);
-    await launchUrl(uri);
-
-    var server = await HttpServer.bind(InternetAddress.anyIPv6, 8080);
-    var requestFromGoogle = await server.first;
-
-    authCode = requestFromGoogle.uri.queryParameters['code'];
-    if (authCode != null) {
-      requestFromGoogle.response
-          .write('Auth ok! Tu peux fermer cette fenêtre mon lapin. <3');
-      log('New auth code received: $authCode');
-    } else {
-      requestFromGoogle.response
-          .write('Auth ko... Pas de code d\'auth reçu... :(');
-    }
-
-    requestFromGoogle.response.close();
-  }
-
-  Future<String> getAuthUrl() async {
+  Future<String> _getAuthUrl() async {
     // String url = '$googleAuthUrl?scope=$scope&response_type=$responseType&redirect_uri=$redirectUri&client_id=$clientId&code_challenge=$codeChallenge&code_challenge_method=$codeChallengeMethod';
     String url =
         '${conf.urls.authUri}?scope=$scope&response_type=$responseType&redirect_uri=$redirectUri&client_id=$clientId';

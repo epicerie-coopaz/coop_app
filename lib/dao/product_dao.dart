@@ -37,7 +37,7 @@ class ProductDao extends GoogleSheetDao {
         var unitString = l[4].trim().toLowerCase();
         if (unitString == 'kilo') {
           unit = Units.kg;
-        } else if (unitString == 'litre') {
+        } else if (unitString == 'litre' || unitString == 'litres') {
           unit = Units.liter;
         } else {
           unit = Units.piece;

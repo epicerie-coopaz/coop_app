@@ -99,7 +99,7 @@ class _ProductScreenState extends State<ProductsScreen> {
                                     child: Text(p.supplier, style: styleBody)),
                                 Expanded(
                                     flex: 1,
-                                    child: Text(p.unit.name, style: styleBody)),
+                                    child: Text(p.unit.unitAsString, style: styleBody)),
                                 Expanded(
                                     flex: 1,
                                     child: Text(p.barreCode, style: styleBody)),

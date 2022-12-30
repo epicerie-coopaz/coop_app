@@ -263,7 +263,7 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
               setState(() {
                 productLines[index] = ProductLine(
                     name: p.designation,
-                    unit: p.unit.name,
+                    unit: p.unit.unitAsString,
                     unitPrice: p.price.toStringAsFixed(2));
               });
             },

@@ -1,6 +1,8 @@
-import 'package:coopaz_app/dao/memberDao.dart';
-import 'package:coopaz_app/dao/orderDao.dart';
+import 'package:coopaz_app/dao/member_dao.dart';
+import 'package:coopaz_app/dao/order_dao.dart';
+import 'package:coopaz_app/dao/product_dao.dart';
 import 'package:coopaz_app/podo/member.dart';
+import 'package:coopaz_app/podo/product.dart';
 import 'package:coopaz_app/podo/product_line.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -8,10 +10,14 @@ import 'package:coopaz_app/logger.dart';
 
 class CashRegisterScreen extends StatefulWidget {
   const CashRegisterScreen(
-      {super.key, required this.orderDao, required this.memberDao});
+      {super.key,
+      required this.orderDao,
+      required this.memberDao,
+      required this.productDao});
 
   final OrderDao orderDao;
   final MemberDao memberDao;
+  final ProductDao productDao;
 
   @override
   State<CashRegisterScreen> createState() => _CashRegisterScreenState();
@@ -30,6 +36,7 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
   NumberFormat numberFormat = NumberFormat('#,##0.00');
 
   late Future<List<Member>> futureMembers;
+  late Future<List<Product>> futureProducts;
 
   //Form data
   String paymentmethodSelected = paymentMethodList.first;
@@ -42,7 +49,10 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
   initState() {
     log('Init screen $title...');
     super.initState();
+    log('Get members...');
     futureMembers = widget.memberDao.getMembers();
+    log('Get products...');
+    futureProducts = widget.productDao.getProducts();
     log('Init screen $title finish');
   }
 
@@ -90,6 +100,12 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
                       Expanded(
                           flex: 2,
                           child: Text(
+                            'Unité',
+                            style: styleHeaders,
+                          )),
+                      Expanded(
+                          flex: 2,
+                          child: Text(
                             'Total',
                             style: styleHeaders,
                           )),
@@ -117,9 +133,12 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
                 child: Column(
                   children: [
                     Row(children: [
-                      Expanded(child: Autocomplete<Member>(
-                        displayStringForOption: (Member m) => '${m.name} : ${m.email}',
-                        optionsBuilder: (TextEditingValue textEditingValue) async {
+                      Expanded(
+                          child: Autocomplete<Member>(
+                        displayStringForOption: (Member m) =>
+                            '${m.name} : ${m.email}',
+                        optionsBuilder:
+                            (TextEditingValue textEditingValue) async {
                           if (textEditingValue.text == '') {
                             return const Iterable<Member>.empty();
                           }
@@ -127,6 +146,11 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
                             return m
                                 .toString()
                                 .contains(textEditingValue.text.toLowerCase());
+                          });
+                        },
+                        onSelected: (m) {
+                          setState(() {
+                            selectedMember = m;
                           });
                         },
                       )),
@@ -222,23 +246,25 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
     var productWidget = Row(children: <Widget>[
       Expanded(
           flex: 8,
-          child: TextFormField(
-            controller: TextEditingController(text: product.name)
-              ..selection =
-                  TextSelection.collapsed(offset: (product.name ?? '').length),
-            decoration: const InputDecoration(
-              hintText: 'Produit',
-            ),
-            validator: (String? value) {
-              if (value == null || value.isEmpty) {
-                return 'Produit invalide';
+          child: Autocomplete<Product>(
+            displayStringForOption: (Product p) => p.designation,
+            optionsBuilder: (TextEditingValue textEditingValue) async {
+              if (textEditingValue.text == '') {
+                return const Iterable<Product>.empty();
               }
-              return null;
+              return (await futureProducts).where((Product p) {
+                return p
+                    .toString()
+                    .toLowerCase()
+                    .contains(textEditingValue.text.toLowerCase());
+              });
             },
-            onChanged: (String value) {
-              product.name = value;
+            onSelected: (p) {
               setState(() {
-                productLines[index] = product;
+                productLines[index] = ProductLine(
+                    name: p.designation,
+                    unit: p.unit.name,
+                    unitPrice: p.price.toStringAsFixed(2));
               });
             },
           )),
@@ -266,30 +292,8 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
               });
             },
           )),
-      Expanded(
-          flex: 2,
-          child: TextFormField(
-            controller: TextEditingController(text: product.unitPrice ?? '')
-              ..selection = TextSelection.collapsed(
-                  offset: (product.unitPrice ?? '').length),
-            decoration: const InputDecoration(
-              hintText: 'Prix unitaire',
-            ),
-            validator: (String? value) {
-              if (value == null ||
-                  value.isEmpty ||
-                  double.tryParse(value) == null) {
-                return 'Prix invalide';
-              }
-              return null;
-            },
-            onChanged: (String value) {
-              product.unitPrice = value;
-              setState(() {
-                productLines[index] = product;
-              });
-            },
-          )),
+      Expanded(flex: 2, child: Text(product.unitPrice ?? '-')),
+      Expanded(flex: 2, child: Text(product.unit ?? '-')),
       Expanded(flex: 2, child: Text(total)),
       Expanded(
           flex: 1,

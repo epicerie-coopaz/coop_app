@@ -1,4 +1,4 @@
-import 'package:coopaz_app/dao/memberDao.dart';
+import 'package:coopaz_app/dao/member_dao.dart';
 import 'package:coopaz_app/logger.dart';
 import 'package:coopaz_app/podo/member.dart';
 import 'package:coopaz_app/podo/utils.dart';

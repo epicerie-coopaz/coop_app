@@ -7,9 +7,9 @@
 
 import 'package:coopaz_app/auth.dart';
 import 'package:coopaz_app/conf.dart';
-import 'package:coopaz_app/dao/memberDao.dart';
-import 'package:coopaz_app/dao/orderDao.dart';
-import 'package:coopaz_app/dao/productDao.dart';
+import 'package:coopaz_app/dao/member_dao.dart';
+import 'package:coopaz_app/dao/order_dao.dart';
+import 'package:coopaz_app/dao/product_dao.dart';
 import 'package:coopaz_app/screens/home_screen.dart';
 import 'package:flutter_test/flutter_test.dart';
 

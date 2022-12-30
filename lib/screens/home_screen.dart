@@ -1,6 +1,6 @@
-import 'package:coopaz_app/dao/memberDao.dart';
-import 'package:coopaz_app/dao/orderDao.dart';
-import 'package:coopaz_app/dao/productDao.dart';
+import 'package:coopaz_app/dao/member_dao.dart';
+import 'package:coopaz_app/dao/order_dao.dart';
+import 'package:coopaz_app/dao/product_dao.dart';
 import 'package:coopaz_app/screens/cash_register/cash_register_screen.dart';
 import 'package:coopaz_app/screens/members_screen.dart';
 import 'package:coopaz_app/screens/products_screen.dart';
@@ -71,8 +71,10 @@ class HomeScreen extends StatelessWidget {
 
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) =>
-                        CashRegisterScreen(orderDao: orderDao, memberDao: memberDao,),
+                    builder: (context) => CashRegisterScreen(
+                        orderDao: orderDao,
+                        memberDao: memberDao,
+                        productDao: productDao),
                   ),
                 );
               },

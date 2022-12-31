@@ -21,7 +21,7 @@ class OrderDao extends GoogleAppsScriptDao {
             .map((p) =>
                 {"product": p.name, "qty": double.tryParse(p.qty ?? '0')})
             .toList(),
-        "456123789"
+        ""
       ],
       // Set to true work on the last saved Apps Script. Set to false to work only on the last deployed Apps Script.
       "devMode": true

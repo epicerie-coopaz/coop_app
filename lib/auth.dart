@@ -15,7 +15,7 @@ class AuthManager {
   String? clientSecret;
   String? redirectUri;
   String responseType = 'code';
-  String scope = 'https://www.googleapis.com/auth/spreadsheets';
+  String scope = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/script.external_request https://www.googleapis.com/auth/script.send_mail https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send';
   String? refreshToken;
   String? accessToken;
   DateTime? accessTokenValidUntil;

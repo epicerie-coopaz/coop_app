@@ -40,7 +40,6 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
 
   //Form data
   String paymentmethodSelected = paymentMethodList.first;
-  DateTime date = DateTime.now();
 
   List<ProductLine> productLines = [ProductLine()];
   Member? selectedMember;
@@ -66,6 +65,12 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
         ?.apply(color: Colors.blue);
 
     List<Row> productLineWidgets = _createProductLineWidgets();
+
+    double total = productLines
+        .map((e) =>
+            (double.tryParse(e.qty ?? '0') ?? 0.0) *
+            (double.tryParse(e.unitPrice ?? '0') ?? 0.0))
+        .fold(0.0, (prev, e) => prev + e);
 
     return Scaffold(
         appBar: AppBar(
@@ -159,11 +164,11 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
                       const Expanded(
                           child: Align(
                               alignment: Alignment.topLeft,
-                              child: Text('Date: '))),
+                              child: Text('Total: '))),
                       Expanded(
                           child: Align(
                               alignment: Alignment.topLeft,
-                              child: Text(formatter.format(date))))
+                              child: Text('${total.toStringAsFixed(2)}€')))
                     ]),
                     Row(children: [
                       const Expanded(

@@ -11,7 +11,7 @@ class OrderDao extends GoogleAppsScriptDao {
       required super.appsScriptId,
       required super.authManager});
 
-  Future createOrder(String clientMail, List<ProductLine> productLines) async {
+  Future createOrder(String clientMail, List<ProductLine> productLines, String chequeNumber) async {
     var body = {
       "function": "processOrder",
       "parameters": [
@@ -21,7 +21,7 @@ class OrderDao extends GoogleAppsScriptDao {
             .map((p) =>
                 {"product": p.name, "qty": double.tryParse(p.qty ?? '0')})
             .toList(),
-        ""
+        chequeNumber
       ],
       // Set to true work on the last saved Apps Script. Set to false to work only on the last deployed Apps Script.
       "devMode": true

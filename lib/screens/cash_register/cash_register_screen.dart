@@ -27,6 +27,8 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   final String title = 'Caisse';
+
+  static const double cardFeeRate = 0.00553;
   final DateFormat formatter = DateFormat('yyyy-MM-dd HH:mm:ss');
   static const List<String> paymentMethodList = <String>[
     'CB',
@@ -66,11 +68,18 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
 
     List<Row> productLineWidgets = _createProductLineWidgets();
 
-    double total = productLines
+    double subtotal = productLines
         .map((e) =>
             (double.tryParse(e.qty ?? '0') ?? 0.0) *
             (double.tryParse(e.unitPrice ?? '0') ?? 0.0))
         .fold(0.0, (prev, e) => prev + e);
+
+    double cardFee = 0.0;
+    if( paymentmethodSelected == 'CB'){
+      cardFee = subtotal * cardFeeRate;
+    }
+
+    double total = subtotal + cardFee;
 
     return Scaffold(
         appBar: AppBar(
@@ -164,16 +173,6 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
                       const Expanded(
                           child: Align(
                               alignment: Alignment.topLeft,
-                              child: Text('Total: '))),
-                      Expanded(
-                          child: Align(
-                              alignment: Alignment.topLeft,
-                              child: Text('${total.toStringAsFixed(2)}€')))
-                    ]),
-                    Row(children: [
-                      const Expanded(
-                          child: Align(
-                              alignment: Alignment.topLeft,
                               child: Text('Mode de paiment: '))),
                       Expanded(
                           child: DropdownButton<String>(
@@ -193,6 +192,26 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
                           );
                         }).toList(),
                       ))
+                    ]),
+                    Row(children: [
+                      const Expanded(
+                          child: Align(
+                              alignment: Alignment.topLeft,
+                              child: Text('Sous total: '))),
+                      Expanded(
+                          child: Align(
+                              alignment: Alignment.topLeft,
+                              child: Text('${subtotal.toStringAsFixed(2)}€')))
+                    ]),
+                    Row(children: [
+                      const Expanded(
+                          child: Align(
+                              alignment: Alignment.topLeft,
+                              child: Text('Total: '))),
+                      Expanded(
+                          child: Align(
+                              alignment: Alignment.topLeft,
+                              child: Text('${total.toStringAsFixed(2)}€')))
                     ]),
                     Center(
                         child: ElevatedButton(
@@ -223,7 +242,7 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
   _sendForm() async {
     // send data to macro
     await widget.orderDao
-        .createOrder(selectedMember?.email ?? '', productLines);
+        .createOrder(selectedMember?.email ?? '', productLines, "");
     // reset form
     _formKey.currentState?.reset();
     setState(() {

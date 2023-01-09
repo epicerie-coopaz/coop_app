@@ -4,9 +4,11 @@ import 'package:coopaz_app/dao/product_dao.dart';
 import 'package:coopaz_app/screens/cash_register/cash_register_screen.dart';
 import 'package:coopaz_app/screens/members_screen.dart';
 import 'package:coopaz_app/screens/products_screen.dart';
+import 'package:coopaz_app/state/model.dart';
 import 'package:flutter/material.dart';
 
 import 'package:coopaz_app/logger.dart';
+import 'package:provider/provider.dart';
 
 class CoopazApp extends StatelessWidget {
   const CoopazApp(
@@ -20,14 +22,19 @@ class CoopazApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Coopaz',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: HomeScreen(
-          memberDao: memberDao, productDao: productDao, orderDao: orderDao),
-      debugShowCheckedModeBanner: false,
+    return ChangeNotifierProvider(
+      create: (context) => AppModel(),
+      builder: (context, child) {
+        return MaterialApp(
+          title: 'Coopaz',
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+          ),
+          home: HomeScreen(
+              memberDao: memberDao, productDao: productDao, orderDao: orderDao),
+          debugShowCheckedModeBanner: false,
+        );
+      },
     );
   }
 }

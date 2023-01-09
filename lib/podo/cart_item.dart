@@ -1,5 +1,5 @@
-class ProductLine {
-  ProductLine({
+class CartItem {
+  CartItem({
     this.name,
     this.qty,
     this.unitPrice,

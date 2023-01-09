@@ -3,10 +3,12 @@ import 'package:coopaz_app/dao/order_dao.dart';
 import 'package:coopaz_app/dao/product_dao.dart';
 import 'package:coopaz_app/podo/member.dart';
 import 'package:coopaz_app/podo/product.dart';
-import 'package:coopaz_app/podo/product_line.dart';
+import 'package:coopaz_app/screens/cash_register/product_list.dart';
+import 'package:coopaz_app/screens/cash_register/validation_panel.dart';
+import 'package:coopaz_app/state/model.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:coopaz_app/logger.dart';
+import 'package:provider/provider.dart';
 
 class CashRegisterScreen extends StatefulWidget {
   const CashRegisterScreen(
@@ -28,23 +30,8 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
 
   final String title = 'Caisse';
 
-  static const double cardFeeRate = 0.00553;
-  final DateFormat formatter = DateFormat('yyyy-MM-dd HH:mm:ss');
-  static const List<String> paymentMethodList = <String>[
-    'CB',
-    'Cheque',
-    'Virement'
-  ];
-  NumberFormat numberFormat = NumberFormat('#,##0.00');
-
   late Future<List<Member>> futureMembers;
   late Future<List<Product>> futureProducts;
-
-  //Form data
-  String paymentmethodSelected = paymentMethodList.first;
-
-  List<ProductLine> productLines = [ProductLine()];
-  Member? selectedMember;
 
   @override
   initState() {
@@ -54,6 +41,7 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
     futureMembers = widget.memberDao.getMembers();
     log('Get products...');
     futureProducts = widget.productDao.getProducts();
+
     log('Init screen $title finish');
   }
 
@@ -61,277 +49,114 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
   Widget build(BuildContext context) {
     log('build screen $title');
 
-    var styleHeaders = Theme.of(context)
-        .primaryTextTheme
-        .titleLarge
-        ?.apply(color: Colors.blue);
+    return Consumer<AppModel>(builder: (context, model, child) {
+      futureProducts.then((p) {
+        model.products = p;
+      });
 
-    List<Row> productLineWidgets = _createProductLineWidgets();
+      futureMembers.then((m) {
+        model.members = m;
+      });
 
-    double subtotal = productLines
-        .map((e) =>
-            (double.tryParse(e.qty ?? '0') ?? 0.0) *
-            (double.tryParse(e.unitPrice ?? '0') ?? 0.0))
-        .fold(0.0, (prev, e) => prev + e);
-
-    double cardFee = 0.0;
-    if( paymentmethodSelected == 'CB'){
-      cardFee = subtotal * cardFeeRate;
-    }
-
-    double total = subtotal + cardFee;
-
-    return Scaffold(
-        appBar: AppBar(
-          title: Text(title),
-        ),
-        body: Form(
-          key: _formKey,
-          child: Row(children: [
-            Expanded(
-                flex: 3,
-                child: Column(
-                  children: [
-                    Row(children: <Widget>[
-                      Expanded(
-                          flex: 8,
-                          child: Text(
-                            'Produit',
-                            style: styleHeaders,
-                          )),
-                      Expanded(
-                          flex: 2,
-                          child: Text(
-                            'Quantité',
-                            style: styleHeaders,
-                          )),
-                      Expanded(
-                          flex: 2,
-                          child: Text(
-                            'Prix unitaire',
-                            style: styleHeaders,
-                          )),
-                      Expanded(
-                          flex: 2,
-                          child: Text(
-                            'Unité',
-                            style: styleHeaders,
-                          )),
-                      Expanded(
-                          flex: 2,
-                          child: Text(
-                            'Total',
-                            style: styleHeaders,
-                          )),
-                      Expanded(flex: 1, child: Container()),
-                    ]),
-                    Column(children: productLineWidgets),
-                    Align(
-                        alignment: Alignment.centerRight,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            log('+ pressed');
-                            _validateAll();
-                            productLines.add(ProductLine());
-                            setState(() {
-                              productLines = productLines;
-                            });
-                          },
-                          child: const Icon(Icons.add),
-                        ))
-                  ],
-                )),
-            const VerticalDivider(),
-            Expanded(
-                flex: 1,
-                child: Column(
-                  children: [
-                    Row(children: [
-                      Expanded(
-                          child: Autocomplete<Member>(
-                        displayStringForOption: (Member m) =>
-                            '${m.name} : ${m.email}',
-                        optionsBuilder:
-                            (TextEditingValue textEditingValue) async {
-                          if (textEditingValue.text == '') {
-                            return const Iterable<Member>.empty();
-                          }
-                          return (await futureMembers).where((Member m) {
-                            return m
-                                .toString()
-                                .contains(textEditingValue.text.toLowerCase());
-                          });
-                        },
-                        onSelected: (m) {
-                          setState(() {
-                            selectedMember = m;
-                          });
-                        },
-                      )),
-                    ]),
-                    Row(children: [
-                      const Expanded(
-                          child: Align(
-                              alignment: Alignment.topLeft,
-                              child: Text('Mode de paiment: '))),
-                      Expanded(
-                          child: DropdownButton<String>(
-                        value: paymentmethodSelected,
-                        elevation: 16,
-                        onChanged: (String? value) {
-                          // This is called when the user selects an item.
-                          setState(() {
-                            paymentmethodSelected = value!;
-                          });
-                        },
-                        items: paymentMethodList
-                            .map<DropdownMenuItem<String>>((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
-                      ))
-                    ]),
-                    Row(children: [
-                      const Expanded(
-                          child: Align(
-                              alignment: Alignment.topLeft,
-                              child: Text('Sous total: '))),
-                      Expanded(
-                          child: Align(
-                              alignment: Alignment.topLeft,
-                              child: Text('${subtotal.toStringAsFixed(2)}€')))
-                    ]),
-                    Row(children: [
-                      const Expanded(
-                          child: Align(
-                              alignment: Alignment.topLeft,
-                              child: Text('Total: '))),
-                      Expanded(
-                          child: Align(
-                              alignment: Alignment.topLeft,
-                              child: Text('${total.toStringAsFixed(2)}€')))
-                    ]),
-                    Center(
-                        child: ElevatedButton(
-                      onPressed: () {
-                        if (_validateAll()) {
-                          log('Send form !!!');
-                          _sendForm();
+      return Scaffold(
+          appBar: AppBar(
+            title: Text(title),
+          ),
+          body: Form(
+            key: _formKey,
+            child: Row(children: [
+              Expanded(
+                  flex: 3,
+                  child: FutureBuilder<List<Product>>(
+                      future: futureProducts,
+                      builder: (BuildContext context,
+                          AsyncSnapshot<List<Product>> snapshot) {
+                        Widget w;
+                        if (snapshot.hasData) {
+                          //model.products = snapshot.data ?? [];
+                          log('product loaded !');
+                          w = ProductList(
+                              formKey: _formKey,
+                              model: model);
+                        } else if (snapshot.hasError) {
+                          log('products loading in error...');
+                          w = Column(children: [
+                            const Icon(
+                              Icons.error_outline,
+                              color: Colors.red,
+                              size: 60,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 16),
+                              child: Text('Error: ${snapshot.error}'),
+                            ),
+                          ]);
                         } else {
-                          log('Form invalid');
+                          log('product loading...');
+                          w = Column(children: const [
+                            SizedBox(
+                              width: 60,
+                              height: 60,
+                              child: CircularProgressIndicator(),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(top: 16),
+                              child: Text(
+                                  'Chargement de la liste des produits...'),
+                            ),
+                          ]);
                         }
-                      },
-                      child: const Text('Valider'),
-                    ))
-                  ],
-                ))
-          ]),
-        ));
-  }
 
-  bool _validateAll() {
-    log(_formKey.currentState.toString());
-    if (_formKey.currentState!.validate()) {
-      return true;
-    }
-    return false;
-  }
+                        return w;
+                      })),
+              const VerticalDivider(),
+              Expanded(
+                  flex: 1,
+                  child: FutureBuilder<List<Member>>(
+                      future: futureMembers,
+                      builder: (BuildContext context,
+                          AsyncSnapshot<List<Member>> snapshot) {
+                        Widget w;
+                        if (snapshot.hasData) {
+                          log('members loaded !');
+                          //model.members = snapshot.data ?? [];
+                          w = ValidationPanel(
+                            orderDao: widget.orderDao,
+                            formKey: _formKey,
+                          );
+                        } else if (snapshot.hasError) {
+                          log('members loading in error...');
+                          w = Column(children: [
+                            const Icon(
+                              Icons.error_outline,
+                              color: Colors.red,
+                              size: 60,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 16),
+                              child: Text('Error: ${snapshot.error}'),
+                            ),
+                          ]);
+                        } else {
+                          log('members loading...');
+                          w = Column(children: const [
+                            SizedBox(
+                              width: 60,
+                              height: 60,
+                              child: CircularProgressIndicator(),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(top: 16),
+                              child:
+                                  Text('Chargement de la liste des membres...'),
+                            ),
+                          ]);
+                        }
 
-  _sendForm() async {
-    // send data to macro
-    await widget.orderDao
-        .createOrder(selectedMember?.email ?? '', productLines, "");
-    // reset form
-    _formKey.currentState?.reset();
-    setState(() {
-      productLines = [ProductLine()];
+                        return w;
+                      }))
+            ]),
+          ));
     });
-  }
-
-  List<Row> _createProductLineWidgets() {
-    List<Row> products = [];
-    for (var entry in productLines.asMap().entries) {
-      var product = _createProductLineWidget(entry.key, entry.value);
-      products.add(product);
-    }
-    return products;
-  }
-
-  Row _createProductLineWidget(int index, ProductLine product) {
-    var total = '';
-    double? unitPrice = double.tryParse(product.unitPrice ?? '');
-    double? qty = double.tryParse(product.qty ?? '');
-    if (unitPrice != null && qty != null) {
-      total = '${numberFormat.format(unitPrice * qty)} €';
-    }
-
-    var productWidget = Row(children: <Widget>[
-      Expanded(
-          flex: 8,
-          child: Autocomplete<Product>(
-            displayStringForOption: (Product p) => p.designation,
-            optionsBuilder: (TextEditingValue textEditingValue) async {
-              if (textEditingValue.text == '') {
-                return const Iterable<Product>.empty();
-              }
-              return (await futureProducts).where((Product p) {
-                return p
-                    .toString()
-                    .toLowerCase()
-                    .contains(textEditingValue.text.toLowerCase());
-              });
-            },
-            onSelected: (p) {
-              setState(() {
-                productLines[index] = ProductLine(
-                    name: p.designation,
-                    unit: p.unit.unitAsString,
-                    unitPrice: p.price.toStringAsFixed(2));
-              });
-            },
-          )),
-      Expanded(
-          flex: 2,
-          child: TextFormField(
-            controller: TextEditingController(text: product.qty ?? '')
-              ..selection =
-                  TextSelection.collapsed(offset: (product.qty ?? '').length),
-            decoration: const InputDecoration(
-              hintText: 'Quantité',
-            ),
-            validator: (String? value) {
-              if (value == null ||
-                  value.isEmpty ||
-                  double.tryParse(value) == null) {
-                return 'Quantité invalide';
-              }
-              return null;
-            },
-            onChanged: (String value) {
-              product.qty = value;
-              setState(() {
-                productLines[index] = product;
-              });
-            },
-          )),
-      Expanded(flex: 2, child: Text(product.unitPrice ?? '-')),
-      Expanded(flex: 2, child: Text(product.unit ?? '-')),
-      Expanded(flex: 2, child: Text(total)),
-      Expanded(
-          flex: 1,
-          child: ElevatedButton(
-            onPressed: () {
-              log('Delete line pressed');
-              setState(() {
-                productLines.remove(product);
-              });
-            },
-            child: const Icon(Icons.delete),
-          ))
-    ]);
-
-    return productWidget;
   }
 }

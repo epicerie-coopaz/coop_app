@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:coopaz_app/dao/data_access.dart';
 import 'package:coopaz_app/logger.dart';
-import 'package:coopaz_app/podo/product_line.dart';
+import 'package:coopaz_app/podo/cart_item.dart';
 import 'package:http/http.dart' as http;
 
 class OrderDao extends GoogleAppsScriptDao {
@@ -11,7 +11,8 @@ class OrderDao extends GoogleAppsScriptDao {
       required super.appsScriptId,
       required super.authManager});
 
-  Future createOrder(String clientMail, List<ProductLine> productLines, String chequeNumber) async {
+  Future createOrder(String clientMail, List<CartItem> productLines,
+      String chequeNumber) async {
     var body = {
       "function": "processOrder",
       "parameters": [

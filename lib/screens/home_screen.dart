@@ -28,10 +28,9 @@ class CoopazApp extends StatelessWidget {
         return MaterialApp(
           title: 'Coopaz',
           theme: ThemeData(
-            colorSchemeSeed: const Color(0xFF476800),
-            useMaterial3: true,
-            //primaryColor: const Color(0xFF476800),
-            //backgroundColor: const Color(0xFF476800),
+            //backgroundColor: const Color(0xFFFEFCF4),
+            colorSchemeSeed: Color.fromARGB(255, 255, 174, 52),
+            //useMaterial3: true
           ),
           home: HomeScreen(
               memberDao: memberDao, productDao: productDao, orderDao: orderDao),
@@ -55,17 +54,10 @@ class HomeScreen extends StatelessWidget {
 
   final String title = 'Logiciel Coopaz';
 
-  final ButtonStyle buttonStyle = const ButtonStyle(
-    minimumSize: MaterialStatePropertyAll(Size(200, 200)),
-    /*backgroundColor: MaterialStatePropertyAll(Colors.blue),
-    foregroundColor: MaterialStatePropertyAll(Colors.white),
-    overlayColor: MaterialStatePropertyAll(Colors.green),
-    */
-  );
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        //backgroundColor: const Color(0xff00BCD1),
         appBar: AppBar(
           // Here we take the value from the MyHomePage object that was created by
           // the App.build method, and use it to set our appbar title.
@@ -76,7 +68,12 @@ class HomeScreen extends StatelessWidget {
           spacing: 10.0, // gap between adjacent chips
           runSpacing: 10.0, // gap between lines
           children: <Widget>[
-            TextButton(
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                minimumSize: const Size(200, 200),
+              ).copyWith(elevation: ButtonStyleButton.allOrNull(0.0)),
               onPressed: () {
                 log('Cash register Clicked !');
 
@@ -89,16 +86,21 @@ class HomeScreen extends StatelessWidget {
                   ),
                 );
               },
-              style: buttonStyle,
               child: const Text('Caisse'),
             ),
-            TextButton(
+            ElevatedButton(
                 onPressed: () {
                   log('Reception Clicked !');
                 },
-                style: buttonStyle,
+                style: ElevatedButton.styleFrom(
+                        foregroundColor:
+                            Theme.of(context).colorScheme.onSecondaryContainer,
+                        backgroundColor:
+                            Theme.of(context).colorScheme.secondaryContainer,
+                        minimumSize: const Size(200, 200))
+                    .copyWith(elevation: ButtonStyleButton.allOrNull(0.0)),
                 child: const Text('Reception')),
-            TextButton(
+            ElevatedButton(
                 onPressed: () {
                   log('Products Clicked !');
                   Navigator.of(context).push(
@@ -108,9 +110,15 @@ class HomeScreen extends StatelessWidget {
                     ),
                   );
                 },
-                style: buttonStyle,
+                style: ElevatedButton.styleFrom(
+                        foregroundColor:
+                            Theme.of(context).colorScheme.onSecondaryContainer,
+                        backgroundColor:
+                            Theme.of(context).colorScheme.secondaryContainer,
+                        minimumSize: const Size(200, 200))
+                    .copyWith(elevation: ButtonStyleButton.allOrNull(0.0)),
                 child: const Text('Produits')),
-            TextButton(
+            ElevatedButton(
                 onPressed: () {
                   log('Members Clicked !');
                   Navigator.of(context).push(
@@ -119,7 +127,13 @@ class HomeScreen extends StatelessWidget {
                     ),
                   );
                 },
-                style: buttonStyle,
+                style: ElevatedButton.styleFrom(
+                        foregroundColor:
+                            Theme.of(context).colorScheme.onSecondaryContainer,
+                        backgroundColor:
+                            Theme.of(context).colorScheme.secondaryContainer,
+                        minimumSize: const Size(200, 200))
+                    .copyWith(elevation: ButtonStyleButton.allOrNull(0.0)),
                 child: const Text('Adhérents')),
           ],
         )));

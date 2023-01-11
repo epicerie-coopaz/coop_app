@@ -40,65 +40,64 @@ class _MembersScreenState extends State<MembersScreen> {
             if (snapshot.hasData) {
               var styleHeaders = Theme.of(context)
                   .primaryTextTheme
-                  .titleMedium
-                  ?.apply(color: Colors.blue);
-              var styleBody = Theme.of(context)
-                  .primaryTextTheme
-                  .bodyMedium
-                  ?.apply(color: Colors.black);
-              return Column(
-                children: [
-                  Expanded(
-                      flex: 0,
-                      child: Row(
-                          children: [
-                        Pair('Nom', 1),
-                        Pair('Email', 1),
-                        Pair('Téléphone', 1),
-                        Pair('Score', 1),
-                      ]
-                              .map(
-                                (e) => Expanded(
-                                  flex: e.b,
-                                  child: Text(
-                                    e.a,
-                                    style: styleHeaders,
-                                  ),
-                                ),
-                              )
-                              .toList())),
-                  const Divider(
-                    thickness: 2,
-                  ),
-                  Expanded(
-                      flex: 1,
-                      child: ListView(
-                        addAutomaticKeepAlives: false,
-                        children: snapshot.data!.map((p) {
-                          return Column(children: [
-                            Row(
+                  .titleLarge
+                  ?.apply(color: Theme.of(context).colorScheme.primary);
+              var styleBody = Theme.of(context).textTheme.bodyMedium;
+              return Container(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Column(
+                    children: [
+                      Expanded(
+                          flex: 0,
+                          child: Row(
                               children: [
-                                Expanded(
-                                    flex: 1,
-                                    child: Text(p.name, style: styleBody)),
-                                Expanded(
-                                    flex: 1,
-                                    child: Text(p.email, style: styleBody)),
-                                Expanded(
-                                    flex: 1,
-                                    child: Text(p.phone, style: styleBody)),
-                                Expanded(
-                                    flex: 1,
-                                    child: Text(p.score.toString(),
-                                        style: styleBody)),
-                              ],
-                            ),
-                            const Divider()
-                          ]);
-                        }).toList(),
-                      ))
-                ],
-              ); //Text(snapshot.data!.title);
+                            Pair('Nom', 1),
+                            Pair('Email', 1),
+                            Pair('Téléphone', 1),
+                            Pair('Score', 1),
+                          ]
+                                  .map(
+                                    (e) => Expanded(
+                                      flex: e.b,
+                                      child: Text(
+                                        e.a,
+                                        style: styleHeaders,
+                                      ),
+                                    ),
+                                  )
+                                  .toList())),
+                      const Divider(
+                        thickness: 2,
+                      ),
+                      Expanded(
+                          flex: 1,
+                          child: ListView(
+                            addAutomaticKeepAlives: false,
+                            children: snapshot.data!.map((p) {
+                              return Column(children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                        flex: 1,
+                                        child: Text(p.name, style: styleBody)),
+                                    Expanded(
+                                        flex: 1,
+                                        child: Text(p.email, style: styleBody)),
+                                    Expanded(
+                                        flex: 1,
+                                        child: Text(p.phone, style: styleBody)),
+                                    Expanded(
+                                        flex: 1,
+                                        child: Text(p.score.toString(),
+                                            style: styleBody)),
+                                  ],
+                                ),
+                                const Divider()
+                              ]);
+                            }).toList(),
+                          ))
+                    ],
+                  )); //Text(snapshot.data!.title);
             } else if (snapshot.hasError) {
               return Text('${snapshot.error}');
             }

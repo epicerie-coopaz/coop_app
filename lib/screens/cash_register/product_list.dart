@@ -1,3 +1,5 @@
+//import 'dart:html';
+
 import 'package:coopaz_app/podo/product.dart';
 import 'package:coopaz_app/podo/cart_item.dart';
 import 'package:coopaz_app/state/model.dart';
@@ -7,10 +9,7 @@ import 'package:coopaz_app/logger.dart';
 import 'package:provider/provider.dart';
 
 class ProductList extends StatefulWidget {
-  const ProductList(
-      {super.key,
-      required this.formKey,
-      required this.model});
+  const ProductList({super.key, required this.formKey, required this.model});
 
   final GlobalKey<FormState> formKey;
   final AppModel model;
@@ -29,59 +28,61 @@ class _ProductListState extends State<ProductList> {
     var styleHeaders = Theme.of(context)
         .primaryTextTheme
         .titleLarge
-        ?.apply(color: Colors.blue);
+        ?.apply(color: Theme.of(context).colorScheme.primary);
 
     return Consumer<AppModel>(builder: (context, model, child) {
       List<Row> productLineWidgets = _createProductLineWidgets(model);
 
-      return Column(
-        children: [
-          Row(children: <Widget>[
-            Expanded(
-                flex: 8,
-                child: Text(
-                  'Produit',
-                  style: styleHeaders,
-                )),
-            Expanded(
-                flex: 2,
-                child: Text(
-                  'Quantité',
-                  style: styleHeaders,
-                )),
-            Expanded(
-                flex: 2,
-                child: Text(
-                  'Prix unitaire',
-                  style: styleHeaders,
-                )),
-            Expanded(
-                flex: 2,
-                child: Text(
-                  'Unité',
-                  style: styleHeaders,
-                )),
-            Expanded(
-                flex: 2,
-                child: Text(
-                  'Total',
-                  style: styleHeaders,
-                )),
-            Expanded(flex: 1, child: Container()),
-          ]),
-          Column(children: productLineWidgets),
-          Align(
-              alignment: Alignment.centerRight,
-              child: ElevatedButton(
-                onPressed: () {
-                  log('+ pressed');
-                  _validateAll();
-                  model.addToCart(CartItem());
-                },
-                child: const Icon(Icons.add),
-              ))
-        ],
-      );
+      return Container(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            children: [
+              Row(children: <Widget>[
+                Expanded(
+                    flex: 8,
+                    child: Text(
+                      'Produit',
+                      style: styleHeaders,
+                    )),
+                Expanded(
+                    flex: 2,
+                    child: Text(
+                      'Quantité',
+                      style: styleHeaders,
+                    )),
+                Expanded(
+                    flex: 2,
+                    child: Text(
+                      'Prix unitaire',
+                      style: styleHeaders,
+                    )),
+                Expanded(
+                    flex: 2,
+                    child: Text(
+                      'Unité',
+                      style: styleHeaders,
+                    )),
+                Expanded(
+                    flex: 2,
+                    child: Text(
+                      'Total',
+                      style: styleHeaders,
+                    )),
+                Expanded(flex: 1, child: Container()),
+              ]),
+              Column(children: productLineWidgets),
+              Align(
+                  alignment: Alignment.centerRight,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      log('+ pressed');
+                      _validateAll();
+                      model.addToCart(CartItem());
+                    },
+                    child: const Icon(Icons.add),
+                  ))
+            ],
+          ));
     });
   }
 

@@ -40,12 +40,9 @@ class _ProductScreenState extends State<ProductsScreen> {
             if (snapshot.hasData) {
               var styleHeaders = Theme.of(context)
                   .primaryTextTheme
-                  .titleMedium
-                  ?.apply(color: Colors.blue);
-              var styleBody = Theme.of(context)
-                  .primaryTextTheme
-                  .bodyMedium
-                  ?.apply(color: Colors.black);
+                  .titleLarge
+                  ?.apply(color: Theme.of(context).colorScheme.primary);
+              var styleBody = Theme.of(context).textTheme.bodyMedium;
               return Column(
                 children: [
                   Expanded(
@@ -99,7 +96,8 @@ class _ProductScreenState extends State<ProductsScreen> {
                                     child: Text(p.supplier, style: styleBody)),
                                 Expanded(
                                     flex: 1,
-                                    child: Text(p.unit.unitAsString, style: styleBody)),
+                                    child: Text(p.unit.unitAsString,
+                                        style: styleBody)),
                                 Expanded(
                                     flex: 1,
                                     child: Text(p.barreCode, style: styleBody)),

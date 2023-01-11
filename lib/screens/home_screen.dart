@@ -28,8 +28,39 @@ class CoopazApp extends StatelessWidget {
         return MaterialApp(
           title: 'Coopaz',
           theme: ThemeData(
-            primarySwatch: Colors.blue,
-          ),
+              //colorSchemeSeed: Color.fromARGB(255, 255, 174, 52),
+              colorScheme: const ColorScheme(
+                brightness: Brightness.light,
+                primary: Color(0xFF4B6700),
+                onPrimary: Color(0xFFFFFFFF),
+                primaryContainer: Color(0xFFC2F35C),
+                onPrimaryContainer: Color(0xFF141F00),
+                secondary: Color(0xFF984800),
+                onSecondary: Color(0xFFFFFFFF),
+                secondaryContainer: Color(0xFFFFDBC8),
+                onSecondaryContainer: Color(0xFF321300),
+                tertiary: Color(0xFF6F5D00),
+                onTertiary: Color(0xFFFFFFFF),
+                tertiaryContainer: Color(0xFFFFE169),
+                onTertiaryContainer: Color(0xFF221B00),
+                error: Color(0xFFBA1A1A),
+                errorContainer: Color(0xFFFFDAD6),
+                onError: Color(0xFFFFFFFF),
+                onErrorContainer: Color(0xFF410002),
+                background: Color(0xFFFEFCF4),
+                onBackground: Color(0xFF1B1C17),
+                surface: Color(0xFFFEFCF4),
+                onSurface: Color(0xFF1B1C17),
+                surfaceVariant: Color(0xFFE2E4D4),
+                onSurfaceVariant: Color(0xFF45483C),
+                outline: Color(0xFF76786B),
+                onInverseSurface: Color(0xFFF2F1E9),
+                inverseSurface: Color(0xFF30312C),
+                inversePrimary: Color(0xFFA7D642),
+                shadow: Color(0xFF000000),
+                surfaceTint: Color(0xFF4B6700),
+              ),
+              useMaterial3: true),
           home: HomeScreen(
               memberDao: memberDao, productDao: productDao, orderDao: orderDao),
           debugShowCheckedModeBanner: false,
@@ -52,16 +83,10 @@ class HomeScreen extends StatelessWidget {
 
   final String title = 'Logiciel Coopaz';
 
-  final ButtonStyle buttonStyle = const ButtonStyle(
-    minimumSize: MaterialStatePropertyAll(Size(200, 200)),
-    backgroundColor: MaterialStatePropertyAll(Colors.blue),
-    foregroundColor: MaterialStatePropertyAll(Colors.white),
-    overlayColor: MaterialStatePropertyAll(Colors.green),
-  );
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        //backgroundColor: const Color(0xff00BCD1),
         appBar: AppBar(
           // Here we take the value from the MyHomePage object that was created by
           // the App.build method, and use it to set our appbar title.
@@ -72,7 +97,12 @@ class HomeScreen extends StatelessWidget {
           spacing: 10.0, // gap between adjacent chips
           runSpacing: 10.0, // gap between lines
           children: <Widget>[
-            TextButton(
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                minimumSize: const Size(200, 200),
+              ).copyWith(elevation: ButtonStyleButton.allOrNull(0.0)),
               onPressed: () {
                 log('Cash register Clicked !');
 
@@ -85,16 +115,21 @@ class HomeScreen extends StatelessWidget {
                   ),
                 );
               },
-              style: buttonStyle,
               child: const Text('Caisse'),
             ),
-            TextButton(
+            ElevatedButton(
                 onPressed: () {
                   log('Reception Clicked !');
                 },
-                style: buttonStyle,
+                style: ElevatedButton.styleFrom(
+                        foregroundColor:
+                            Theme.of(context).colorScheme.onSecondaryContainer,
+                        backgroundColor:
+                            Theme.of(context).colorScheme.secondaryContainer,
+                        minimumSize: const Size(200, 200))
+                    .copyWith(elevation: ButtonStyleButton.allOrNull(0.0)),
                 child: const Text('Reception')),
-            TextButton(
+            ElevatedButton(
                 onPressed: () {
                   log('Products Clicked !');
                   Navigator.of(context).push(
@@ -104,9 +139,15 @@ class HomeScreen extends StatelessWidget {
                     ),
                   );
                 },
-                style: buttonStyle,
+                style: ElevatedButton.styleFrom(
+                        foregroundColor:
+                            Theme.of(context).colorScheme.onSecondaryContainer,
+                        backgroundColor:
+                            Theme.of(context).colorScheme.secondaryContainer,
+                        minimumSize: const Size(200, 200))
+                    .copyWith(elevation: ButtonStyleButton.allOrNull(0.0)),
                 child: const Text('Produits')),
-            TextButton(
+            ElevatedButton(
                 onPressed: () {
                   log('Members Clicked !');
                   Navigator.of(context).push(
@@ -115,7 +156,13 @@ class HomeScreen extends StatelessWidget {
                     ),
                   );
                 },
-                style: buttonStyle,
+                style: ElevatedButton.styleFrom(
+                        foregroundColor:
+                            Theme.of(context).colorScheme.onSecondaryContainer,
+                        backgroundColor:
+                            Theme.of(context).colorScheme.secondaryContainer,
+                        minimumSize: const Size(200, 200))
+                    .copyWith(elevation: ButtonStyleButton.allOrNull(0.0)),
                 child: const Text('Adhérents')),
           ],
         )));

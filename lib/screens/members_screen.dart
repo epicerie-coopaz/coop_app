@@ -41,11 +41,8 @@ class _MembersScreenState extends State<MembersScreen> {
               var styleHeaders = Theme.of(context)
                   .primaryTextTheme
                   .titleMedium
-                  ?.apply(color: Colors.blue);
-              var styleBody = Theme.of(context)
-                  .primaryTextTheme
-                  .bodyMedium
-                  ?.apply(color: Colors.black);
+                  ?.apply(color: Theme.of(context).primaryColor);
+              var styleBody = Theme.of(context).textTheme.bodyMedium;
               return Column(
                 children: [
                   Expanded(

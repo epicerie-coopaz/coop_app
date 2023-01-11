@@ -33,56 +33,54 @@ class _ProductListState extends State<ProductList> {
     return Consumer<AppModel>(builder: (context, model, child) {
       List<Row> productLineWidgets = _createProductLineWidgets(model);
 
-      return Container(
-          padding: const EdgeInsets.all(12.0),
-          child: Column(
-            children: [
-              Row(children: <Widget>[
-                Expanded(
-                    flex: 8,
-                    child: Text(
-                      'Produit',
-                      style: styleHeaders,
-                    )),
-                Expanded(
-                    flex: 2,
-                    child: Text(
-                      'Quantité',
-                      style: styleHeaders,
-                    )),
-                Expanded(
-                    flex: 2,
-                    child: Text(
-                      'Prix unitaire',
-                      style: styleHeaders,
-                    )),
-                Expanded(
-                    flex: 2,
-                    child: Text(
-                      'Unité',
-                      style: styleHeaders,
-                    )),
-                Expanded(
-                    flex: 2,
-                    child: Text(
-                      'Total',
-                      style: styleHeaders,
-                    )),
-                Expanded(flex: 1, child: Container()),
-              ]),
-              Column(children: productLineWidgets),
-              Align(
-                  alignment: Alignment.centerRight,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      log('+ pressed');
-                      _validateAll();
-                      model.addToCart(CartItem());
-                    },
-                    child: const Icon(Icons.add),
-                  ))
-            ],
-          ));
+      return Column(
+        children: [
+          Row(children: <Widget>[
+            Expanded(
+                flex: 8,
+                child: Text(
+                  'Produit',
+                  style: styleHeaders,
+                )),
+            Expanded(
+                flex: 2,
+                child: Text(
+                  'Quantité',
+                  style: styleHeaders,
+                )),
+            Expanded(
+                flex: 2,
+                child: Text(
+                  'Prix unitaire',
+                  style: styleHeaders,
+                )),
+            Expanded(
+                flex: 2,
+                child: Text(
+                  'Unité',
+                  style: styleHeaders,
+                )),
+            Expanded(
+                flex: 2,
+                child: Text(
+                  'Total',
+                  style: styleHeaders,
+                )),
+            Expanded(flex: 1, child: Container()),
+          ]),
+          Column(children: productLineWidgets),
+          Align(
+              alignment: Alignment.centerRight,
+              child: ElevatedButton(
+                onPressed: () {
+                  log('+ pressed');
+                  _validateAll();
+                  model.addToCart(CartItem());
+                },
+                child: const Icon(Icons.add),
+              ))
+        ],
+      );
     });
   }
 

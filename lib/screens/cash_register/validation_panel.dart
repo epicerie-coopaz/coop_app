@@ -48,105 +48,100 @@ class _ValidationPanelState extends State<ValidationPanel> {
 
       double total = subtotal + cardFee;
 
-      return Container(
-          padding: const EdgeInsets.all(12.0),
-          child: Column(children: [
-            Row(children: [
-              const Expanded(
-                  flex: 1,
-                  child: Text(
-                    'Adhérent :',
-                  )),
-              Expanded(
-                  flex: 2,
-                  child: Autocomplete<Member>(
-                    displayStringForOption: (Member m) =>
-                        '${m.name} : ${m.email}',
-                    optionsBuilder: (TextEditingValue textEditingValue) async {
-                      if (textEditingValue.text == '') {
-                        return const Iterable<Member>.empty();
-                      }
-                      return model.members.where((Member m) {
-                        return m
-                            .toString()
-                            .contains(textEditingValue.text.toLowerCase());
-                      });
-                    },
-                    onSelected: (m) {
-                      setState(() {
-                        selectedMember = m;
-                      });
-                    },
-                  )),
-            ]),
-            Row(children: [
-              const Expanded(
-                  flex: 1,
-                  child: Align(
-                      alignment: Alignment.topLeft,
-                      child: Text('Paiement : '))),
-              Expanded(
-                  flex: 2,
-                  child: DropdownButton<String>(
-                    value: paymentmethodSelected,
-                    elevation: 16,
-                    onChanged: (String? value) {
-                      // This is called when the user selects an item.
-                      setState(() {
-                        paymentmethodSelected = value!;
-                      });
-                    },
-                    items: paymentMethodList
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                  ))
-            ]),
-            //Todo: add a text box to enter cheque number
-            //if(paymentmethodSelected == 'Cheque') {widgets...}
-            Row(children: [
-              const Expanded(
-                  flex: 1,
-                  child: Align(
-                      alignment: Alignment.topLeft,
-                      child: Text('Sous total : '))),
-              Expanded(
-                  flex: 2,
-                  child: Align(
-                      alignment: Alignment.topLeft,
-                      child: Text('${subtotal.toStringAsFixed(2)}€')))
-            ]),
-            Row(children: [
-              const Expanded(
-                  flex: 1,
-                  child: Align(
-                      alignment: Alignment.topLeft, child: Text('Total : '))),
-              Expanded(
-                  flex: 2,
-                  child: Align(
-                      alignment: Alignment.topLeft,
-                      child: Text('${total.toStringAsFixed(2)}€')))
-            ]),
-            Center(
-                child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                backgroundColor: Theme.of(context).colorScheme.primary,
-              ).copyWith(elevation: ButtonStyleButton.allOrNull(0.0)),
-              onPressed: () {
-                if (_validateAll()) {
-                  log('Send form !!!');
-                  _sendForm(model);
-                } else {
-                  log('Form invalid');
-                }
-              },
-              child: const Text('Valider'),
-            )),
-          ]));
+      return Column(children: [
+        Row(children: [
+          const Expanded(
+              flex: 1,
+              child: Text(
+                'Adhérent :',
+              )),
+          Expanded(
+              flex: 2,
+              child: Autocomplete<Member>(
+                displayStringForOption: (Member m) => '${m.name} : ${m.email}',
+                optionsBuilder: (TextEditingValue textEditingValue) async {
+                  if (textEditingValue.text == '') {
+                    return const Iterable<Member>.empty();
+                  }
+                  return model.members.where((Member m) {
+                    return m
+                        .toString()
+                        .contains(textEditingValue.text.toLowerCase());
+                  });
+                },
+                onSelected: (m) {
+                  setState(() {
+                    selectedMember = m;
+                  });
+                },
+              )),
+        ]),
+        Row(children: [
+          const Expanded(
+              flex: 1,
+              child: Align(
+                  alignment: Alignment.topLeft, child: Text('Paiement : '))),
+          Expanded(
+              flex: 2,
+              child: DropdownButton<String>(
+                value: paymentmethodSelected,
+                elevation: 16,
+                onChanged: (String? value) {
+                  // This is called when the user selects an item.
+                  setState(() {
+                    paymentmethodSelected = value!;
+                  });
+                },
+                items: paymentMethodList
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ))
+        ]),
+        //Todo: add a text box to enter cheque number
+        //if(paymentmethodSelected == 'Cheque') {widgets...}
+        Row(children: [
+          const Expanded(
+              flex: 1,
+              child: Align(
+                  alignment: Alignment.topLeft, child: Text('Sous total : '))),
+          Expanded(
+              flex: 2,
+              child: Align(
+                  alignment: Alignment.topLeft,
+                  child: Text('${subtotal.toStringAsFixed(2)}€')))
+        ]),
+        Row(children: [
+          const Expanded(
+              flex: 1,
+              child:
+                  Align(alignment: Alignment.topLeft, child: Text('Total : '))),
+          Expanded(
+              flex: 2,
+              child: Align(
+                  alignment: Alignment.topLeft,
+                  child: Text('${total.toStringAsFixed(2)}€')))
+        ]),
+        Center(
+            child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+            backgroundColor: Theme.of(context).colorScheme.primary,
+          ).copyWith(elevation: ButtonStyleButton.allOrNull(0.0)),
+          onPressed: () {
+            if (_validateAll()) {
+              log('Send form !!!');
+              _sendForm(model);
+            } else {
+              log('Form invalid');
+            }
+          },
+          child: const Text('Valider'),
+        )),
+      ]);
     });
   }
 

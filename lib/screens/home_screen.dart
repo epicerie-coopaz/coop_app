@@ -28,7 +28,10 @@ class CoopazApp extends StatelessWidget {
         return MaterialApp(
           title: 'Coopaz',
           theme: ThemeData(
-            primarySwatch: Colors.blue,
+            colorSchemeSeed: const Color(0xFF476800),
+            useMaterial3: true,
+            //primaryColor: const Color(0xFF476800),
+            //backgroundColor: const Color(0xFF476800),
           ),
           home: HomeScreen(
               memberDao: memberDao, productDao: productDao, orderDao: orderDao),
@@ -54,9 +57,10 @@ class HomeScreen extends StatelessWidget {
 
   final ButtonStyle buttonStyle = const ButtonStyle(
     minimumSize: MaterialStatePropertyAll(Size(200, 200)),
-    backgroundColor: MaterialStatePropertyAll(Colors.blue),
+    /*backgroundColor: MaterialStatePropertyAll(Colors.blue),
     foregroundColor: MaterialStatePropertyAll(Colors.white),
     overlayColor: MaterialStatePropertyAll(Colors.green),
+    */
   );
 
   @override

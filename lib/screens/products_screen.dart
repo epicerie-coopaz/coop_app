@@ -39,13 +39,10 @@ class _ProductScreenState extends State<ProductsScreen> {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               var styleHeaders = Theme.of(context)
-                  .primaryTextTheme
+                  .textTheme
                   .titleMedium
-                  ?.apply(color: Colors.blue);
-              var styleBody = Theme.of(context)
-                  .primaryTextTheme
-                  .bodyMedium
-                  ?.apply(color: Colors.black);
+                  ?.apply(color: Theme.of(context).primaryColor);
+              var styleBody = Theme.of(context).textTheme.bodyMedium;
               return Column(
                 children: [
                   Expanded(
@@ -65,12 +62,13 @@ class _ProductScreenState extends State<ProductsScreen> {
                       ]
                               .map(
                                 (e) => Expanded(
-                                  flex: e.b,
-                                  child: Text(
-                                    e.a,
-                                    style: styleHeaders,
-                                  ),
-                                ),
+                                    flex: e.b,
+                                    child: Title(
+                                      color: Theme.of(context).primaryColor,
+                                      child: Text(
+                                        e.a,
+                                      ),
+                                    )),
                               )
                               .toList())),
                   const Divider(
@@ -99,7 +97,8 @@ class _ProductScreenState extends State<ProductsScreen> {
                                     child: Text(p.supplier, style: styleBody)),
                                 Expanded(
                                     flex: 1,
-                                    child: Text(p.unit.unitAsString, style: styleBody)),
+                                    child: Text(p.unit.unitAsString,
+                                        style: styleBody)),
                                 Expanded(
                                     flex: 1,
                                     child: Text(p.barreCode, style: styleBody)),

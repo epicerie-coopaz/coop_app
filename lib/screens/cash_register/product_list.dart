@@ -34,7 +34,7 @@ class _ProductListState extends State<ProductList> {
       List<Row> productLineWidgets = _createProductLineWidgets(model);
 
       return Container(
-          padding: EdgeInsets.all(12.0),
+          padding: const EdgeInsets.all(12.0),
           child: Column(
             children: [
               Row(children: <Widget>[

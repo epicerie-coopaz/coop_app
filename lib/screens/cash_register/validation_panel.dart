@@ -34,11 +34,6 @@ class _ValidationPanelState extends State<ValidationPanel> {
   Widget build(BuildContext context) {
     log('build ValidationPanel');
 
-    var styleHeaders = Theme.of(context)
-        .primaryTextTheme
-        .titleLarge
-        ?.apply(color: Theme.of(context).colorScheme.primary);
-
     return Consumer<AppModel>(builder: (context, model, child) {
       double subtotal = model.cart
           .map((e) =>
@@ -54,7 +49,7 @@ class _ValidationPanelState extends State<ValidationPanel> {
       double total = subtotal + cardFee;
 
       return Container(
-          padding: EdgeInsets.all(12.0),
+          padding: const EdgeInsets.all(12.0),
           child: Column(children: [
             Row(children: [
               const Expanded(

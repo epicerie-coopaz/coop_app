@@ -7,10 +7,7 @@ import 'package:coopaz_app/logger.dart';
 import 'package:provider/provider.dart';
 
 class ProductList extends StatefulWidget {
-  const ProductList(
-      {super.key,
-      required this.formKey,
-      required this.model});
+  const ProductList({super.key, required this.formKey, required this.model});
 
   final GlobalKey<FormState> formKey;
   final AppModel model;
@@ -29,7 +26,7 @@ class _ProductListState extends State<ProductList> {
     var styleHeaders = Theme.of(context)
         .primaryTextTheme
         .titleLarge
-        ?.apply(color: Colors.blue);
+        ?.apply(color: Theme.of(context).primaryColor);
 
     return Consumer<AppModel>(builder: (context, model, child) {
       List<Row> productLineWidgets = _createProductLineWidgets(model);

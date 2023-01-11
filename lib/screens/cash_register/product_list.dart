@@ -8,17 +8,12 @@ import 'package:intl/intl.dart';
 import 'package:coopaz_app/logger.dart';
 import 'package:provider/provider.dart';
 
-class ProductList extends StatefulWidget {
-  const ProductList({super.key, required this.formKey, required this.model});
+class ProductList extends StatelessWidget {
+  const ProductList(
+      {super.key,
+      required this.formKey});
 
   final GlobalKey<FormState> formKey;
-  final AppModel model;
-
-  @override
-  State<ProductList> createState() => _ProductListState();
-}
-
-class _ProductListState extends State<ProductList> {
   static NumberFormat numberFormat = NumberFormat('#,##0.00');
 
   @override
@@ -97,10 +92,10 @@ class _ProductListState extends State<ProductList> {
   }
 
   bool _validateAll() {
-    log(widget.formKey.currentState.toString());
+    log(formKey.currentState.toString());
     bool valid = false;
-    if (widget.formKey.currentState != null) {
-      valid = widget.formKey.currentState!.validate();
+    if (formKey.currentState != null) {
+      valid = formKey.currentState!.validate();
     }
     return valid;
   }

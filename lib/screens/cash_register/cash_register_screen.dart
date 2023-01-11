@@ -77,7 +77,9 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
                             if (snapshot.hasData) {
                               //model.products = snapshot.data ?? [];
                               log('product loaded !');
-                              w = ProductList(formKey: _formKey, model: model);
+                              w = ProductList(
+                                formKey: _formKey,
+                              );
                             } else if (snapshot.hasError) {
                               log('products loading in error...');
                               w = Column(children: [

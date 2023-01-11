@@ -40,8 +40,8 @@ class _ProductScreenState extends State<ProductsScreen> {
             if (snapshot.hasData) {
               var styleHeaders = Theme.of(context)
                   .primaryTextTheme
-                  .titleMedium
-                  ?.apply(color: Theme.of(context).primaryColor);
+                  .titleLarge
+                  ?.apply(color: Theme.of(context).colorScheme.primary);
               var styleBody = Theme.of(context).textTheme.bodyMedium;
               return Column(
                 children: [

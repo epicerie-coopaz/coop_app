@@ -1,3 +1,5 @@
+//import 'dart:html';
+
 import 'package:coopaz_app/podo/product.dart';
 import 'package:coopaz_app/podo/cart_item.dart';
 import 'package:coopaz_app/state/model.dart';
@@ -26,7 +28,7 @@ class _ProductListState extends State<ProductList> {
     var styleHeaders = Theme.of(context)
         .primaryTextTheme
         .titleLarge
-        ?.apply(color: Theme.of(context).primaryColor);
+        ?.apply(color: Theme.of(context).colorScheme.primary);
 
     return Consumer<AppModel>(builder: (context, model, child) {
       List<Row> productLineWidgets = _createProductLineWidgets(model);

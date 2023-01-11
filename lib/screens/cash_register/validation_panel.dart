@@ -50,11 +50,7 @@ class _ValidationPanelState extends State<ValidationPanel> {
 
       return Column(children: [
         Row(children: [
-          const Expanded(
-              flex: 1,
-              child: Text(
-                'Adhérent :',
-              )),
+          const Expanded(flex: 1, child: Text('Adhérent :')),
           Expanded(
               flex: 2,
               child: Autocomplete<Member>(
@@ -126,20 +122,24 @@ class _ValidationPanelState extends State<ValidationPanel> {
                   child: Text('${total.toStringAsFixed(2)}€')))
         ]),
         Center(
-            child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            foregroundColor: Theme.of(context).colorScheme.onPrimary,
-            backgroundColor: Theme.of(context).colorScheme.primary,
-          ).copyWith(elevation: ButtonStyleButton.allOrNull(0.0)),
-          onPressed: () {
-            if (_validateAll()) {
-              log('Send form !!!');
-              _sendForm(model);
-            } else {
-              log('Form invalid');
-            }
-          },
-          child: const Text('Valider'),
+            child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 15.0),
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              minimumSize: const Size(100, 50),
+            ),
+            onPressed: () {
+              if (_validateAll()) {
+                log('Send form !!!');
+                _sendForm(model);
+              } else {
+                log('Form invalid');
+              }
+            },
+            child: const Text('Valider'),
+          ),
         )),
       ]);
     });

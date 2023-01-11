@@ -27,7 +27,7 @@ class _ProductListState extends State<ProductList> {
 
     var styleHeaders = Theme.of(context)
         .primaryTextTheme
-        .titleLarge
+        .titleMedium
         ?.apply(color: Theme.of(context).colorScheme.primary);
 
     return Consumer<AppModel>(builder: (context, model, child) {
@@ -43,42 +43,54 @@ class _ProductListState extends State<ProductList> {
                   style: styleHeaders,
                 )),
             Expanded(
-                flex: 2,
+                flex: 1,
                 child: Text(
-                  'Quantité',
+                  'Qté',
                   style: styleHeaders,
+                  textAlign: TextAlign.right,
                 )),
             Expanded(
-                flex: 2,
+                flex: 1,
                 child: Text(
-                  'Prix unitaire',
+                  'Prix unit.',
                   style: styleHeaders,
+                  textAlign: TextAlign.right,
                 )),
             Expanded(
-                flex: 2,
+                flex: 1,
                 child: Text(
                   'Unité',
                   style: styleHeaders,
+                  textAlign: TextAlign.right,
                 )),
             Expanded(
-                flex: 2,
+                flex: 1,
                 child: Text(
                   'Total',
                   style: styleHeaders,
+                  textAlign: TextAlign.right,
                 )),
-            Expanded(flex: 1, child: Container()),
+            const SizedBox(width: 71),
           ]),
           Column(children: productLineWidgets),
-          Align(
-              alignment: Alignment.centerRight,
-              child: ElevatedButton(
-                onPressed: () {
-                  log('+ pressed');
-                  _validateAll();
-                  model.addToCart(CartItem());
-                },
-                child: const Icon(Icons.add),
-              ))
+          const SizedBox(height: 40),
+          Row(children: [
+            Expanded(
+                flex: 10,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                  ),
+                  onPressed: () {
+                    log('+ pressed');
+                    _validateAll();
+                    model.addToCart(CartItem());
+                  },
+                  child: const Icon(Icons.add),
+                )),
+            const Expanded(flex: 7, child: SizedBox())
+          ]),
         ],
       );
     });
@@ -138,7 +150,7 @@ class _ProductListState extends State<ProductList> {
             },
           )),
       Expanded(
-          flex: 2,
+          flex: 1,
           child: TextFormField(
             controller: TextEditingController(text: cartItem.qty ?? '')
               ..selection =
@@ -158,20 +170,35 @@ class _ProductListState extends State<ProductList> {
               cartItem.qty = value;
               model.modifyCartItem(index, cartItem);
             },
+            textAlign: TextAlign.right,
           )),
-      Expanded(flex: 2, child: Text(cartItem.unitPrice ?? '')),
-      Expanded(flex: 2, child: Text(cartItem.unit ?? '')),
-      Expanded(flex: 2, child: Text(total)),
       Expanded(
           flex: 1,
-          child: ElevatedButton(
-            onPressed: () {
-              log('Delete line pressed');
-              model.removeFromCart(index);
-              _validateAll();
-            },
-            child: const Icon(Icons.delete),
-          ))
+          child: Text(
+            cartItem.unitPrice ?? '',
+            textAlign: TextAlign.right,
+          )),
+      Expanded(
+          flex: 1,
+          child: Text(
+            cartItem.unit ?? '',
+            textAlign: TextAlign.right,
+          )),
+      Expanded(
+          flex: 1,
+          child: Text(
+            total,
+            textAlign: TextAlign.right,
+          )),
+      const SizedBox(width: 15),
+      ElevatedButton(
+        onPressed: () {
+          log('Delete line pressed');
+          model.removeFromCart(index);
+          _validateAll();
+        },
+        child: const Icon(Icons.delete),
+      )
     ]);
 
     return productWidget;

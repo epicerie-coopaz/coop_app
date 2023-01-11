@@ -34,102 +34,108 @@ class _ProductScreenState extends State<ProductsScreen> {
         appBar: AppBar(
           title: Text(title),
         ),
-        body: FutureBuilder<List<Product>>(
-          future: futureProducts,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              var styleHeaders = Theme.of(context)
-                  .primaryTextTheme
-                  .titleLarge
-                  ?.apply(color: Theme.of(context).colorScheme.primary);
-              var styleBody = Theme.of(context).textTheme.bodyMedium;
-              return Column(
-                children: [
-                  Expanded(
-                      flex: 0,
-                      child: Row(
-                          children: [
-                        Pair('Désignation', 3),
-                        Pair('Nom', 1),
-                        Pair('Famille', 1),
-                        Pair('Fournisseur', 1),
-                        Pair('Unité', 1),
-                        Pair('Code barres', 1),
-                        Pair('Ref.', 1),
-                        Pair('Acheteur', 1),
-                        Pair('Prix', 1),
-                        Pair('Stock', 1)
-                      ]
-                              .map(
-                                (e) => Expanded(
-                                  flex: e.b,
-                                  child: Text(
-                                    e.a,
-                                    style: styleHeaders,
-                                  ),
-                                ),
-                              )
-                              .toList())),
-                  const Divider(
-                    thickness: 2,
-                  ),
-                  Expanded(
-                      flex: 1,
-                      child: ListView(
-                        addAutomaticKeepAlives: false,
-                        children: snapshot.data!.map((p) {
-                          return Column(children: [
-                            Row(
+        body: Container(
+            padding: const EdgeInsets.all(12.0),
+            child: FutureBuilder<List<Product>>(
+              future: futureProducts,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  var styleHeaders = Theme.of(context)
+                      .primaryTextTheme
+                      .titleLarge
+                      ?.apply(color: Theme.of(context).colorScheme.primary);
+                  var styleBody = Theme.of(context).textTheme.bodyMedium;
+                  return Column(
+                    children: [
+                      Expanded(
+                          flex: 0,
+                          child: Row(
                               children: [
-                                Expanded(
-                                    flex: 3,
-                                    child:
-                                        Text(p.designation, style: styleBody)),
-                                Expanded(
-                                    flex: 1,
-                                    child: Text(p.name, style: styleBody)),
-                                Expanded(
-                                    flex: 1,
-                                    child: Text(p.family, style: styleBody)),
-                                Expanded(
-                                    flex: 1,
-                                    child: Text(p.supplier, style: styleBody)),
-                                Expanded(
-                                    flex: 1,
-                                    child: Text(p.unit.unitAsString,
-                                        style: styleBody)),
-                                Expanded(
-                                    flex: 1,
-                                    child: Text(p.barreCode, style: styleBody)),
-                                Expanded(
-                                    flex: 1,
-                                    child: Text(p.reference, style: styleBody)),
-                                Expanded(
-                                    flex: 1,
-                                    child: Text(p.buyer, style: styleBody)),
-                                Expanded(
-                                    flex: 1,
-                                    child:
-                                        Text('${p.price}€', style: styleBody)),
-                                Expanded(
-                                    flex: 1,
-                                    child: Text(p.stock.toString(),
-                                        style: styleBody)),
-                              ],
-                            ),
-                            const Divider()
-                          ]);
-                        }).toList(),
-                      ))
-                ],
-              ); //Text(snapshot.data!.title);
-            } else if (snapshot.hasError) {
-              return Text('${snapshot.error}');
-            }
+                            Pair('Désignation', 3),
+                            Pair('Nom', 1),
+                            Pair('Famille', 1),
+                            Pair('Fournisseur', 1),
+                            Pair('Unité', 1),
+                            Pair('Code barres', 1),
+                            Pair('Ref.', 1),
+                            Pair('Acheteur', 1),
+                            Pair('Prix', 1),
+                            Pair('Stock', 1)
+                          ]
+                                  .map(
+                                    (e) => Expanded(
+                                      flex: e.b,
+                                      child: Text(
+                                        e.a,
+                                        style: styleHeaders,
+                                      ),
+                                    ),
+                                  )
+                                  .toList())),
+                      const Divider(
+                        thickness: 2,
+                      ),
+                      Expanded(
+                          flex: 1,
+                          child: ListView(
+                            addAutomaticKeepAlives: false,
+                            children: snapshot.data!.map((p) {
+                              return Column(children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                        flex: 3,
+                                        child: Text(p.designation,
+                                            style: styleBody)),
+                                    Expanded(
+                                        flex: 1,
+                                        child: Text(p.name, style: styleBody)),
+                                    Expanded(
+                                        flex: 1,
+                                        child:
+                                            Text(p.family, style: styleBody)),
+                                    Expanded(
+                                        flex: 1,
+                                        child:
+                                            Text(p.supplier, style: styleBody)),
+                                    Expanded(
+                                        flex: 1,
+                                        child: Text(p.unit.unitAsString,
+                                            style: styleBody)),
+                                    Expanded(
+                                        flex: 1,
+                                        child: Text(p.barreCode,
+                                            style: styleBody)),
+                                    Expanded(
+                                        flex: 1,
+                                        child: Text(p.reference,
+                                            style: styleBody)),
+                                    Expanded(
+                                        flex: 1,
+                                        child: Text(p.buyer, style: styleBody)),
+                                    Expanded(
+                                        flex: 1,
+                                        child: Text('${p.price}€',
+                                            style: styleBody)),
+                                    Expanded(
+                                        flex: 1,
+                                        child: Text(p.stock.toString(),
+                                            style: styleBody)),
+                                  ],
+                                ),
+                                const Divider()
+                              ]);
+                            }).toList(),
+                          ))
+                    ],
+                  ); //Text(snapshot.data!.title);
+                } else if (snapshot.hasError) {
+                  return Text('${snapshot.error}');
+                }
 
-            // By default, show a loading spinner.
-            return const CircularProgressIndicator();
-          },
-        ));
+                // By default, show a loading spinner.
+                return const CircularProgressIndicator();
+              },
+            )));
   }
 }

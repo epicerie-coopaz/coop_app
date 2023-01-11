@@ -34,18 +34,18 @@ class _MembersScreenState extends State<MembersScreen> {
         appBar: AppBar(
           title: Text(title),
         ),
-        body: FutureBuilder<List<Member>>(
-          future: futureMembers,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              var styleHeaders = Theme.of(context)
-                  .primaryTextTheme
-                  .titleLarge
-                  ?.apply(color: Theme.of(context).colorScheme.primary);
-              var styleBody = Theme.of(context).textTheme.bodyMedium;
-              return Container(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Column(
+        body: Container(
+            padding: const EdgeInsets.all(12.0),
+            child: FutureBuilder<List<Member>>(
+              future: futureMembers,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  var styleHeaders = Theme.of(context)
+                      .primaryTextTheme
+                      .titleLarge
+                      ?.apply(color: Theme.of(context).colorScheme.primary);
+                  var styleBody = Theme.of(context).textTheme.bodyMedium;
+                  return Column(
                     children: [
                       Expanded(
                           flex: 0,
@@ -97,14 +97,14 @@ class _MembersScreenState extends State<MembersScreen> {
                             }).toList(),
                           ))
                     ],
-                  )); //Text(snapshot.data!.title);
-            } else if (snapshot.hasError) {
-              return Text('${snapshot.error}');
-            }
+                  ); //Text(snapshot.data!.title);
+                } else if (snapshot.hasError) {
+                  return Text('${snapshot.error}');
+                }
 
-            // By default, show a loading spinner.
-            return const CircularProgressIndicator();
-          },
-        ));
+                // By default, show a loading spinner.
+                return const CircularProgressIndicator();
+              },
+            )));
   }
 }

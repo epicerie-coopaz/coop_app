@@ -1,6 +1,7 @@
 import 'package:coopaz_app/dao/product_dao.dart';
 import 'package:coopaz_app/logger.dart';
 import 'package:coopaz_app/podo/utils.dart';
+import 'package:coopaz_app/screens/loading_widget.dart';
 import 'package:coopaz_app/state/model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -22,7 +23,7 @@ class ProductsScreen extends StatelessWidget {
         w = _productsList(context, model);
       } else {
         productDao.getProducts().then((p) => model.products = p);
-        w = _loading();
+        w = const Loading(text: 'Chargement de la liste des produits...');
       }
       return Scaffold(
           appBar: AppBar(
@@ -40,20 +41,6 @@ class ProductsScreen extends StatelessWidget {
     });
   }
 
-  Widget _loading() {
-    return Center(
-        child: Column(children: const [
-      SizedBox(
-        width: 60,
-        height: 60,
-        child: CircularProgressIndicator(),
-      ),
-      Padding(
-        padding: EdgeInsets.only(top: 16),
-        child: Text('Chargement de la liste des produits...'),
-      ),
-    ]));
-  }
 
   Widget _productsList(BuildContext context, AppModel model) {
     var styleHeaders = Theme.of(context)

@@ -51,90 +51,50 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
     log('build screen $title');
 
     return Consumer<AppModel>(builder: (context, model, child) {
-      futureProducts.then((p) {
-        model.products = p;
-      });
+      Widget cartList;
+      if (model.products.isNotEmpty) {
+        cartList = ProductList(
+          formKey: _formKey,
+        );
+      } else {
+        widget.productDao.getProducts().then((p) => model.products = p);
+        cartList =
+            const Loading(text: 'Chargement de la liste des produits...');
+      }
 
-      futureMembers.then((m) {
-        model.members = m;
-      });
+      Widget validationPanel;
+      if (model.products.isNotEmpty) {
+        validationPanel = ValidationPanel(
+          orderDao: widget.orderDao,
+          formKey: _formKey,
+        );
+      } else {
+        widget.memberDao.getMembers().then((m) => model.members = m);
+        validationPanel =
+            const Loading(text: 'Chargement de la liste des membres...');
+      }
 
       return Scaffold(
           appBar: AppBar(
-            title: Text(title),
+            title: Row(children: [
+              Text(title),
+              const Spacer(),
+              IconButton(
+                  onPressed: () async {
+                    model.products = [];
+                    model.members = [];
+                  },
+                  icon: const Icon(Icons.refresh))
+            ]),
           ),
           body: Container(
               padding: const EdgeInsets.all(12.0),
               child: Form(
                 key: _formKey,
                 child: Row(children: [
-                  Expanded(
-                      flex: 3,
-                      child: FutureBuilder<List<Product>>(
-                          future: futureProducts,
-                          builder: (BuildContext context,
-                              AsyncSnapshot<List<Product>> snapshot) {
-                            Widget w;
-                            if (snapshot.hasData) {
-                              log('product loaded !');
-                              w = ProductList(
-                                formKey: _formKey,
-                              );
-                            } else if (snapshot.hasError) {
-                              log('products loading in error...');
-                              w = Column(children: [
-                                const Icon(
-                                  Icons.error_outline,
-                                  color: Colors.red,
-                                  size: 60,
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 16),
-                                  child: Text('Error: ${snapshot.error}'),
-                                ),
-                              ]);
-                            } else {
-                              log('product loading...');
-                              w = const Loading(text: 'Chargement de la liste des produits...');
-                            }
-
-                            return w;
-                          })),
+                  Expanded(flex: 3, child: cartList),
                   const VerticalDivider(),
-                  Expanded(
-                      flex: 1,
-                      child: FutureBuilder<List<Member>>(
-                          future: futureMembers,
-                          builder: (BuildContext context,
-                              AsyncSnapshot<List<Member>> snapshot) {
-                            Widget w;
-                            if (snapshot.hasData) {
-                              log('members loaded !');
-                              //model.members = snapshot.data ?? [];
-                              w = ValidationPanel(
-                                orderDao: widget.orderDao,
-                                formKey: _formKey,
-                              );
-                            } else if (snapshot.hasError) {
-                              log('members loading in error...');
-                              w = Column(children: [
-                                const Icon(
-                                  Icons.error_outline,
-                                  color: Colors.red,
-                                  size: 60,
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 16),
-                                  child: Text('Error: ${snapshot.error}'),
-                                ),
-                              ]);
-                            } else {
-                              log('members loading...');
-                              w = const Loading(text: 'Chargement de la liste des membres...');
-                            }
-
-                            return w;
-                          }))
+                  Expanded(flex: 1, child: validationPanel)
                 ]),
               )));
     });

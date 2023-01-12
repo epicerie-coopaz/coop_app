@@ -5,6 +5,7 @@ import 'package:coopaz_app/podo/member.dart';
 import 'package:coopaz_app/podo/product.dart';
 import 'package:coopaz_app/screens/cash_register/product_list.dart';
 import 'package:coopaz_app/screens/cash_register/validation_panel.dart';
+import 'package:coopaz_app/screens/loading_widget.dart';
 import 'package:coopaz_app/state/model.dart';
 import 'package:flutter/material.dart';
 import 'package:coopaz_app/logger.dart';
@@ -94,18 +95,7 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
                               ]);
                             } else {
                               log('product loading...');
-                              w = Column(children: const [
-                                SizedBox(
-                                  width: 60,
-                                  height: 60,
-                                  child: CircularProgressIndicator(),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(top: 16),
-                                  child: Text(
-                                      'Chargement de la liste des produits...'),
-                                ),
-                              ]);
+                              w = const Loading(text: 'Chargement de la liste des produits...');
                             }
 
                             return w;
@@ -140,18 +130,7 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
                               ]);
                             } else {
                               log('members loading...');
-                              w = Column(children: const [
-                                SizedBox(
-                                  width: 60,
-                                  height: 60,
-                                  child: CircularProgressIndicator(),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(top: 16),
-                                  child: Text(
-                                      'Chargement de la liste des membres...'),
-                                ),
-                              ]);
+                              w = const Loading(text: 'Chargement de la liste des membres...');
                             }
 
                             return w;

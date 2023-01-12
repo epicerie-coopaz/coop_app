@@ -75,7 +75,6 @@ class _CashRegisterScreenState extends State<CashRegisterScreen> {
                               AsyncSnapshot<List<Product>> snapshot) {
                             Widget w;
                             if (snapshot.hasData) {
-                              //model.products = snapshot.data ?? [];
                               log('product loaded !');
                               w = ProductList(
                                 formKey: _formKey,

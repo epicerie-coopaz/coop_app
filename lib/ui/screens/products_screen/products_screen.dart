@@ -1,8 +1,8 @@
 import 'package:coopaz_app/dao/product_dao.dart';
 import 'package:coopaz_app/logger.dart';
 import 'package:coopaz_app/podo/utils.dart';
-import 'package:coopaz_app/screens/loading_widget.dart';
-import 'package:coopaz_app/state/model.dart';
+import 'package:coopaz_app/ui/common_widgets/loading_widget.dart';
+import 'package:coopaz_app/state/app_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

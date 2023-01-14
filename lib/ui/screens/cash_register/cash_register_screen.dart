@@ -64,12 +64,14 @@ class CashRegisterScreen extends StatelessWidget {
                   appModel.products = [];
                   appModel.members = [];
                 },
-                icon: const Icon(Icons.refresh)),
+                icon: const Icon(Icons.refresh),
+                tooltip : 'Recharger listes produits et adhérents'),
             IconButton(
                 onPressed: () async {
                   cashRegisterModel.cleanCart();
                 },
-                icon: const Icon(Icons.clear))
+                icon: const Icon(Icons.clear),
+                tooltip : 'Effacer le formulaire')
           ]),
         ),
         body: Container(

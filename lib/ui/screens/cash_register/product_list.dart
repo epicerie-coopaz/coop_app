@@ -190,13 +190,14 @@ class ProductList extends StatelessWidget {
             textAlign: TextAlign.right,
           )),
       const SizedBox(width: 15),
-      ElevatedButton(
+      IconButton(
         onPressed: () {
           log('Delete line pressed');
           cashRegisterModel.removeFromCart(index);
           _validateAll();
         },
-        child: const Icon(Icons.delete),
+        icon: const Icon(Icons.delete),
+        tooltip: 'Supprimer ligne',
       )
     ]);
 

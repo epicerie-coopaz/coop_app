@@ -1,10 +1,11 @@
 import 'package:coopaz_app/dao/member_dao.dart';
 import 'package:coopaz_app/dao/order_dao.dart';
 import 'package:coopaz_app/dao/product_dao.dart';
-import 'package:coopaz_app/screens/cash_register/cash_register_screen.dart';
-import 'package:coopaz_app/screens/members_screen.dart';
-import 'package:coopaz_app/screens/products_screen.dart';
-import 'package:coopaz_app/state/model.dart';
+import 'package:coopaz_app/state/cash_register.dart';
+import 'package:coopaz_app/ui/screens/cash_register/cash_register_screen.dart';
+import 'package:coopaz_app/ui/screens/members_screen/members_screen.dart';
+import 'package:coopaz_app/ui/screens/products_screen/products_screen.dart';
+import 'package:coopaz_app/state/app_model.dart';
 import 'package:flutter/material.dart';
 
 import 'package:coopaz_app/logger.dart';
@@ -22,8 +23,15 @@ class CoopazApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => AppModel(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => AppModel(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => CashRegisterModel(),
+        ),
+      ],
       builder: (context, child) {
         return MaterialApp(
           title: 'Coopaz',

@@ -2,16 +2,15 @@
 
 import 'package:coopaz_app/podo/product.dart';
 import 'package:coopaz_app/podo/cart_item.dart';
-import 'package:coopaz_app/state/model.dart';
+import 'package:coopaz_app/state/app_model.dart';
+import 'package:coopaz_app/state/cash_register.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:coopaz_app/logger.dart';
 import 'package:provider/provider.dart';
 
 class ProductList extends StatelessWidget {
-  const ProductList(
-      {super.key,
-      required this.formKey});
+  const ProductList({super.key, required this.formKey});
 
   final GlobalKey<FormState> formKey;
   static NumberFormat numberFormat = NumberFormat('#,##0.00');
@@ -25,70 +24,72 @@ class ProductList extends StatelessWidget {
         .titleMedium
         ?.apply(color: Theme.of(context).colorScheme.primary);
 
-    return Consumer<AppModel>(builder: (context, model, child) {
-      List<Row> productLineWidgets = _createProductLineWidgets(model);
+    AppModel appModel = context.watch<AppModel>();
+    CashRegisterModel cashRegisterModel = context.watch<CashRegisterModel>();
 
-      return Column(
-        children: [
-          Row(children: <Widget>[
-            Expanded(
-                flex: 8,
-                child: Text(
-                  'Produit',
-                  style: styleHeaders,
-                )),
-            Expanded(
-                flex: 1,
-                child: Text(
-                  'Qté',
-                  style: styleHeaders,
-                  textAlign: TextAlign.right,
-                )),
-            Expanded(
-                flex: 1,
-                child: Text(
-                  'Prix unit.',
-                  style: styleHeaders,
-                  textAlign: TextAlign.right,
-                )),
-            Expanded(
-                flex: 1,
-                child: Text(
-                  'Unité',
-                  style: styleHeaders,
-                  textAlign: TextAlign.right,
-                )),
-            Expanded(
-                flex: 1,
-                child: Text(
-                  'Total',
-                  style: styleHeaders,
-                  textAlign: TextAlign.right,
-                )),
-            const SizedBox(width: 71),
-          ]),
-          Column(children: productLineWidgets),
-          const SizedBox(height: 40),
-          Row(children: [
-            Expanded(
-                flex: 10,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                  ),
-                  onPressed: () {
-                    log('+ pressed');
-                    _validateAll();
-                    model.addToCart(CartItem());
-                  },
-                  child: const Icon(Icons.add),
-                )),
-            const Expanded(flex: 7, child: SizedBox())
-          ]),
-        ],
-      );
-    });
+    List<Row> productLineWidgets =
+        _createProductLineWidgets(appModel, cashRegisterModel);
+
+    return Column(
+      children: [
+        Row(children: <Widget>[
+          Expanded(
+              flex: 8,
+              child: Text(
+                'Produit',
+                style: styleHeaders,
+              )),
+          Expanded(
+              flex: 1,
+              child: Text(
+                'Qté',
+                style: styleHeaders,
+                textAlign: TextAlign.right,
+              )),
+          Expanded(
+              flex: 1,
+              child: Text(
+                'Prix unit.',
+                style: styleHeaders,
+                textAlign: TextAlign.right,
+              )),
+          Expanded(
+              flex: 1,
+              child: Text(
+                'Unité',
+                style: styleHeaders,
+                textAlign: TextAlign.right,
+              )),
+          Expanded(
+              flex: 1,
+              child: Text(
+                'Total',
+                style: styleHeaders,
+                textAlign: TextAlign.right,
+              )),
+          const SizedBox(width: 71),
+        ]),
+        Column(children: productLineWidgets),
+        const SizedBox(height: 40),
+        Row(children: [
+          Expanded(
+              flex: 10,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                ),
+                onPressed: () {
+                  log('+ pressed');
+                  _validateAll();
+                  cashRegisterModel.addToCart(CartItem());
+                },
+                child: const Icon(Icons.add),
+              )),
+          const Expanded(flex: 7, child: SizedBox())
+        ]),
+      ],
+    );
   }
 
   bool _validateAll() {
@@ -100,16 +101,19 @@ class ProductList extends StatelessWidget {
     return valid;
   }
 
-  List<Row> _createProductLineWidgets(AppModel model) {
+  List<Row> _createProductLineWidgets(
+      AppModel appModel, CashRegisterModel cashRegisterModel) {
     List<Row> products = [];
-    for (var entry in model.cart.asMap().entries) {
-      var product = _createProductLineWidget(entry.key, entry.value, model);
+    for (var entry in cashRegisterModel.cart.asMap().entries) {
+      var product = _createProductLineWidget(
+          appModel, cashRegisterModel, entry.key, entry.value);
       products.add(product);
     }
     return products;
   }
 
-  Row _createProductLineWidget(int index, CartItem cartItem, AppModel model) {
+  Row _createProductLineWidget(AppModel appModel,
+      CashRegisterModel cashRegisterModel, int index, CartItem cartItem) {
     var total = '';
     double? unitPrice = double.tryParse(cartItem.unitPrice ?? '');
     double? qty = double.tryParse(cartItem.qty ?? '');
@@ -128,7 +132,7 @@ class ProductList extends StatelessWidget {
               if (textEditingValue.text == '') {
                 return const Iterable<Product>.empty();
               }
-              return model.products.where((Product p) {
+              return appModel.products.where((Product p) {
                 return p
                     .toString()
                     .toLowerCase()
@@ -136,7 +140,7 @@ class ProductList extends StatelessWidget {
               });
             },
             onSelected: (p) {
-              model.modifyCartItem(
+              cashRegisterModel.modifyCartItem(
                   index,
                   CartItem(
                       name: p.designation,
@@ -163,7 +167,7 @@ class ProductList extends StatelessWidget {
             },
             onChanged: (String value) {
               cartItem.qty = value;
-              model.modifyCartItem(index, cartItem);
+              cashRegisterModel.modifyCartItem(index, cartItem);
             },
             textAlign: TextAlign.right,
           )),
@@ -189,7 +193,7 @@ class ProductList extends StatelessWidget {
       ElevatedButton(
         onPressed: () {
           log('Delete line pressed');
-          model.removeFromCart(index);
+          cashRegisterModel.removeFromCart(index);
           _validateAll();
         },
         child: const Icon(Icons.delete),

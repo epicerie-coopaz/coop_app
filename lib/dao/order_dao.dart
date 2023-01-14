@@ -18,7 +18,7 @@ class OrderDao extends GoogleAppsScriptDao {
       "function": "processOrder",
       "parameters": [
         clientMail,
-        paymentMethod.asString,
+        paymentMethod.asTechnicalString,
         productLines
             .map((p) =>
                 {"product": p.name, "qty": double.tryParse(p.qty ?? '0')})

@@ -1,39 +1,29 @@
 import 'package:coopaz_app/dao/order_dao.dart';
 import 'package:coopaz_app/podo/member.dart';
+import 'package:coopaz_app/podo/payment_method.dart';
 import 'package:coopaz_app/state/app_model.dart';
 import 'package:coopaz_app/state/cash_register.dart';
 import 'package:flutter/material.dart';
 import 'package:coopaz_app/logger.dart';
 import 'package:provider/provider.dart';
 
-class ValidationPanel extends StatefulWidget {
+class ValidationPanel extends StatelessWidget {
   const ValidationPanel(
       {super.key, required this.orderDao, required this.formKey});
 
   final GlobalKey<FormState> formKey;
   final OrderDao orderDao;
 
-  @override
-  State<ValidationPanel> createState() => _ValidationPanelState();
-}
-
-class _ValidationPanelState extends State<ValidationPanel> {
   final String title = 'Caisse';
 
   static const double cardFeeRate = 0.00553;
-  static const List<String> paymentMethodList = <String>[
-    'CB',
-    'Cheque',
-    'Virement'
-  ];
-  //Form data
-  String paymentmethodSelected = paymentMethodList.first;
-
-  Member? selectedMember;
 
   @override
   Widget build(BuildContext context) {
     log('build ValidationPanel');
+
+    AppModel appModel = context.watch<AppModel>();
+    CashRegisterModel cashRegisterModel = context.watch<CashRegisterModel>();
 
     double subtotal = context
         .watch<CashRegisterModel>()
@@ -44,14 +34,11 @@ class _ValidationPanelState extends State<ValidationPanel> {
         .fold(0.0, (prev, e) => prev + e);
 
     double cardFee = 0.0;
-    if (paymentmethodSelected == 'CB') {
+    if (cashRegisterModel.selectedPaymentMethod == PaymentMethod.card) {
       cardFee = subtotal * cardFeeRate;
     }
 
     double total = subtotal + cardFee;
-
-    AppModel appModel = context.watch<AppModel>();
-    CashRegisterModel cashRegisterModel = context.watch<CashRegisterModel>();
 
     return Column(children: [
       Row(children: [
@@ -59,7 +46,9 @@ class _ValidationPanelState extends State<ValidationPanel> {
         Expanded(
             flex: 2,
             child: Autocomplete<Member>(
-              displayStringForOption: (Member m) => '${m.name} : ${m.email}',
+              key: ValueKey(cashRegisterModel.selectedmember?.name ?? ''),
+              initialValue: TextEditingValue(text: cashRegisterModel.selectedmember?.name ?? ''),
+              displayStringForOption: (Member m) => m.name,
               optionsBuilder: (TextEditingValue textEditingValue) async {
                 if (textEditingValue.text == '') {
                   return const Iterable<Member>.empty();
@@ -67,13 +56,12 @@ class _ValidationPanelState extends State<ValidationPanel> {
                 return appModel.members.where((Member m) {
                   return m
                       .toString()
+                      .toLowerCase()
                       .contains(textEditingValue.text.toLowerCase());
                 });
               },
               onSelected: (m) {
-                setState(() {
-                  selectedMember = m;
-                });
+                cashRegisterModel.selectedmember = m;
               },
             )),
       ]),
@@ -84,20 +72,19 @@ class _ValidationPanelState extends State<ValidationPanel> {
                 alignment: Alignment.topLeft, child: Text('Paiement : '))),
         Expanded(
             flex: 2,
-            child: DropdownButton<String>(
-              value: paymentmethodSelected,
+            child: DropdownButton<PaymentMethod>(
+              value: cashRegisterModel.selectedPaymentMethod,
               elevation: 16,
-              onChanged: (String? value) {
+              onChanged: (PaymentMethod? value) {
                 // This is called when the user selects an item.
-                setState(() {
-                  paymentmethodSelected = value!;
-                });
+                cashRegisterModel.selectedPaymentMethod =
+                    value ?? PaymentMethod.card;
               },
-              items: paymentMethodList
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
+              items: PaymentMethod.values
+                  .map<DropdownMenuItem<PaymentMethod>>((PaymentMethod value) {
+                return DropdownMenuItem<PaymentMethod>(
                   value: value,
-                  child: Text(value),
+                  child: Text(value.asString),
                 );
               }).toList(),
             ))
@@ -150,8 +137,8 @@ class _ValidationPanelState extends State<ValidationPanel> {
   }
 
   bool _validateAll() {
-    log(widget.formKey.currentState.toString());
-    if (widget.formKey.currentState!.validate()) {
+    log(formKey.currentState.toString());
+    if (formKey.currentState!.validate()) {
       return true;
     }
     return false;
@@ -159,10 +146,10 @@ class _ValidationPanelState extends State<ValidationPanel> {
 
   _sendForm(CashRegisterModel model) async {
     // send data to macro
-    await widget.orderDao
-        .createOrder(selectedMember?.email ?? '', model.cart, "");
+    await orderDao.createOrder(model.selectedmember?.email ?? '', model.cart,
+        model.selectedPaymentMethod, "");
     // reset form
-    widget.formKey.currentState?.reset();
+    formKey.currentState?.reset();
 
     model.cleanCart();
   }

@@ -12,7 +12,11 @@ const CARD_FEE_RATE = 0.00553;
 
 const FOLDER_ID = '1N97mrKpTYFa9zOD2Ilp9-tLO26vOWOEQ'; // Folder id to save in a Drive folder.
 
-const EMAIL_FROM = 'guilhem.radonde@gmail.com'
+const EMAIL_FROM = 'guilhem.radonde@gmail.com';
+
+const PAYMENT_METHOD_CARD = 'CB';
+const PAYMENT_METHOD_TRANSFER = 'virement';
+const PAYMENT_METHOD_CHEQUE = 'cheque';
 
 
 /**
@@ -21,7 +25,7 @@ const EMAIL_FROM = 'guilhem.radonde@gmail.com'
  * Change the parameters to whatever is needed for testing
  */
 function testProcessInvoice() {
-  processOrder('laurie.besinet@gmail.com', 'CB', [{ 'product': 'GRENADE FRUITS BIO PAYS LANDAIS KILO 806', 'qty': 5.2 }], '718718718-4');
+  processOrder('laurie.besinet@gmail.com', 'CARD', [{ 'product': 'GRENADE FRUITS BIO PAYS LANDAIS KILO 806', 'qty': 5.2 }], '718718718-5');
 }
 
 /**
@@ -61,7 +65,7 @@ function processOrder(emailAddress, paymentMethod, orderProducts, chequeNumber) 
   if (emailAddress == '' || !emailAddress.includes('@') || memberName == undefined) {
     throw `Email address invalid: ${emailAddress}`;
   }
-  if (paymentMethod != 'CB' && paymentMethod != 'virement' && paymentMethod != 'cheque') {
+  if (paymentMethod != PAYMENT_METHOD_CARD && paymentMethod != PAYMENT_METHOD_TRANSFER && paymentMethod != PAYMENT_METHOD_CHEQUE) {
     throw `Payment method invalid: ${paymentMethod}`;
   }
   if (orderProducts == undefined || orderProducts == null || !(orderProducts.length > 0)) {
@@ -210,7 +214,7 @@ function _updateStock(orderProducts, allProductsRange, allProductsValues, cardFe
     }
   }
 
-  if (paymentMethod == 'CB') {
+  if (paymentMethod == PAYMENT_METHOD_CARD) {
     fees = orderSum * cardFeeRate;
   }
 

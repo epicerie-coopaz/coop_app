@@ -7,8 +7,15 @@ import 'package:flutter/foundation.dart';
 
 class CashRegisterModel extends ChangeNotifier {
   final List<CartItem> _cart = [];
-  Member? _selectedmember;
+  Member? _selectedMember;
   PaymentMethod _selectedPaymentMethod = PaymentMethod.card;
+  String _chequeOrTransferNumber = '';
+
+  String get chequeOrTransferNumber => _chequeOrTransferNumber;
+  set chequeOrTransferNumber(s) {
+    _chequeOrTransferNumber = s;
+    notifyListeners();
+  }
 
   PaymentMethod get selectedPaymentMethod => _selectedPaymentMethod;
   set selectedPaymentMethod(pm) {
@@ -16,9 +23,9 @@ class CashRegisterModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Member? get selectedmember => _selectedmember;
-  set selectedmember(m) {
-    _selectedmember = m;
+  Member? get selectedMember => _selectedMember;
+  set selectedMember(m) {
+    _selectedMember = m;
     notifyListeners();
   }
 
@@ -42,7 +49,8 @@ class CashRegisterModel extends ChangeNotifier {
   void cleanCart() {
     _cart.clear();
     _selectedPaymentMethod = PaymentMethod.card;
-    _selectedmember = null;
+    _selectedMember = null;
+    _chequeOrTransferNumber = '';
     notifyListeners();
   }
 }

@@ -46,8 +46,9 @@ class ValidationPanel extends StatelessWidget {
         Expanded(
             flex: 2,
             child: Autocomplete<Member>(
-              key: ValueKey(cashRegisterModel.selectedmember?.name ?? ''),
-              initialValue: TextEditingValue(text: cashRegisterModel.selectedmember?.name ?? ''),
+              key: ValueKey(cashRegisterModel.selectedMember?.name ?? ''),
+              initialValue: TextEditingValue(
+                  text: cashRegisterModel.selectedMember?.name ?? ''),
               displayStringForOption: (Member m) => m.name,
               optionsBuilder: (TextEditingValue textEditingValue) async {
                 if (textEditingValue.text == '') {
@@ -61,7 +62,7 @@ class ValidationPanel extends StatelessWidget {
                 });
               },
               onSelected: (m) {
-                cashRegisterModel.selectedmember = m;
+                cashRegisterModel.selectedMember = m;
               },
             )),
       ]),
@@ -89,8 +90,34 @@ class ValidationPanel extends StatelessWidget {
               }).toList(),
             ))
       ]),
-      //Todo: add a text box to enter cheque number
-      //if(paymentmethodSelected == 'Cheque') {widgets...}
+      if (cashRegisterModel.selectedPaymentMethod == PaymentMethod.cheque)
+        TextFormField(
+          controller: TextEditingController(
+              text: cashRegisterModel.chequeOrTransferNumber)
+            ..selection = TextSelection.collapsed(
+                offset: (cashRegisterModel.chequeOrTransferNumber).length),
+          decoration: const InputDecoration(
+            hintText: 'N. chèque',
+          ),
+          onChanged: (String value) {
+            cashRegisterModel.chequeOrTransferNumber = value;
+          },
+          textAlign: TextAlign.right,
+        ),
+      if (cashRegisterModel.selectedPaymentMethod == PaymentMethod.transfer)
+        TextFormField(
+          controller: TextEditingController(
+              text: cashRegisterModel.chequeOrTransferNumber)
+            ..selection = TextSelection.collapsed(
+                offset: (cashRegisterModel.chequeOrTransferNumber).length),
+          decoration: const InputDecoration(
+            hintText: 'N. virement',
+          ),
+          onChanged: (String value) {
+            cashRegisterModel.chequeOrTransferNumber = value;
+          },
+          textAlign: TextAlign.right,
+        ),
       Row(children: [
         const Expanded(
             flex: 1,
@@ -146,8 +173,14 @@ class ValidationPanel extends StatelessWidget {
 
   _sendForm(CashRegisterModel model) async {
     // send data to macro
-    await orderDao.createOrder(model.selectedmember?.email ?? '', model.cart,
-        model.selectedPaymentMethod, "");
+    String chequeOrTransferNumber = '';
+
+    if (model.selectedPaymentMethod != PaymentMethod.card) {
+      chequeOrTransferNumber = model.chequeOrTransferNumber;
+    }
+
+    await orderDao.createOrder(model.selectedMember?.email ?? '', model.cart,
+        model.selectedPaymentMethod, chequeOrTransferNumber);
     // reset form
     formKey.currentState?.reset();
 

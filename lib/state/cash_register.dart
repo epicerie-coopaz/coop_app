@@ -10,6 +10,13 @@ class CashRegisterModel extends ChangeNotifier {
   Member? _selectedMember;
   PaymentMethod _selectedPaymentMethod = PaymentMethod.card;
   String _chequeOrTransferNumber = '';
+  bool _isAwaitingSendFormResponse = false;
+
+  bool get isAwaitingSendFormResponse => _isAwaitingSendFormResponse;
+  set isAwaitingSendFormResponse(b) {
+    _isAwaitingSendFormResponse = b;
+    notifyListeners();
+  }
 
   String get chequeOrTransferNumber => _chequeOrTransferNumber;
   set chequeOrTransferNumber(s) {

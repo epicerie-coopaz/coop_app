@@ -15,7 +15,8 @@ class AuthManager {
   String? clientSecret;
   String? redirectUri;
   String responseType = 'code';
-  String scope = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/script.external_request https://www.googleapis.com/auth/script.send_mail https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send';
+  String scope =
+      'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/script.external_request https://www.googleapis.com/auth/script.send_mail https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send';
   String? refreshToken;
   String? accessToken;
   DateTime? accessTokenValidUntil;
@@ -75,8 +76,8 @@ class AuthManager {
 
     authCode = requestFromGoogle.uri.queryParameters['code'];
     if (authCode != null) {
-      requestFromGoogle.response
-          .write('Auth ok! \n\nTu peux fermer cette fenêtre mon lapin. <3');
+      requestFromGoogle.response.write(
+          'Connexion au compte google réussi! \n\nTu peux fermer cette fenêtre mon lapin. <3');
       log('New auth code received: $authCode');
     } else {
       requestFromGoogle.response

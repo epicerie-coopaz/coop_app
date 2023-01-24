@@ -45,7 +45,7 @@ Future<void> main() async {
       theme: ThemeData(useMaterial3: true),
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Erreur lors du demarage !'),
+          title: const Text('Erreur lors du démarrage !'),
         ),
         body: ListView(
           children: [Text(e.toString()), const Divider(), Text(s.toString())],

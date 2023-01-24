@@ -74,18 +74,21 @@ class ProductList extends StatelessWidget {
         Row(children: [
           Expanded(
               flex: 10,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                ),
-                onPressed: () {
-                  log('+ pressed');
-                  _validateAll();
-                  cashRegisterModel.addToCart(CartItem());
-                },
-                child: const Icon(Icons.add),
-              )),
+              child: !cashRegisterModel.isAwaitingSendFormResponse
+                  ? ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor:
+                            Theme.of(context).colorScheme.onPrimary,
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                      ),
+                      onPressed: () {
+                        log('+ pressed');
+                        _validateAll();
+                        cashRegisterModel.addToCart(CartItem());
+                      },
+                      child: const Icon(Icons.add),
+                    )
+                  : Container()),
           const Expanded(flex: 7, child: SizedBox())
         ]),
       ],
@@ -124,53 +127,60 @@ class ProductList extends StatelessWidget {
     var productWidget = Row(children: <Widget>[
       Expanded(
           flex: 8,
-          child: Autocomplete<Product>(
-            initialValue: TextEditingValue(text: cartItem.name ?? ''),
-            key: ValueKey(cartItem),
-            displayStringForOption: (Product p) => p.designation,
-            optionsBuilder: (TextEditingValue textEditingValue) async {
-              if (textEditingValue.text == '') {
-                return const Iterable<Product>.empty();
-              }
-              return appModel.products.where((Product p) {
-                return p
-                    .toString()
-                    .toLowerCase()
-                    .contains(textEditingValue.text.toLowerCase());
-              });
-            },
-            onSelected: (p) {
-              cashRegisterModel.modifyCartItem(
-                  index,
-                  CartItem(
-                      name: p.designation,
-                      unit: p.unit.unitAsString,
-                      unitPrice: p.price.toStringAsFixed(2)));
-            },
-          )),
+          child: !cashRegisterModel.isAwaitingSendFormResponse
+              ? Autocomplete<Product>(
+                  initialValue: TextEditingValue(text: cartItem.name ?? ''),
+                  key: ValueKey(cartItem),
+                  displayStringForOption: (Product p) => p.designation,
+                  optionsBuilder: (TextEditingValue textEditingValue) async {
+                    if (textEditingValue.text == '') {
+                      return const Iterable<Product>.empty();
+                    }
+                    return appModel.products.where((Product p) {
+                      return p
+                          .toString()
+                          .toLowerCase()
+                          .contains(textEditingValue.text.toLowerCase());
+                    });
+                  },
+                  onSelected: (p) {
+                    cashRegisterModel.modifyCartItem(
+                        index,
+                        CartItem(
+                            name: p.designation,
+                            unit: p.unit.unitAsString,
+                            unitPrice: p.price.toStringAsFixed(2)));
+                  },
+                )
+              : Text(cashRegisterModel.cart[index].name ?? '')),
       Expanded(
           flex: 1,
-          child: TextFormField(
-            controller: TextEditingController(text: cartItem.qty ?? '')
-              ..selection =
-                  TextSelection.collapsed(offset: (cartItem.qty ?? '').length),
-            decoration: const InputDecoration(
-              hintText: 'Quantité',
-            ),
-            validator: (String? value) {
-              if (value == null ||
-                  value.isEmpty ||
-                  double.tryParse(value) == null) {
-                return 'Quantité invalide';
-              }
-              return null;
-            },
-            onChanged: (String value) {
-              cartItem.qty = value;
-              cashRegisterModel.modifyCartItem(index, cartItem);
-            },
-            textAlign: TextAlign.right,
-          )),
+          child: !cashRegisterModel.isAwaitingSendFormResponse
+              ? TextFormField(
+                  controller: TextEditingController(text: cartItem.qty ?? '')
+                    ..selection = TextSelection.collapsed(
+                        offset: (cartItem.qty ?? '').length),
+                  decoration: const InputDecoration(
+                    hintText: 'Quantité',
+                  ),
+                  validator: (String? value) {
+                    if (value == null ||
+                        value.isEmpty ||
+                        double.tryParse(value) == null) {
+                      return 'Quantité invalide';
+                    }
+                    return null;
+                  },
+                  onChanged: (String value) {
+                    cartItem.qty = value;
+                    cashRegisterModel.modifyCartItem(index, cartItem);
+                  },
+                  textAlign: TextAlign.right,
+                )
+              : Text(
+                  cashRegisterModel.cart[index].qty ?? '',
+                  textAlign: TextAlign.right,
+                )),
       Expanded(
           flex: 1,
           child: Text(

@@ -9,11 +9,25 @@ import 'package:intl/intl.dart';
 import 'package:coopaz_app/logger.dart';
 import 'package:provider/provider.dart';
 
-class ProductList extends StatelessWidget {
-  const ProductList({super.key, required this.formKey});
+class ProductList extends StatefulWidget {
+  ProductList({super.key, required this.formKey});
 
   final GlobalKey<FormState> formKey;
-  static NumberFormat numberFormat = NumberFormat('#,##0.00');
+  final NumberFormat numberFormat = NumberFormat('#,##0.00');
+
+  final ScrollController scrollController = ScrollController();
+
+  @override
+  State<ProductList> createState() {
+    return _ProductList();
+  }
+}
+
+class _ProductList extends State<ProductList> {
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,11 +83,18 @@ class ProductList extends StatelessWidget {
               )),
           const SizedBox(width: 71),
         ]),
-        Column(children: productLineWidgets),
+        Expanded(
+            child: ListView.builder(
+          itemCount: productLineWidgets.length,
+          controller: widget.scrollController,
+          itemBuilder: (context, index) {
+            return productLineWidgets[index];
+          },
+        )),
         const SizedBox(height: 40),
         Row(children: [
           Expanded(
-              flex: 10,
+              flex: 1,
               child: !cashRegisterModel.isAwaitingSendFormResponse
                   ? ElevatedButton(
                       style: ElevatedButton.styleFrom(
@@ -85,21 +106,26 @@ class ProductList extends StatelessWidget {
                         log('+ pressed');
                         _validateAll();
                         cashRegisterModel.addToCart(CartItem());
+
+                        widget.scrollController.animateTo(
+                            widget.scrollController.position.maxScrollExtent,
+                            duration: const Duration(milliseconds: 500),
+                            curve: Curves.easeOut);
                       },
                       child: const Icon(Icons.add),
                     )
                   : Container()),
-          const Expanded(flex: 7, child: SizedBox())
+          const Expanded(flex: 15, child: SizedBox())
         ]),
       ],
     );
   }
 
   bool _validateAll() {
-    log(formKey.currentState.toString());
+    log(widget.formKey.currentState.toString());
     bool valid = false;
-    if (formKey.currentState != null) {
-      valid = formKey.currentState!.validate();
+    if (widget.formKey.currentState != null) {
+      valid = widget.formKey.currentState!.validate();
     }
     return valid;
   }
@@ -121,7 +147,7 @@ class ProductList extends StatelessWidget {
     double? unitPrice = double.tryParse(cartItem.unitPrice ?? '');
     double? qty = double.tryParse(cartItem.qty ?? '');
     if (unitPrice != null && qty != null) {
-      total = '${numberFormat.format(unitPrice * qty)} €';
+      total = '${widget.numberFormat.format(unitPrice * qty)} €';
     }
 
     var productWidget = Row(children: <Widget>[
@@ -174,6 +200,7 @@ class ProductList extends StatelessWidget {
                   onChanged: (String value) {
                     cartItem.qty = value;
                     cashRegisterModel.modifyCartItem(index, cartItem);
+                    _validateAll();
                   },
                   textAlign: TextAlign.right,
                 )

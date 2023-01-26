@@ -107,10 +107,15 @@ class _ProductList extends State<ProductList> {
                         _validateAll();
                         cashRegisterModel.addToCart(CartItem());
 
-                        widget.scrollController.animateTo(
-                            widget.scrollController.position.maxScrollExtent,
-                            duration: const Duration(milliseconds: 500),
-                            curve: Curves.easeOut);
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          if (widget.scrollController.hasClients) {
+                            widget.scrollController.animateTo(
+                                widget
+                                    .scrollController.position.maxScrollExtent,
+                                duration: const Duration(milliseconds: 500),
+                                curve: Curves.easeOut);
+                          }
+                        });
                       },
                       child: const Icon(Icons.add),
                     )

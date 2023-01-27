@@ -154,40 +154,44 @@ class _ProductList extends State<ProductList> {
           '${cartItem.product?.price}€/${cartItem.product!.unit.unitAsString}';
     }
 
-
     var productWidget = Row(children: <Widget>[
       Expanded(
           flex: 8,
           child: !cashRegisterModel.isAwaitingSendFormResponse
               ? FormField<Product>(
-            builder: (formFieldState) {
-              return Autocomplete<Product>(
-                  initialValue: TextEditingValue(text: cartItem.product?.designation ?? ''),
-                  key: ValueKey(cartItem),
-                  displayStringForOption: (Product p) => p.designation,
-                  optionsBuilder: (TextEditingValue textEditingValue) async {
-                    if (textEditingValue.text == '') {
-                      return const Iterable<Product>.empty();
+                  builder: (formFieldState) {
+                    return Autocomplete<Product>(
+                      initialValue: TextEditingValue(
+                          text: cartItem.product?.designation ?? ''),
+                      key: ValueKey(cartItem),
+                      displayStringForOption: (Product p) => p.designation,
+                      optionsBuilder:
+                          (TextEditingValue textEditingValue) async {
+                        if (textEditingValue.text == '') {
+                          return const Iterable<Product>.empty();
+                        }
+                        return appModel.products.where((Product p) {
+                          return p.stock > 0.0;
+                        }).where((Product p) {
+                          return p
+                              .toString()
+                              .toLowerCase()
+                              .contains(textEditingValue.text.toLowerCase());
+                        });
+                      },
+                      onSelected: (p) {
+                        cashRegisterModel.modifyCartItem(
+                            index, CartItem(product: p));
+                      },
+                    );
+                  },
+                  validator: (Product? value) {
+                    if (value == null) {
+                      return 'Produit invalide';
                     }
-                    return appModel.products.where((Product p) {
-                      return p
-                          .toString()
-                          .toLowerCase()
-                          .contains(textEditingValue.text.toLowerCase());
-                    });
+                    return null;
                   },
-                  onSelected: (p) {
-                    cashRegisterModel.modifyCartItem(index, CartItem(product: p));
-                  },
-                );
-            },
-            validator: (Product? value) {
-              if (value == null) {
-                return 'Produit invalide';
-              }
-              return null;
-            },
-          )
+                )
               : Text(cashRegisterModel.cart[index].product?.designation ?? '')),
       Expanded(
           flex: 1,
@@ -212,7 +216,7 @@ class _ProductList extends State<ProductList> {
                     cashRegisterModel.modifyCartItem(index, cartItem);
                     _validateAll();
                     _validateAll();
-            },
+                  },
                   textAlign: TextAlign.right,
                 )
               : Text(

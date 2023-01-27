@@ -30,8 +30,7 @@ class ValidationPanel extends StatelessWidget {
         .watch<CashRegisterModel>()
         .cart
         .map((e) =>
-            (double.tryParse(e.qty ?? '0') ?? 0.0) *
-            (double.tryParse(e.unitPrice ?? '0') ?? 0.0))
+            (double.tryParse(e.qty ?? '0') ?? 0.0) * (e.product?.price ?? 0.0))
         .fold(0.0, (prev, e) => prev + e);
 
     double cardFee = 0.0;

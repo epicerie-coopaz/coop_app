@@ -1,18 +1,16 @@
+import 'package:coopaz_app/podo/product.dart';
+
 class CartItem {
   CartItem({
-    this.name,
+    this.product,
     this.qty,
-    this.unitPrice,
-    this.unit,
   });
 
-  String? name;
+  Product? product;
   String? qty;
-  String? unitPrice;
-  String? unit;
 
   @override
   String toString() {
-    return '{name: $name, qty: $qty, unitPrice: $unitPrice, unit: $unit,}';
+    return '{product: $product, qty: $qty,}';
   }
 }

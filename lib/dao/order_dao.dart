@@ -21,7 +21,7 @@ class OrderDao extends GoogleAppsScriptDao {
         paymentMethod.asTechnicalString,
         productLines
             .map((p) =>
-                {"product": p.name, "qty": double.tryParse(p.qty ?? '0')})
+                {"product": p.product, "qty": double.tryParse(p.qty ?? '0')})
             .toList(),
         chequeNumber
       ],

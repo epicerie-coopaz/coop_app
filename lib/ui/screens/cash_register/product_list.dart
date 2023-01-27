@@ -70,13 +70,6 @@ class _ProductList extends State<ProductList> {
           Expanded(
               flex: 1,
               child: Text(
-                'Unité',
-                style: styleHeaders,
-                textAlign: TextAlign.right,
-              )),
-          Expanded(
-              flex: 1,
-              child: Text(
                 'Total',
                 style: styleHeaders,
                 textAlign: TextAlign.right,
@@ -149,18 +142,27 @@ class _ProductList extends State<ProductList> {
   Row _createProductLineWidget(AppModel appModel,
       CashRegisterModel cashRegisterModel, int index, CartItem cartItem) {
     var total = '';
-    double? unitPrice = double.tryParse(cartItem.unitPrice ?? '');
+    double? unitPrice = cartItem.product?.price;
     double? qty = double.tryParse(cartItem.qty ?? '');
     if (unitPrice != null && qty != null) {
       total = '${widget.numberFormat.format(unitPrice * qty)} €';
     }
 
+    String unitPriceAsString = '';
+    if (cartItem.product != null) {
+      unitPriceAsString =
+          '${cartItem.product?.price}€/${cartItem.product!.unit.unitAsString}';
+    }
+
+
     var productWidget = Row(children: <Widget>[
       Expanded(
           flex: 8,
           child: !cashRegisterModel.isAwaitingSendFormResponse
-              ? Autocomplete<Product>(
-                  initialValue: TextEditingValue(text: cartItem.name ?? ''),
+              ? FormField<Product>(
+            builder: (formFieldState) {
+              return Autocomplete<Product>(
+                  initialValue: TextEditingValue(text: cartItem.product?.designation ?? ''),
                   key: ValueKey(cartItem),
                   displayStringForOption: (Product p) => p.designation,
                   optionsBuilder: (TextEditingValue textEditingValue) async {
@@ -175,15 +177,18 @@ class _ProductList extends State<ProductList> {
                     });
                   },
                   onSelected: (p) {
-                    cashRegisterModel.modifyCartItem(
-                        index,
-                        CartItem(
-                            name: p.designation,
-                            unit: p.unit.unitAsString,
-                            unitPrice: p.price.toStringAsFixed(2)));
+                    cashRegisterModel.modifyCartItem(index, CartItem(product: p));
                   },
-                )
-              : Text(cashRegisterModel.cart[index].name ?? '')),
+                );
+            },
+            validator: (Product? value) {
+              if (value == null) {
+                return 'Produit invalide';
+              }
+              return null;
+            },
+          )
+              : Text(cashRegisterModel.cart[index].product?.designation ?? '')),
       Expanded(
           flex: 1,
           child: !cashRegisterModel.isAwaitingSendFormResponse
@@ -206,7 +211,8 @@ class _ProductList extends State<ProductList> {
                     cartItem.qty = value;
                     cashRegisterModel.modifyCartItem(index, cartItem);
                     _validateAll();
-                  },
+                    _validateAll();
+            },
                   textAlign: TextAlign.right,
                 )
               : Text(
@@ -216,13 +222,7 @@ class _ProductList extends State<ProductList> {
       Expanded(
           flex: 1,
           child: Text(
-            cartItem.unitPrice ?? '',
-            textAlign: TextAlign.right,
-          )),
-      Expanded(
-          flex: 1,
-          child: Text(
-            cartItem.unit ?? '',
+            unitPriceAsString,
             textAlign: TextAlign.right,
           )),
       Expanded(
@@ -236,7 +236,6 @@ class _ProductList extends State<ProductList> {
         onPressed: () {
           log('Delete line pressed');
           cashRegisterModel.removeFromCart(index);
-          _validateAll();
         },
         icon: const Icon(Icons.delete),
         tooltip: 'Supprimer ligne',

@@ -54,10 +54,9 @@ class MembersScreen extends StatelessWidget {
             flex: 0,
             child: Row(
                 children: [
-              Pair('Nom', 1),
-              Pair('Email', 1),
+              Pair('Nom', 2),
+              Pair('Email', 3),
               Pair('Téléphone', 1),
-              Pair('Score', 1),
             ]
                     .map(
                       (e) => Expanded(
@@ -80,12 +79,9 @@ class MembersScreen extends StatelessWidget {
                 return Column(children: [
                   Row(
                     children: [
-                      Expanded(flex: 1, child: Text(m.name, style: styleBody)),
-                      Expanded(flex: 1, child: Text(m.email, style: styleBody)),
+                      Expanded(flex: 2, child: Text(m.name, style: styleBody)),
+                      Expanded(flex: 3, child: Text(m.email, style: styleBody)),
                       Expanded(flex: 1, child: Text(m.phone, style: styleBody)),
-                      Expanded(
-                          flex: 1,
-                          child: Text(m.score.toString(), style: styleBody)),
                     ],
                   ),
                   const Divider()

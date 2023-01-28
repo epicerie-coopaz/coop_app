@@ -127,18 +127,6 @@ class HomeScreen extends StatelessWidget {
             ),
             ElevatedButton(
                 onPressed: () {
-                  log('Reception Clicked !');
-                },
-                style: ElevatedButton.styleFrom(
-                        foregroundColor:
-                            Theme.of(context).colorScheme.onSecondaryContainer,
-                        backgroundColor:
-                            Theme.of(context).colorScheme.secondaryContainer,
-                        minimumSize: const Size(200, 200))
-                    .copyWith(elevation: ButtonStyleButton.allOrNull(0.0)),
-                child: const Text('Reception')),
-            ElevatedButton(
-                onPressed: () {
                   log('Products Clicked !');
                   Navigator.of(context).push(
                     MaterialPageRoute(

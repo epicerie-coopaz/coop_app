@@ -42,7 +42,12 @@ class ValidationPanel extends StatelessWidget {
 
     return Column(children: [
       Row(children: [
-        const Expanded(flex: 1, child: Text('Adhérent :')),
+        Expanded(
+          flex: 1, 
+          child: Text(
+            'Adhérent :',textScaleFactor: appModel.textSize
+          )
+        ),
         Expanded(
             flex: 2,
             child: !cashRegisterModel.isAwaitingSendFormResponse
@@ -69,10 +74,10 @@ class ValidationPanel extends StatelessWidget {
                 : Text(cashRegisterModel.selectedMember!.name)),
       ]),
       Row(children: [
-        const Expanded(
+        Expanded(
             flex: 1,
             child: Align(
-                alignment: Alignment.topLeft, child: Text('Paiement : '))),
+                alignment: Alignment.topLeft, child: Text('Paiement : ',textScaleFactor: appModel.textSize))),
         Expanded(
             flex: 2,
             child: !cashRegisterModel.isAwaitingSendFormResponse
@@ -89,11 +94,11 @@ class ValidationPanel extends StatelessWidget {
                             (PaymentMethod value) {
                       return DropdownMenuItem<PaymentMethod>(
                         value: value,
-                        child: Text(value.asString),
+                        child: Text(value.asString ,textScaleFactor: appModel.textSize),
                       );
                     }).toList(),
                   )
-                : Text(cashRegisterModel.selectedPaymentMethod.asString))
+                : Text(cashRegisterModel.selectedPaymentMethod.asString,textScaleFactor: appModel.textSize))
       ]),
       if (cashRegisterModel.selectedPaymentMethod == PaymentMethod.cheque)
         TextFormField(
@@ -124,26 +129,26 @@ class ValidationPanel extends StatelessWidget {
           textAlign: TextAlign.right,
         ),
       Row(children: [
-        const Expanded(
+        Expanded(
             flex: 1,
             child: Align(
-                alignment: Alignment.topLeft, child: Text('Sous total : '))),
+                alignment: Alignment.topLeft, child: Text('Sous total : ',textScaleFactor: appModel.textSize))),
         Expanded(
             flex: 2,
             child: Align(
                 alignment: Alignment.topLeft,
-                child: Text('${subtotal.toStringAsFixed(2)}€')))
+                child: Text('${subtotal.toStringAsFixed(2)}€',textScaleFactor: appModel.textSize)))
       ]),
       Row(children: [
-        const Expanded(
+        Expanded(
             flex: 1,
             child:
-                Align(alignment: Alignment.topLeft, child: Text('Total : '))),
+                Align(alignment: Alignment.topLeft, child: Text('Total : ',textScaleFactor: appModel.textSize))),
         Expanded(
             flex: 2,
             child: Align(
                 alignment: Alignment.topLeft,
-                child: Text('${total.toStringAsFixed(2)}€')))
+                child: Text('${total.toStringAsFixed(2)}€',textScaleFactor: appModel.textSize)))
       ]),
       if (cashRegisterModel.isAwaitingSendFormResponse == false)
         Center(
@@ -163,7 +168,7 @@ class ValidationPanel extends StatelessWidget {
                 log('Form invalid');
               }
             },
-            child: const Text('Valider'),
+            child: Text('Valider',textScaleFactor: appModel.textSize),
           ),
         ))
       else

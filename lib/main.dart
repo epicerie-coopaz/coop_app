@@ -42,7 +42,6 @@ Future<void> main() async {
     log('App started !');
   } catch (e, s) {
     runApp(MaterialApp(
-      theme: ThemeData(useMaterial3: true),
       home: Scaffold(
         appBar: AppBar(
           title: const Text('Erreur lors du démarrage !'),

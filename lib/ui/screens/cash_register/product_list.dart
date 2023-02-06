@@ -51,12 +51,14 @@ class _ProductList extends State<ProductList> {
               flex: 8,
               child: Text(
                 'Produit',
+                textScaleFactor: appModel.textSize,
                 style: styleHeaders,
               )),
           Expanded(
               flex: 1,
               child: Text(
                 'Qté',
+                textScaleFactor: appModel.textSize,
                 style: styleHeaders,
                 textAlign: TextAlign.right,
               )),
@@ -64,6 +66,7 @@ class _ProductList extends State<ProductList> {
               flex: 1,
               child: Text(
                 'Prix unit.',
+                textScaleFactor: appModel.textSize,
                 style: styleHeaders,
                 textAlign: TextAlign.right,
               )),
@@ -71,6 +74,7 @@ class _ProductList extends State<ProductList> {
               flex: 1,
               child: Text(
                 'Total',
+                textScaleFactor: appModel.textSize,
                 style: styleHeaders,
                 textAlign: TextAlign.right,
               )),
@@ -157,7 +161,7 @@ class _ProductList extends State<ProductList> {
     var productWidget = Row(children: <Widget>[
       Expanded(
           flex: 8,
-          child: !cashRegisterModel.isAwaitingSendFormResponse
+          child : !cashRegisterModel.isAwaitingSendFormResponse
               ? FormField<Product>(
                   builder: (formFieldState) {
                     return Autocomplete<Product>(
@@ -192,7 +196,11 @@ class _ProductList extends State<ProductList> {
                     return null;
                   },
                 )
-              : Text(cashRegisterModel.cart[index].product?.designation ?? '')),
+              : Text(
+                  cashRegisterModel.cart[index].product?.designation ?? '',
+                  textScaleFactor: appModel.textSize
+                )
+        ),
       Expanded(
           flex: 1,
           child: !cashRegisterModel.isAwaitingSendFormResponse
@@ -218,6 +226,9 @@ class _ProductList extends State<ProductList> {
                     _validateAll();
                   },
                   textAlign: TextAlign.right,
+                  style: TextStyle(
+                    fontSize: 14*appModel.textSize,
+                  ),
                 )
               : Text(
                   cashRegisterModel.cart[index].qty ?? '',
@@ -228,11 +239,13 @@ class _ProductList extends State<ProductList> {
           child: Text(
             unitPriceAsString,
             textAlign: TextAlign.right,
+            textScaleFactor: appModel.textSize
           )),
       Expanded(
           flex: 1,
           child: Text(
             total,
+            textScaleFactor: appModel.textSize,
             textAlign: TextAlign.right,
           )),
       const SizedBox(width: 15),

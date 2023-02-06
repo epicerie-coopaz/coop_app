@@ -36,7 +36,11 @@ class CoopazApp extends StatelessWidget {
         return MaterialApp(
           title: 'Coopaz',
           theme: ThemeData(
-              //colorSchemeSeed: Color.fromARGB(255, 255, 174, 52),
+/*               textTheme: const TextTheme(
+                displayLarge: TextStyle(
+                  color: Colors.blue,fontSize: 30
+                )
+              ), */
               colorScheme: const ColorScheme(
                 brightness: Brightness.light,
                 primary: Color(0xFF4B6700),

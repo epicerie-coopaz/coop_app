@@ -61,28 +61,53 @@ class CashRegisterScreen extends StatelessWidget {
             const Spacer(),
             IconButton(
                 onPressed: () async {
+                  appModel.textSize = appModel.textSize - 0.2;
+                  log(appModel.textSize.toString());
+                },
+                icon: const Icon(Icons.text_decrease),
+                tooltip: 'Diminuer la taille du texte'),
+            IconButton(
+                onPressed: () async {
+                  appModel.textSize = appModel.textSize + 0.2;
+                  log(appModel.textSize.toString());
+                },
+                icon: const Icon(Icons.text_increase),
+                tooltip: 'Agrandir la taille du texte'),
+            IconButton(
+                onPressed: () async {
                   appModel.products = [];
                   appModel.members = [];
                 },
                 icon: const Icon(Icons.refresh),
-                tooltip : 'Recharger listes produits et adhérents'),
+                tooltip: 'Recharger listes produits et adhérents'),
             IconButton(
                 onPressed: () async {
                   cashRegisterModel.cleanCart();
                 },
                 icon: const Icon(Icons.clear),
-                tooltip : 'Effacer le formulaire')
+                tooltip: 'Effacer le formulaire')
           ]),
         ),
-        body: Container(
-            padding: const EdgeInsets.all(12.0),
-            child: Form(
-              key: _formKey,
-              child: Row(children: [
-                Expanded(flex: 3, child: cartList),
-                const VerticalDivider(),
-                Expanded(flex: 1, child: validationPanel)
-              ]),
-            )));
+        body: /* DefaultTextStyle(
+            style: 
+            TextStyle(
+              //TO DO enlever couleur
+              color: Colors.blue,
+              fontSize: appModel.textSize,
+              
+            ),
+            child: */ Container(
+                padding: const EdgeInsets.all(12.0),
+                child: Form(
+                  key: _formKey,
+                  child: Row(children: [
+                    Expanded(flex: 3, child: cartList),
+                    const VerticalDivider(),
+                    Expanded(flex: 1, child: validationPanel)
+                  ]),
+                )
+              )
+         //)
+      );
   }
 }

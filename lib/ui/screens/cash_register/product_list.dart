@@ -107,8 +107,7 @@ class _ProductList extends State<ProductList> {
                         WidgetsBinding.instance.addPostFrameCallback((_) {
                           if (widget.scrollController.hasClients) {
                             widget.scrollController.animateTo(
-                                widget
-                                    .scrollController.position.maxScrollExtent,
+                                widget.scrollController.position.maxScrollExtent,
                                 duration: const Duration(milliseconds: 500),
                                 curve: Curves.easeOut);
                           }
@@ -191,7 +190,7 @@ class _ProductList extends State<ProductList> {
                         ) {
                           return TextField(
                             //autofocus: true,
-                            decoration: InputDecoration(hintText: 'Produit',),
+                            decoration: const InputDecoration(hintText: 'Produit',),
                             controller: fieldTextEditingController,
                             focusNode: fieldFocusNode,
                             style: TextStyle(fontSize: 14 * appModel.textSize),

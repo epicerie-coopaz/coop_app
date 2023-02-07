@@ -42,11 +42,11 @@ class ValidationPanel extends StatelessWidget {
 
     return Column(children: [
       Container(
-          padding: EdgeInsets.only(top: 8),
+          padding: const EdgeInsets.only(top: 8),
           alignment: Alignment.bottomLeft,
           child: Text('Adhérent :',
               textScaleFactor: appModel.textSize,
-              style: TextStyle(fontWeight: FontWeight.w600))),
+              style: const TextStyle(fontWeight: FontWeight.w600))),
       Container(
           alignment: Alignment.bottomLeft,
           child: !cashRegisterModel.isAwaitingSendFormResponse
@@ -71,7 +71,7 @@ class ValidationPanel extends StatelessWidget {
                       FocusNode fieldFocusNode,
                       VoidCallback onFieldSubmitted) {
                     return TextField(
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         hintText: 'Nom adhérent',
                       ),
                       controller: fieldTextEditingController,
@@ -85,10 +85,9 @@ class ValidationPanel extends StatelessWidget {
                 )
               : Text(cashRegisterModel.selectedMember!.name)),
       Container(
-          padding: EdgeInsets.only(top: 25),
+          padding: const EdgeInsets.only(top: 25),
           alignment: Alignment.bottomLeft,
-          child: Text('Paiement : ',
-              style: TextStyle(fontSize: 11 * appModel.textSize))),
+          child: Text('Paiement : ',style: TextStyle(fontSize: 11 * appModel.textSize))),
       Row(children: [
         Expanded(
             flex: 2,
@@ -143,7 +142,7 @@ class ValidationPanel extends StatelessWidget {
           textAlign: TextAlign.right,
         ),
       Container(
-        padding: EdgeInsets.only(top: 25),
+        padding: const EdgeInsets.only(top: 25),
         child: Row(children: [
           Expanded(
               flex: 1,
@@ -160,7 +159,7 @@ class ValidationPanel extends StatelessWidget {
         ]),
       ),
       Container(
-        padding: EdgeInsets.only(top: 5),
+        padding: const EdgeInsets.only(top: 5),
         child: Row(children: [
           Expanded(
               flex: 1,
@@ -168,14 +167,14 @@ class ValidationPanel extends StatelessWidget {
                   alignment: Alignment.topLeft,
                   child: Text('Total : ',
                       textScaleFactor: appModel.textSize,
-                      style: TextStyle(fontWeight: FontWeight.bold)))),
+                      style: const TextStyle(fontWeight: FontWeight.bold)))),
           Expanded(
               flex: 1,
               child: Align(
                   alignment: Alignment.topLeft,
                   child: Text('${total.toStringAsFixed(2)}€',
                       textScaleFactor: appModel.textSize,
-                      style: TextStyle(fontWeight: FontWeight.bold))))
+                      style: const TextStyle(fontWeight: FontWeight.bold))))
         ]),
       ),
       if (cashRegisterModel.isAwaitingSendFormResponse == false)

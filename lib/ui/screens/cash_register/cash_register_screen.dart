@@ -88,26 +88,17 @@ class CashRegisterScreen extends StatelessWidget {
                 tooltip: 'Effacer le formulaire')
           ]),
         ),
-        body: /* DefaultTextStyle(
-            style: 
-            TextStyle(
-              //TO DO enlever couleur
-              color: Colors.blue,
-              fontSize: appModel.textSize,
-              
-            ),
-            child: */ Container(
-                padding: const EdgeInsets.all(12.0),
-                child: Form(
-                  key: _formKey,
-                  child: Row(children: [
-                    Expanded(flex: 5, child: cartList),
-                    const VerticalDivider(),
-                    Expanded(flex: 1, child: validationPanel)
-                  ]),
-                )
-              )
-         //)
+        body: Container(
+          padding: const EdgeInsets.all(12.0),
+          child: Form(
+            key: _formKey,
+            child: Row(children: [
+              Expanded(flex: 5, child: cartList),
+              const VerticalDivider(),
+              Expanded(flex: 1, child: validationPanel)
+            ]),
+          )
+        )
       );
   }
 }

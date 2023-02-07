@@ -41,43 +41,55 @@ class ValidationPanel extends StatelessWidget {
     double total = subtotal + cardFee;
 
     return Column(children: [
+      Container(
+          padding: EdgeInsets.only(top: 8),
+          alignment: Alignment.bottomLeft,
+          child: Text('Adhérent :',
+              textScaleFactor: appModel.textSize,
+              style: TextStyle(fontWeight: FontWeight.w600))),
+      Container(
+          alignment: Alignment.bottomLeft,
+          child: !cashRegisterModel.isAwaitingSendFormResponse
+              ? Autocomplete<Member>(
+                  key: ValueKey(cashRegisterModel.selectedMember?.name ?? ''),
+                  initialValue: TextEditingValue(
+                      text: cashRegisterModel.selectedMember?.name ?? ''),
+                  displayStringForOption: (Member m) => m.name,
+                  optionsBuilder: (TextEditingValue textEditingValue) async {
+                    if (textEditingValue.text == '') {
+                      return const Iterable<Member>.empty();
+                    }
+                    return appModel.members.where((Member m) {
+                      return m
+                          .toString()
+                          .toLowerCase()
+                          .contains(textEditingValue.text.toLowerCase());
+                    });
+                  },
+                  fieldViewBuilder: (BuildContext context,
+                      TextEditingController fieldTextEditingController,
+                      FocusNode fieldFocusNode,
+                      VoidCallback onFieldSubmitted) {
+                    return TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Nom adhérent',
+                      ),
+                      controller: fieldTextEditingController,
+                      focusNode: fieldFocusNode,
+                      style: TextStyle(fontSize: 14 * appModel.textSize),
+                    );
+                  },
+                  onSelected: (m) {
+                    cashRegisterModel.selectedMember = m;
+                  },
+                )
+              : Text(cashRegisterModel.selectedMember!.name)),
+      Container(
+          padding: EdgeInsets.only(top: 25),
+          alignment: Alignment.bottomLeft,
+          child: Text('Paiement : ',
+              style: TextStyle(fontSize: 11 * appModel.textSize))),
       Row(children: [
-        Expanded(
-          flex: 1, 
-          child: Text(
-            'Adhérent :',textScaleFactor: appModel.textSize
-          )
-        ),
-        Expanded(
-            flex: 2,
-            child: !cashRegisterModel.isAwaitingSendFormResponse
-                ? Autocomplete<Member>(
-                    key: ValueKey(cashRegisterModel.selectedMember?.name ?? ''),
-                    initialValue: TextEditingValue(
-                        text: cashRegisterModel.selectedMember?.name ?? ''),
-                    displayStringForOption: (Member m) => m.name,
-                    optionsBuilder: (TextEditingValue textEditingValue) async {
-                      if (textEditingValue.text == '') {
-                        return const Iterable<Member>.empty();
-                      }
-                      return appModel.members.where((Member m) {
-                        return m
-                            .toString()
-                            .toLowerCase()
-                            .contains(textEditingValue.text.toLowerCase());
-                      });
-                    },
-                    onSelected: (m) {
-                      cashRegisterModel.selectedMember = m;
-                    },
-                  )
-                : Text(cashRegisterModel.selectedMember!.name)),
-      ]),
-      Row(children: [
-        Expanded(
-            flex: 1,
-            child: Align(
-                alignment: Alignment.topLeft, child: Text('Paiement : ',textScaleFactor: appModel.textSize))),
         Expanded(
             flex: 2,
             child: !cashRegisterModel.isAwaitingSendFormResponse
@@ -94,11 +106,13 @@ class ValidationPanel extends StatelessWidget {
                             (PaymentMethod value) {
                       return DropdownMenuItem<PaymentMethod>(
                         value: value,
-                        child: Text(value.asString ,textScaleFactor: appModel.textSize),
+                        child: Text(value.asString,
+                            style: TextStyle(fontSize: 11 * appModel.textSize)),
                       );
                     }).toList(),
                   )
-                : Text(cashRegisterModel.selectedPaymentMethod.asString,textScaleFactor: appModel.textSize))
+                : Text(cashRegisterModel.selectedPaymentMethod.asString,
+                    textScaleFactor: appModel.textSize))
       ]),
       if (cashRegisterModel.selectedPaymentMethod == PaymentMethod.cheque)
         TextFormField(
@@ -128,28 +142,42 @@ class ValidationPanel extends StatelessWidget {
           },
           textAlign: TextAlign.right,
         ),
-      Row(children: [
-        Expanded(
-            flex: 1,
-            child: Align(
-                alignment: Alignment.topLeft, child: Text('Sous total : ',textScaleFactor: appModel.textSize))),
-        Expanded(
-            flex: 2,
-            child: Align(
-                alignment: Alignment.topLeft,
-                child: Text('${subtotal.toStringAsFixed(2)}€',textScaleFactor: appModel.textSize)))
-      ]),
-      Row(children: [
-        Expanded(
-            flex: 1,
-            child:
-                Align(alignment: Alignment.topLeft, child: Text('Total : ',textScaleFactor: appModel.textSize))),
-        Expanded(
-            flex: 2,
-            child: Align(
-                alignment: Alignment.topLeft,
-                child: Text('${total.toStringAsFixed(2)}€',textScaleFactor: appModel.textSize)))
-      ]),
+      Container(
+        padding: EdgeInsets.only(top: 25),
+        child: Row(children: [
+          Expanded(
+              flex: 1,
+              child: Align(
+                  alignment: Alignment.topLeft,
+                  child: Text('Sous total : ',
+                      style: TextStyle(fontSize: 11 * appModel.textSize)))),
+          Expanded(
+              flex: 1,
+              child: Align(
+                  alignment: Alignment.topLeft,
+                  child: Text('${subtotal.toStringAsFixed(2)}€',
+                      style: TextStyle(fontSize: 11 * appModel.textSize))))
+        ]),
+      ),
+      Container(
+        padding: EdgeInsets.only(top: 5),
+        child: Row(children: [
+          Expanded(
+              flex: 1,
+              child: Align(
+                  alignment: Alignment.topLeft,
+                  child: Text('Total : ',
+                      textScaleFactor: appModel.textSize,
+                      style: TextStyle(fontWeight: FontWeight.bold)))),
+          Expanded(
+              flex: 1,
+              child: Align(
+                  alignment: Alignment.topLeft,
+                  child: Text('${total.toStringAsFixed(2)}€',
+                      textScaleFactor: appModel.textSize,
+                      style: TextStyle(fontWeight: FontWeight.bold))))
+        ]),
+      ),
       if (cashRegisterModel.isAwaitingSendFormResponse == false)
         Center(
             child: Container(
@@ -168,7 +196,7 @@ class ValidationPanel extends StatelessWidget {
                 log('Form invalid');
               }
             },
-            child: Text('Valider',textScaleFactor: appModel.textSize),
+            child: Text('Valider', textScaleFactor: appModel.textSize),
           ),
         ))
       else
@@ -194,8 +222,8 @@ class ValidationPanel extends StatelessWidget {
       chequeOrTransferNumber = model.chequeOrTransferNumber;
     }
 
-    await orderDao.createOrder(model.selectedMember?.email ?? '',
-        model.cart, model.selectedPaymentMethod, chequeOrTransferNumber);
+    await orderDao.createOrder(model.selectedMember?.email ?? '', model.cart,
+        model.selectedPaymentMethod, chequeOrTransferNumber);
     // reset form
     formKey.currentState?.reset();
 

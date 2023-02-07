@@ -101,7 +101,7 @@ class CashRegisterScreen extends StatelessWidget {
                 child: Form(
                   key: _formKey,
                   child: Row(children: [
-                    Expanded(flex: 3, child: cartList),
+                    Expanded(flex: 5, child: cartList),
                     const VerticalDivider(),
                     Expanded(flex: 1, child: validationPanel)
                   ]),

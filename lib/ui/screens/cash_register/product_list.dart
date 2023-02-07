@@ -48,7 +48,7 @@ class _ProductList extends State<ProductList> {
       children: [
         Row(children: <Widget>[
           Expanded(
-              flex: 8,
+              flex: 7,
               child: Text(
                 'Produit',
                 textScaleFactor: appModel.textSize,
@@ -65,7 +65,7 @@ class _ProductList extends State<ProductList> {
           Expanded(
               flex: 1,
               child: Text(
-                'Prix unit.',
+                'Prix U.',
                 textScaleFactor: appModel.textSize,
                 style: styleHeaders,
                 textAlign: TextAlign.right,
@@ -160,29 +160,43 @@ class _ProductList extends State<ProductList> {
 
     var productWidget = Row(children: <Widget>[
       Expanded(
-          flex: 8,
+          flex: 7,
           child : !cashRegisterModel.isAwaitingSendFormResponse
               ? FormField<Product>(
                   builder: (formFieldState) {
                     return Autocomplete<Product>(
-                      initialValue: TextEditingValue(
-                          text: cartItem.product?.designation ?? ''),
+                      initialValue: TextEditingValue(text: cartItem.product?.designation ?? ''),
                       key: ValueKey(cartItem),
                       displayStringForOption: (Product p) => p.designation,
                       optionsBuilder:
                           (TextEditingValue textEditingValue) async {
-                        if (textEditingValue.text == '') {
-                          return const Iterable<Product>.empty();
-                        }
-                        return appModel.products.where((Product p) {
-                          return p.stock > 0.0;
-                        }).where((Product p) {
-                          return p
-                              .toString()
-                              .toLowerCase()
-                              .contains(textEditingValue.text.toLowerCase());
-                        });
-                      },
+                            if (textEditingValue.text == '') {
+                              return const Iterable<Product>.empty();
+                            }
+                            return appModel.products.where((Product p) {
+                              return p.stock > 0.0;
+                            }).where((Product p) {
+                              return p
+                                  .toString()
+                                  .toLowerCase()
+                                  .contains(textEditingValue.text.toLowerCase());
+                            });
+                          },
+
+                      fieldViewBuilder: (
+                        BuildContext context,
+                        TextEditingController fieldTextEditingController,
+                        FocusNode fieldFocusNode,
+                        VoidCallback onFieldSubmitted
+                        ) {
+                          return TextField(
+                            //autofocus: true,
+                            decoration: InputDecoration(hintText: 'Produit',),
+                            controller: fieldTextEditingController,
+                            focusNode: fieldFocusNode,
+                            style: TextStyle(fontSize: 14 * appModel.textSize),
+                          );
+                        },
                       onSelected: (p) {
                         cashRegisterModel.modifyCartItem(
                             index, CartItem(product: p));

@@ -48,6 +48,7 @@ class ValidationPanel extends StatelessWidget {
               textScaleFactor: appModel.textSize,
               style: const TextStyle(fontWeight: FontWeight.w600))),
       Container(
+          color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
           alignment: Alignment.bottomLeft,
           child: !cashRegisterModel.isAwaitingSendFormResponse
               ? Autocomplete<Member>(
@@ -84,6 +85,23 @@ class ValidationPanel extends StatelessWidget {
                   },
                 )
               : Text(cashRegisterModel.selectedMember!.name)),
+      Container(
+        padding: const EdgeInsets.only(top: 25),
+        child: Row(children: [
+          Expanded(
+              flex: 1,
+              child: Align(
+                  alignment: Alignment.topLeft,
+                  child: Text('Sous total : ',
+                      style: TextStyle(fontSize: 11 * appModel.textSize)))),
+          Expanded(
+              flex: 1,
+              child: Align(
+                  alignment: Alignment.topLeft,
+                  child: Text('${subtotal.toStringAsFixed(2)}€',
+                      style: TextStyle(fontSize: 11 * appModel.textSize))))
+        ]),
+      ),
       Container(
           padding: const EdgeInsets.only(top: 25),
           alignment: Alignment.bottomLeft,
@@ -141,23 +159,7 @@ class ValidationPanel extends StatelessWidget {
           },
           textAlign: TextAlign.right,
         ),
-      Container(
-        padding: const EdgeInsets.only(top: 25),
-        child: Row(children: [
-          Expanded(
-              flex: 1,
-              child: Align(
-                  alignment: Alignment.topLeft,
-                  child: Text('Sous total : ',
-                      style: TextStyle(fontSize: 11 * appModel.textSize)))),
-          Expanded(
-              flex: 1,
-              child: Align(
-                  alignment: Alignment.topLeft,
-                  child: Text('${subtotal.toStringAsFixed(2)}€',
-                      style: TextStyle(fontSize: 11 * appModel.textSize))))
-        ]),
-      ),
+      
       Container(
         padding: const EdgeInsets.only(top: 5),
         child: Row(children: [

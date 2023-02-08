@@ -82,41 +82,35 @@ class _ProductList extends State<ProductList> {
         ]),
         Expanded(
             child: ListView.builder(
-          itemCount: productLineWidgets.length,
-          controller: widget.scrollController,
-          itemBuilder: (context, index) {
-            return productLineWidgets[index];
-          },
+              itemCount: productLineWidgets.length,
+              controller: widget.scrollController,
+              itemBuilder: (context, index) {
+                return productLineWidgets[index];
+              },
         )),
         const SizedBox(height: 40),
         Row(children: [
-          Expanded(
-              flex: 1,
-              child: !cashRegisterModel.isAwaitingSendFormResponse
-                  ? ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor:
-                            Theme.of(context).colorScheme.onPrimary,
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                      ),
-                      onPressed: () {
-                        log('+ pressed');
-                        _validateAll();
-                        cashRegisterModel.addToCart(CartItem());
+          !cashRegisterModel.isAwaitingSendFormResponse
+          ? FloatingActionButton(
+              foregroundColor:Theme.of(context).colorScheme.onPrimary,
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              onPressed: () {
+                log('+ pressed');
+                _validateAll();
+                cashRegisterModel.addToCart(CartItem());
 
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          if (widget.scrollController.hasClients) {
-                            widget.scrollController.animateTo(
-                                widget.scrollController.position.maxScrollExtent,
-                                duration: const Duration(milliseconds: 500),
-                                curve: Curves.easeOut);
-                          }
-                        });
-                      },
-                      child: const Icon(Icons.add),
-                    )
-                  : Container()),
-          const Expanded(flex: 15, child: SizedBox())
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (widget.scrollController.hasClients) {
+                    widget.scrollController.animateTo(
+                        widget.scrollController.position.maxScrollExtent,
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeOut);
+                  }
+                });
+              },
+              child: const Icon(Icons.add),
+            )
+          : Container()
         ]),
       ],
     );

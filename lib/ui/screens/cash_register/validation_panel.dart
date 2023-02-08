@@ -40,12 +40,15 @@ class ValidationPanel extends StatelessWidget {
 
     double total = subtotal + cardFee;
 
+    double smallText = 11 * appModel.zoomText;
+    double bigText =  14 * appModel.zoomText;
+
     return Column(children: [
       Container(
           padding: const EdgeInsets.only(top: 8),
           alignment: Alignment.bottomLeft,
           child: Text('Adhérent :',
-              textScaleFactor: appModel.textSize,
+              textScaleFactor: appModel.zoomText,
               style: const TextStyle(fontWeight: FontWeight.w600))),
       Container(
           color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
@@ -77,7 +80,7 @@ class ValidationPanel extends StatelessWidget {
                       ),
                       controller: fieldTextEditingController,
                       focusNode: fieldFocusNode,
-                      style: TextStyle(fontSize: 14 * appModel.textSize),
+                      style: TextStyle(fontSize:bigText),
                     );
                   },
                   onSelected: (m) {
@@ -92,20 +95,18 @@ class ValidationPanel extends StatelessWidget {
               flex: 1,
               child: Align(
                   alignment: Alignment.topLeft,
-                  child: Text('Sous total : ',
-                      style: TextStyle(fontSize: 11 * appModel.textSize)))),
+                  child: Text('Sous total : ',style: TextStyle(fontSize: smallText)))),
           Expanded(
               flex: 1,
               child: Align(
                   alignment: Alignment.topLeft,
-                  child: Text('${subtotal.toStringAsFixed(2)}€',
-                      style: TextStyle(fontSize: 11 * appModel.textSize))))
+                  child: Text('${subtotal.toStringAsFixed(2)}€',style: TextStyle(fontSize: smallText))))
         ]),
       ),
       Container(
           padding: const EdgeInsets.only(top: 25),
           alignment: Alignment.bottomLeft,
-          child: Text('Paiement : ',style: TextStyle(fontSize: 11 * appModel.textSize))),
+          child: Text('Paiement : ',style: TextStyle(fontSize: smallText))),
       Row(children: [
         Expanded(
             flex: 2,
@@ -124,12 +125,12 @@ class ValidationPanel extends StatelessWidget {
                       return DropdownMenuItem<PaymentMethod>(
                         value: value,
                         child: Text(value.asString,
-                            style: TextStyle(fontSize: 11 * appModel.textSize)),
+                            style: TextStyle(fontSize: 11 * appModel.zoomText)),
                       );
                     }).toList(),
                   )
                 : Text(cashRegisterModel.selectedPaymentMethod.asString,
-                    textScaleFactor: appModel.textSize))
+                    textScaleFactor: appModel.zoomText))
       ]),
       if (cashRegisterModel.selectedPaymentMethod == PaymentMethod.cheque)
         TextFormField(
@@ -159,23 +160,22 @@ class ValidationPanel extends StatelessWidget {
           },
           textAlign: TextAlign.right,
         ),
-      
       Container(
-        padding: const EdgeInsets.only(top: 5),
+        padding: const EdgeInsets.only(top: 25),
         child: Row(children: [
           Expanded(
               flex: 1,
               child: Align(
                   alignment: Alignment.topLeft,
                   child: Text('Total : ',
-                      textScaleFactor: appModel.textSize,
+                      textScaleFactor: appModel.zoomText,
                       style: const TextStyle(fontWeight: FontWeight.bold)))),
           Expanded(
               flex: 1,
               child: Align(
                   alignment: Alignment.topLeft,
                   child: Text('${total.toStringAsFixed(2)}€',
-                      textScaleFactor: appModel.textSize,
+                      textScaleFactor: appModel.zoomText,
                       style: const TextStyle(fontWeight: FontWeight.bold))))
         ]),
       ),
@@ -197,7 +197,7 @@ class ValidationPanel extends StatelessWidget {
                 log('Form invalid');
               }
             },
-            child: Text('Valider', textScaleFactor: appModel.textSize),
+            child: Text('Valider', textScaleFactor: appModel.zoomText),
           ),
         ))
       else

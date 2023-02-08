@@ -30,6 +30,7 @@ class CashRegisterScreen extends StatelessWidget {
     log('build screen $title');
 
     AppModel appModel = context.watch<AppModel>();
+    double zoomStep = 0.2;
     CashRegisterModel cashRegisterModel = context.watch<CashRegisterModel>();
 
     Widget cartList;
@@ -61,15 +62,15 @@ class CashRegisterScreen extends StatelessWidget {
             const Spacer(),
             IconButton(
                 onPressed: () async {
-                  appModel.textSize = appModel.textSize - 0.2;
-                  log(appModel.textSize.toString());
+                  appModel.zoomText = appModel.zoomText - zoomStep;
+                  log(appModel.zoomText.toString());
                 },
                 icon: const Icon(Icons.text_decrease),
                 tooltip: 'Diminuer la taille du texte'),
             IconButton(
                 onPressed: () async {
-                  appModel.textSize = appModel.textSize + 0.2;
-                  log(appModel.textSize.toString());
+                  appModel.zoomText = appModel.zoomText + zoomStep;
+                  log(appModel.zoomText.toString());
                 },
                 icon: const Icon(Icons.text_increase),
                 tooltip: 'Agrandir la taille du texte'),
@@ -89,16 +90,14 @@ class CashRegisterScreen extends StatelessWidget {
           ]),
         ),
         body: Container(
-          padding: const EdgeInsets.all(12.0),
-          child: Form(
-            key: _formKey,
-            child: Row(children: [
-              Expanded(flex: 5, child: cartList),
-              const VerticalDivider(),
-              Expanded(flex: 1, child: validationPanel)
-            ]),
-          )
-        )
-      );
+            padding: const EdgeInsets.all(12.0),
+            child: Form(
+              key: _formKey,
+              child: Row(children: [
+                Expanded(flex: 5, child: cartList),
+                const VerticalDivider(),
+                Expanded(flex: 1, child: validationPanel)
+              ]),
+            )));
   }
 }

@@ -36,11 +36,6 @@ class CoopazApp extends StatelessWidget {
         return MaterialApp(
           title: 'Coopaz',
           theme: ThemeData(
-/*               textTheme: const TextTheme(
-                displayLarge: TextStyle(
-                  color: Colors.blue,fontSize: 30
-                )
-              ), */
               colorScheme: const ColorScheme(
                 brightness: Brightness.light,
                 primary: Color(0xFF4B6700),
@@ -98,7 +93,6 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        //backgroundColor: const Color(0xff00BCD1),
         appBar: AppBar(
           // Here we take the value from the MyHomePage object that was created by
           // the App.build method, and use it to set our appbar title.

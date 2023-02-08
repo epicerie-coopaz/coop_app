@@ -10,8 +10,8 @@ class AppModel extends ChangeNotifier {
   double _textSize = 1.0;
 
   // Text Size section
-  double get textSize => _textSize;
-  set textSize(double textSize) {
+  double get zoomText => _textSize;
+  set zoomText(double textSize) {
     _textSize = textSize;
     notifyListeners();
   }

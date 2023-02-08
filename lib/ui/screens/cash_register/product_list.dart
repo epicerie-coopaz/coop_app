@@ -51,14 +51,14 @@ class _ProductList extends State<ProductList> {
               flex: 7,
               child: Text(
                 'Produit',
-                textScaleFactor: appModel.textSize,
+                textScaleFactor: appModel.zoomText,
                 style: styleHeaders,
               )),
           Expanded(
               flex: 1,
               child: Text(
                 'Qté',
-                textScaleFactor: appModel.textSize,
+                textScaleFactor: appModel.zoomText,
                 style: styleHeaders,
                 textAlign: TextAlign.right,
               )),
@@ -66,7 +66,7 @@ class _ProductList extends State<ProductList> {
               flex: 1,
               child: Text(
                 'Prix U.',
-                textScaleFactor: appModel.textSize,
+                textScaleFactor: appModel.zoomText,
                 style: styleHeaders,
                 textAlign: TextAlign.right,
               )),
@@ -74,7 +74,7 @@ class _ProductList extends State<ProductList> {
               flex: 1,
               child: Text(
                 'Total',
-                textScaleFactor: appModel.textSize,
+                textScaleFactor: appModel.zoomText,
                 style: styleHeaders,
                 textAlign: TextAlign.right,
               )),
@@ -82,35 +82,35 @@ class _ProductList extends State<ProductList> {
         ]),
         Expanded(
             child: ListView.builder(
-              itemCount: productLineWidgets.length,
-              controller: widget.scrollController,
-              itemBuilder: (context, index) {
-                return productLineWidgets[index];
-              },
+          itemCount: productLineWidgets.length,
+          controller: widget.scrollController,
+          itemBuilder: (context, index) {
+            return productLineWidgets[index];
+          },
         )),
         const SizedBox(height: 40),
         Row(children: [
           !cashRegisterModel.isAwaitingSendFormResponse
-          ? FloatingActionButton(
-              foregroundColor:Theme.of(context).colorScheme.onPrimary,
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              onPressed: () {
-                log('+ pressed');
-                _validateAll();
-                cashRegisterModel.addToCart(CartItem());
+              ? FloatingActionButton(
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  onPressed: () {
+                    log('+ pressed');
+                    _validateAll();
+                    cashRegisterModel.addToCart(CartItem());
 
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (widget.scrollController.hasClients) {
-                    widget.scrollController.animateTo(
-                        widget.scrollController.position.maxScrollExtent,
-                        duration: const Duration(milliseconds: 500),
-                        curve: Curves.easeOut);
-                  }
-                });
-              },
-              child: const Icon(Icons.add),
-            )
-          : Container()
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (widget.scrollController.hasClients) {
+                        widget.scrollController.animateTo(
+                            widget.scrollController.position.maxScrollExtent,
+                            duration: const Duration(milliseconds: 500),
+                            curve: Curves.easeOut);
+                      }
+                    });
+                  },
+                  child: const Icon(Icons.add),
+                )
+              : Container()
         ]),
       ],
     );
@@ -154,42 +154,42 @@ class _ProductList extends State<ProductList> {
     var productWidget = Row(children: <Widget>[
       Expanded(
           flex: 7,
-          child : !cashRegisterModel.isAwaitingSendFormResponse
+          child: !cashRegisterModel.isAwaitingSendFormResponse
               ? FormField<Product>(
                   builder: (formFieldState) {
                     return Autocomplete<Product>(
-                      initialValue: TextEditingValue(text: cartItem.product?.designation ?? ''),
+                      initialValue: TextEditingValue(
+                          text: cartItem.product?.designation ?? ''),
                       key: ValueKey(cartItem),
                       displayStringForOption: (Product p) => p.designation,
                       optionsBuilder:
                           (TextEditingValue textEditingValue) async {
-                            if (textEditingValue.text == '') {
-                              return const Iterable<Product>.empty();
-                            }
-                            return appModel.products.where((Product p) {
-                              return p.stock > 0.0;
-                            }).where((Product p) {
-                              return p
-                                  .toString()
-                                  .toLowerCase()
-                                  .contains(textEditingValue.text.toLowerCase());
-                            });
-                          },
-
-                      fieldViewBuilder: (
-                        BuildContext context,
-                        TextEditingController fieldTextEditingController,
-                        FocusNode fieldFocusNode,
-                        VoidCallback onFieldSubmitted
-                        ) {
-                          return TextField(
-                            //autofocus: true,
-                            decoration: const InputDecoration(hintText: 'Produit',),
-                            controller: fieldTextEditingController,
-                            focusNode: fieldFocusNode,
-                            style: TextStyle(fontSize: 14 * appModel.textSize),
-                          );
-                        },
+                        if (textEditingValue.text == '') {
+                          return const Iterable<Product>.empty();
+                        }
+                        return appModel.products.where((Product p) {
+                          return p.stock > 0.0;
+                        }).where((Product p) {
+                          return p
+                              .toString()
+                              .toLowerCase()
+                              .contains(textEditingValue.text.toLowerCase());
+                        });
+                      },
+                      fieldViewBuilder: (BuildContext context,
+                          TextEditingController fieldTextEditingController,
+                          FocusNode fieldFocusNode,
+                          VoidCallback onFieldSubmitted) {
+                        return TextField(
+                          //autofocus: true,
+                          decoration: const InputDecoration(
+                            hintText: 'Produit',
+                          ),
+                          controller: fieldTextEditingController,
+                          focusNode: fieldFocusNode,
+                          style: TextStyle(fontSize: 14 * appModel.zoomText),
+                        );
+                      },
                       onSelected: (p) {
                         cashRegisterModel.modifyCartItem(
                             index, CartItem(product: p));
@@ -203,11 +203,8 @@ class _ProductList extends State<ProductList> {
                     return null;
                   },
                 )
-              : Text(
-                  cashRegisterModel.cart[index].product?.designation ?? '',
-                  textScaleFactor: appModel.textSize
-                )
-        ),
+              : Text(cashRegisterModel.cart[index].product?.designation ?? '',
+                  textScaleFactor: appModel.zoomText)),
       Expanded(
           flex: 1,
           child: !cashRegisterModel.isAwaitingSendFormResponse
@@ -234,7 +231,7 @@ class _ProductList extends State<ProductList> {
                   },
                   textAlign: TextAlign.right,
                   style: TextStyle(
-                    fontSize: 14*appModel.textSize,
+                    fontSize: 14 * appModel.zoomText,
                   ),
                 )
               : Text(
@@ -243,16 +240,13 @@ class _ProductList extends State<ProductList> {
                 )),
       Expanded(
           flex: 1,
-          child: Text(
-            unitPriceAsString,
-            textAlign: TextAlign.right,
-            textScaleFactor: appModel.textSize
-          )),
+          child: Text(unitPriceAsString,
+              textAlign: TextAlign.right, textScaleFactor: appModel.zoomText)),
       Expanded(
           flex: 1,
           child: Text(
             total,
-            textScaleFactor: appModel.textSize,
+            textScaleFactor: appModel.zoomText,
             textAlign: TextAlign.right,
           )),
       const SizedBox(width: 15),

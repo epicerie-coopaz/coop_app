@@ -39,6 +39,7 @@ class _ProductList extends State<ProductList> {
         ?.apply(color: Theme.of(context).colorScheme.primary);
 
     AppModel appModel = context.watch<AppModel>();
+    double bigText = 20 * appModel.zoomText;
     CashRegisterModel cashRegisterModel = context.watch<CashRegisterModel>();
 
     List<Row> productLineWidgets =
@@ -107,12 +108,11 @@ class _ProductList extends State<ProductList> {
                       }
                     });
                   },
-                  label: Icon(Icons.add,size:20* appModel.zoomText),
+                  label: Icon(Icons.add, size: bigText),
                   tooltip: 'Ajouter une ligne produit',
                 )
               : Container()
         ]),
-
       ],
     );
   }
@@ -141,6 +141,7 @@ class _ProductList extends State<ProductList> {
       CashRegisterModel cashRegisterModel, int index, CartItem cartItem) {
     var total = '';
     double? unitPrice = cartItem.product?.price;
+    double mediumText = 14 * appModel.zoomText;
     double? qty = double.tryParse(cartItem.qty ?? '');
     if (unitPrice != null && qty != null) {
       total = '${widget.numberFormat.format(unitPrice * qty)} €';
@@ -159,8 +160,7 @@ class _ProductList extends State<ProductList> {
               ? FormField<Product>(
                   builder: (formFieldState) {
                     return Autocomplete<Product>(
-                      initialValue: TextEditingValue(
-                          text: cartItem.product?.designation ?? ''),
+                      initialValue: TextEditingValue(text: cartItem.product?.designation ?? ''),
                       key: ValueKey(cartItem),
                       displayStringForOption: (Product p) => p.designation,
                       optionsBuilder:
@@ -182,15 +182,24 @@ class _ProductList extends State<ProductList> {
                           FocusNode fieldFocusNode,
                           VoidCallback onFieldSubmitted) {
                         return TextField(
-                          //autofocus: true,
                           decoration: const InputDecoration(
                             hintText: 'Produit',
                           ),
                           controller: fieldTextEditingController,
                           focusNode: fieldFocusNode,
-                          style: TextStyle(fontSize: 14 * appModel.zoomText),
+                          style: TextStyle(fontSize: mediumText),
                         );
                       },
+                      optionsViewBuilder: ((context, onSelected, options) {
+                        return Material(child:
+                        ListView.builder(
+                          itemBuilder: (context, index) {
+                            return ListTile(
+                              title: Text(options.elementAt(index).designation),
+                            );
+                          },
+                        ));
+                      }),
                       onSelected: (p) {
                         cashRegisterModel.modifyCartItem(
                             index, CartItem(product: p));

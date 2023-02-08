@@ -8,9 +8,9 @@ enum Units {
       case Units.kg:
         return 'Kg';
       case Units.liter:
-        return 'Litre';
+        return 'L';
       case Units.piece:
-        return 'Pièce';
+        return 'Pce';
     }
   }
 }

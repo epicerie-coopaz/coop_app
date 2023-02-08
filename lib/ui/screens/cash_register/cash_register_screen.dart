@@ -30,6 +30,7 @@ class CashRegisterScreen extends StatelessWidget {
     log('build screen $title');
 
     AppModel appModel = context.watch<AppModel>();
+    double zoomStep = 0.2;
     CashRegisterModel cashRegisterModel = context.watch<CashRegisterModel>();
 
     Widget cartList;
@@ -61,17 +62,31 @@ class CashRegisterScreen extends StatelessWidget {
             const Spacer(),
             IconButton(
                 onPressed: () async {
+                  appModel.zoomText = appModel.zoomText - zoomStep;
+                  log(appModel.zoomText.toString());
+                },
+                icon: const Icon(Icons.text_decrease),
+                tooltip: 'Diminuer la taille du texte'),
+            IconButton(
+                onPressed: () async {
+                  appModel.zoomText = appModel.zoomText + zoomStep;
+                  log(appModel.zoomText.toString());
+                },
+                icon: const Icon(Icons.text_increase),
+                tooltip: 'Agrandir la taille du texte'),
+            IconButton(
+                onPressed: () async {
                   appModel.products = [];
                   appModel.members = [];
                 },
                 icon: const Icon(Icons.refresh),
-                tooltip : 'Recharger listes produits et adhérents'),
+                tooltip: 'Recharger listes produits et adhérents'),
             IconButton(
                 onPressed: () async {
                   cashRegisterModel.cleanCart();
                 },
                 icon: const Icon(Icons.clear),
-                tooltip : 'Effacer le formulaire')
+                tooltip: 'Effacer le formulaire')
           ]),
         ),
         body: Container(
@@ -79,7 +94,7 @@ class CashRegisterScreen extends StatelessWidget {
             child: Form(
               key: _formKey,
               child: Row(children: [
-                Expanded(flex: 3, child: cartList),
+                Expanded(flex: 5, child: cartList),
                 const VerticalDivider(),
                 Expanded(flex: 1, child: validationPanel)
               ]),

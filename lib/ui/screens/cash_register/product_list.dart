@@ -91,14 +91,13 @@ class _ProductList extends State<ProductList> {
         const SizedBox(height: 40),
         Row(children: [
           !cashRegisterModel.isAwaitingSendFormResponse
-              ? FloatingActionButton(
+              ? FloatingActionButton.extended(
                   foregroundColor: Theme.of(context).colorScheme.onPrimary,
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   onPressed: () {
                     log('+ pressed');
                     _validateAll();
                     cashRegisterModel.addToCart(CartItem());
-
                     WidgetsBinding.instance.addPostFrameCallback((_) {
                       if (widget.scrollController.hasClients) {
                         widget.scrollController.animateTo(
@@ -108,10 +107,12 @@ class _ProductList extends State<ProductList> {
                       }
                     });
                   },
-                  child: const Icon(Icons.add),
+                  label: Icon(Icons.add,size:20* appModel.zoomText),
+                  tooltip: 'Ajouter une ligne produit',
                 )
               : Container()
         ]),
+
       ],
     );
   }

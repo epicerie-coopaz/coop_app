@@ -21,6 +21,8 @@ class AuthManager {
   String? accessToken;
   DateTime? accessTokenValidUntil;
 
+  final File refreshFile = File("secrets/refresh");
+
   Future init() async {
     clientId = conf.clientId;
     clientSecret = conf.clientSecret;
@@ -45,6 +47,8 @@ class AuthManager {
       });
 
       if (response.statusCode != 200) {
+        await refreshFile.delete();
+        refreshToken = null;
         throw Exception(
             'Failed to get access token: [${response.statusCode}] ${response.body}');
       }
@@ -88,33 +92,40 @@ class AuthManager {
   }
 
   Future getRefreshToken() async {
-    if (authCode == null) {
-      await getAuth();
+
+    if (await refreshFile.exists()) {
+      refreshToken = await refreshFile.readAsString();
+    } else {
+      if (authCode == null) {
+        await getAuth();
+      }
+      final response = await post(Uri.parse(conf.urls.tokenUri), headers: {
+        "Accept": "application/json",
+      }, body: {
+        'code': authCode,
+        'client_id': clientId,
+        'client_secret': clientSecret,
+        'redirect_uri': redirectUri,
+        'grant_type': 'authorization_code'
+      });
+
+      if (response.statusCode != 200) {
+        throw Exception(
+            'Failed to get refresh token: [${response.statusCode}] ${response.body}');
+      }
+      var body = jsonDecode(response.body);
+
+      accessToken = body['access_token'];
+
+      refreshToken = body['refresh_token'];
+      log('New refresh token received: $refreshToken');
+      log('New access token received: $accessToken');
+      accessTokenValidUntil =
+          DateTime.now().add(Duration(seconds: body['expires_in']));
+      log('New token valid until : $accessTokenValidUntil');
+
+      await refreshFile.writeAsString(refreshToken ?? "");
     }
-    final response = await post(Uri.parse(conf.urls.tokenUri), headers: {
-      "Accept": "application/json",
-    }, body: {
-      'code': authCode,
-      'client_id': clientId,
-      'client_secret': clientSecret,
-      'redirect_uri': redirectUri,
-      'grant_type': 'authorization_code'
-    });
-
-    if (response.statusCode != 200) {
-      throw Exception(
-          'Failed to get refresh token: [${response.statusCode}] ${response.body}');
-    }
-    var body = jsonDecode(response.body);
-
-    accessToken = body['access_token'];
-
-    refreshToken = body['refresh_token'];
-    log('New refresh token received: $refreshToken');
-    log('New access token received: $accessToken');
-    accessTokenValidUntil =
-        DateTime.now().add(Duration(seconds: body['expires_in']));
-    log('New token valid until : $accessTokenValidUntil');
   }
 
   Future<String> _getAuthUrl() async {

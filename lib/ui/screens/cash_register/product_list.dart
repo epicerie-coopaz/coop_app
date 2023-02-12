@@ -155,58 +155,49 @@ class _ProductList extends State<ProductList> {
     var productWidget = Row(children: <Widget>[
       Expanded(
           flex: 7,
-          child: !cashRegisterModel.isAwaitingSendFormResponse
-              ? FormField<Product>(
-                  builder: (FormFieldState<Product> formFieldState) {
-                    return Autocomplete<Product>(
-                      initialValue: TextEditingValue(
-                          text: cartItem.product?.designation ?? ''),
-                      key: ValueKey(cartItem),
-                      displayStringForOption: (Product p) => p.designation,
-                      optionsBuilder:
-                          (TextEditingValue textEditingValue) async {
-                        if (textEditingValue.text == '') {
-                          return const Iterable<Product>.empty();
-                        }
-                        return appModel.products.where((Product p) {
-                          return p.stock > 0.0;
-                        }).where((Product p) {
-                          return p
-                              .toString()
-                              .toLowerCase()
-                              .contains(textEditingValue.text.toLowerCase());
-                        });
-                      },
-                      fieldViewBuilder: (BuildContext context,
-                          TextEditingController fieldTextEditingController,
-                          FocusNode fieldFocusNode,
-                          VoidCallback onFieldSubmitted) {
-                        return TextField(
-                          //autofocus: true,
-                          decoration: const InputDecoration(
-                            hintText: 'Produit',
-                          ),
-                          controller: fieldTextEditingController,
-                          focusNode: fieldFocusNode,
-                          style: TextStyle(fontSize: 14 * appModel.zoomText),
-                        );
-                      },
-                      onSelected: (p) {
-                        formFieldState.didChange(p);
-                        cashRegisterModel.modifyCartItem(
-                            index, CartItem(product: p));
-                      },
-                    );
-                  },
-                  validator: (Product? value) {
-                    if (value == null) {
-                      return 'Produit invalide';
-                    }
-                    return null;
-                  },
-                )
-              : Text(cashRegisterModel.cart[index].product?.designation ?? '',
-                  textScaleFactor: appModel.zoomText)),
+          child: Autocomplete<Product>(
+            initialValue:
+                TextEditingValue(text: cartItem.product?.designation ?? ''),
+            key: ValueKey(cartItem),
+            displayStringForOption: (Product p) => p.designation,
+            optionsBuilder: (TextEditingValue textEditingValue) async {
+              if (textEditingValue.text == '') {
+                return const Iterable<Product>.empty();
+              }
+              return appModel.products.where((Product p) {
+                return p.stock > 0.0;
+              }).where((Product p) {
+                return p
+                    .toString()
+                    .toLowerCase()
+                    .contains(textEditingValue.text.toLowerCase());
+              });
+            },
+            fieldViewBuilder: (BuildContext context,
+                TextEditingController fieldTextEditingController,
+                FocusNode fieldFocusNode,
+                VoidCallback onFieldSubmitted) {
+              return TextFormField(
+                decoration: const InputDecoration(
+                  hintText: 'Produit',
+                ),
+                controller: fieldTextEditingController,
+                focusNode: fieldFocusNode,
+                style: TextStyle(fontSize: 14 * appModel.zoomText),
+                enabled: !cashRegisterModel.isAwaitingSendFormResponse,
+                validator: (String? value) {
+                  String? result;
+                  if (value?.isEmpty ?? false) {
+                    result = 'Produit invalide';
+                  }
+                  return result;
+                },
+              );
+            },
+            onSelected: (p) {
+              cashRegisterModel.modifyCartItem(index, CartItem(product: p));
+            },
+          )),
       Expanded(
           flex: 1,
           child: !cashRegisterModel.isAwaitingSendFormResponse

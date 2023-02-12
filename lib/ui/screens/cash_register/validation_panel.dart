@@ -41,7 +41,7 @@ class ValidationPanel extends StatelessWidget {
     double total = subtotal + cardFee;
 
     double smallText = 11 * appModel.zoomText;
-    double bigText =  14 * appModel.zoomText;
+    double bigText = 14 * appModel.zoomText;
 
     return Column(children: [
       Container(
@@ -53,41 +53,47 @@ class ValidationPanel extends StatelessWidget {
       Container(
           color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
           alignment: Alignment.bottomLeft,
-          child: !cashRegisterModel.isAwaitingSendFormResponse
-              ? Autocomplete<Member>(
-                  key: ValueKey(cashRegisterModel.selectedMember?.name ?? ''),
-                  initialValue: TextEditingValue(
-                      text: cashRegisterModel.selectedMember?.name ?? ''),
-                  displayStringForOption: (Member m) => m.name,
-                  optionsBuilder: (TextEditingValue textEditingValue) async {
-                    if (textEditingValue.text == '') {
-                      return const Iterable<Member>.empty();
-                    }
-                    return appModel.members.where((Member m) {
-                      return m
-                          .toString()
-                          .toLowerCase()
-                          .contains(textEditingValue.text.toLowerCase());
-                    });
-                  },
-                  fieldViewBuilder: (BuildContext context,
-                      TextEditingController fieldTextEditingController,
-                      FocusNode fieldFocusNode,
-                      VoidCallback onFieldSubmitted) {
-                    return TextField(
-                      decoration: const InputDecoration(
-                        hintText: 'Nom adhérent',
-                      ),
-                      controller: fieldTextEditingController,
-                      focusNode: fieldFocusNode,
-                      style: TextStyle(fontSize:bigText),
-                    );
-                  },
-                  onSelected: (m) {
-                    cashRegisterModel.selectedMember = m;
-                  },
-                )
-              : Text(cashRegisterModel.selectedMember!.name)),
+          child: Autocomplete<Member>(
+            key: ValueKey(cashRegisterModel.selectedMember?.name ?? ''),
+            initialValue: TextEditingValue(
+                text: cashRegisterModel.selectedMember?.name ?? ''),
+            displayStringForOption: (Member m) => m.name,
+            optionsBuilder: (TextEditingValue textEditingValue) async {
+              if (textEditingValue.text == '') {
+                return const Iterable<Member>.empty();
+              }
+              return appModel.members.where((Member m) {
+                return m
+                    .toString()
+                    .toLowerCase()
+                    .contains(textEditingValue.text.toLowerCase());
+              });
+            },
+            fieldViewBuilder: (BuildContext context,
+                TextEditingController fieldTextEditingController,
+                FocusNode fieldFocusNode,
+                VoidCallback onFieldSubmitted) {
+              return TextFormField(
+                enabled: !cashRegisterModel.isAwaitingSendFormResponse,
+                decoration: const InputDecoration(
+                  hintText: 'Nom adhérent',
+                ),
+                controller: fieldTextEditingController,
+                focusNode: fieldFocusNode,
+                style: TextStyle(fontSize: bigText),
+                validator: (String? value) {
+                  String? result;
+                  if (value?.isEmpty ?? false) {
+                    result = 'Adhérent invalide';
+                  }
+                  return result;
+                },
+              );
+            },
+            onSelected: (m) {
+              cashRegisterModel.selectedMember = m;
+            },
+          )),
       Container(
         padding: const EdgeInsets.only(top: 25),
         child: Row(children: [
@@ -95,18 +101,20 @@ class ValidationPanel extends StatelessWidget {
               flex: 1,
               child: Align(
                   alignment: Alignment.topLeft,
-                  child: Text('Sous total : ',style: TextStyle(fontSize: smallText)))),
+                  child: Text('Sous total : ',
+                      style: TextStyle(fontSize: smallText)))),
           Expanded(
               flex: 1,
               child: Align(
                   alignment: Alignment.topLeft,
-                  child: Text('${subtotal.toStringAsFixed(2)}€',style: TextStyle(fontSize: smallText))))
+                  child: Text('${subtotal.toStringAsFixed(2)}€',
+                      style: TextStyle(fontSize: smallText))))
         ]),
       ),
       Container(
           padding: const EdgeInsets.only(top: 25),
           alignment: Alignment.bottomLeft,
-          child: Text('Paiement : ',style: TextStyle(fontSize: smallText))),
+          child: Text('Paiement : ', style: TextStyle(fontSize: smallText))),
       Row(children: [
         Expanded(
             flex: 2,

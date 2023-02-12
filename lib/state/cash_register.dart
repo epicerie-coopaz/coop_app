@@ -6,7 +6,7 @@ import 'package:coopaz_app/podo/payment_method.dart';
 import 'package:flutter/foundation.dart';
 
 class CashRegisterModel extends ChangeNotifier {
-  final List<CartItem> _cart = [];
+  final List<CartItem> _cart = [CartItem()];
   Member? _selectedMember;
   PaymentMethod _selectedPaymentMethod = PaymentMethod.card;
   String _chequeOrTransferNumber = '';
@@ -36,7 +36,9 @@ class CashRegisterModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  UnmodifiableListView<CartItem> get cart => UnmodifiableListView(_cart);
+  UnmodifiableListView<CartItem> get cart {
+    return UnmodifiableListView(_cart);
+  }
 
   void addToCart(CartItem item) {
     _cart.add(item);
@@ -55,6 +57,7 @@ class CashRegisterModel extends ChangeNotifier {
 
   void cleanCart() {
     _cart.clear();
+    _cart.add(CartItem());
     _selectedPaymentMethod = PaymentMethod.card;
     _selectedMember = null;
     _chequeOrTransferNumber = '';

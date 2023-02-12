@@ -8,6 +8,7 @@ class AppModel extends ChangeNotifier {
   final List<Member> _members = [];
   final List<Product> _products = [];
   double _textSize = 1.0;
+  int Function(Member, Member) _memberCompare = (a,b) => a.name.toLowerCase().compareTo(b.name.toLowerCase());
 
   // Text Size section
   double get zoomText => _textSize;
@@ -36,5 +37,15 @@ class AppModel extends ChangeNotifier {
       _members.addAll(members);
       notifyListeners();
     }
+  }
+
+  setMemberSort(int Function(Member, Member) compare) {
+    _memberCompare = compare;
+    notifyListeners();
+  }
+
+  UnmodifiableListView<Member> memberSorted() {
+    _members.sort(_memberCompare);
+    return UnmodifiableListView(_members);
   }
 }

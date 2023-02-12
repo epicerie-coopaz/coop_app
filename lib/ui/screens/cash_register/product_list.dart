@@ -73,7 +73,7 @@ class _ProductList extends State<ProductList> {
           Expanded(
               flex: 1,
               child: Text(
-                'Total',
+                'Prix',
                 textScaleFactor: appModel.zoomText,
                 style: styleHeaders,
                 textAlign: TextAlign.right,

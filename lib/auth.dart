@@ -37,29 +37,33 @@ class AuthManager {
     if (accessToken == null ||
         (accessTokenValidUntil?.difference(DateTime.now()).inSeconds ?? 0) <
             10) {
-      final response = await post(Uri.parse(conf.urls.tokenUri), headers: {
-        "Accept": "application/json",
-      }, body: {
-        'client_id': clientId,
-        'client_secret': clientSecret,
-        'grant_type': 'refresh_token',
-        'refresh_token': refreshToken
-      });
+      for (int i = 1; i <= 2; i++) {
+        log('Attempt $i to get an access token');
+        final response = await post(Uri.parse(conf.urls.tokenUri), headers: {
+          "Accept": "application/json",
+        }, body: {
+          'client_id': clientId,
+          'client_secret': clientSecret,
+          'grant_type': 'refresh_token',
+          'refresh_token': refreshToken
+        });
 
-      if (response.statusCode != 200) {
-        await refreshFile.delete();
-        refreshToken = null;
-        throw Exception(
-            'Failed to get access token: [${response.statusCode}] ${response.body}');
+        if (response.statusCode != 200) {
+          log('Failed to get access token: [${response.statusCode}] ${response.body}');
+          refreshToken = null;
+          await refreshFile.delete();
+          await getRefreshToken();
+        } else {
+          var body = jsonDecode(response.body);
+
+          accessToken = body['access_token'];
+          log('New access token received: $accessToken');
+          accessTokenValidUntil =
+              DateTime.now().add(Duration(seconds: body['expires_in']));
+          log('New token valid until : $accessTokenValidUntil');
+          break;
+        }
       }
-
-      var body = jsonDecode(response.body);
-
-      accessToken = body['access_token'];
-      log('New access token received: $accessToken');
-      accessTokenValidUntil =
-          DateTime.now().add(Duration(seconds: body['expires_in']));
-      log('New token valid until : $accessTokenValidUntil');
     }
 
     log('Token : $accessToken');
@@ -92,7 +96,6 @@ class AuthManager {
   }
 
   Future getRefreshToken() async {
-
     if (await refreshFile.exists()) {
       refreshToken = await refreshFile.readAsString();
     } else {

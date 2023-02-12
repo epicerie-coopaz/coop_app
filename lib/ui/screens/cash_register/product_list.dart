@@ -78,7 +78,7 @@ class _ProductList extends State<ProductList> {
                 style: styleHeaders,
                 textAlign: TextAlign.right,
               )),
-          const SizedBox(width: 71),
+          Expanded(flex: 1, child: Container()),
         ]),
         Expanded(
             child: ListView.builder(
@@ -120,6 +120,7 @@ class _ProductList extends State<ProductList> {
     log(widget.formKey.currentState.toString());
     bool valid = false;
     if (widget.formKey.currentState != null) {
+      widget.formKey.currentState!.save();
       valid = widget.formKey.currentState!.validate();
     }
     return valid;
@@ -156,7 +157,7 @@ class _ProductList extends State<ProductList> {
           flex: 7,
           child: !cashRegisterModel.isAwaitingSendFormResponse
               ? FormField<Product>(
-                  builder: (formFieldState) {
+                  builder: (FormFieldState<Product> formFieldState) {
                     return Autocomplete<Product>(
                       initialValue: TextEditingValue(
                           text: cartItem.product?.designation ?? ''),
@@ -191,6 +192,7 @@ class _ProductList extends State<ProductList> {
                         );
                       },
                       onSelected: (p) {
+                        formFieldState.didChange(p);
                         cashRegisterModel.modifyCartItem(
                             index, CartItem(product: p));
                       },
@@ -227,7 +229,6 @@ class _ProductList extends State<ProductList> {
                     cartItem.qty = value;
                     cashRegisterModel.modifyCartItem(index, cartItem);
                     _validateAll();
-                    _validateAll();
                   },
                   textAlign: TextAlign.right,
                   style: TextStyle(
@@ -249,15 +250,18 @@ class _ProductList extends State<ProductList> {
             textScaleFactor: appModel.zoomText,
             textAlign: TextAlign.right,
           )),
-      const SizedBox(width: 15),
-      IconButton(
-        onPressed: () {
-          log('Delete line pressed');
-          cashRegisterModel.removeFromCart(index);
-        },
-        icon: const Icon(Icons.delete),
-        tooltip: 'Supprimer ligne',
-      )
+      Expanded(
+          flex: 1,
+          child: !cashRegisterModel.isAwaitingSendFormResponse
+              ? IconButton(
+                  onPressed: () {
+                    log('Delete line pressed');
+                    cashRegisterModel.removeFromCart(index);
+                  },
+                  icon: const Icon(Icons.delete),
+                  tooltip: 'Supprimer ligne',
+                )
+              : Container()),
     ]);
 
     return productWidget;

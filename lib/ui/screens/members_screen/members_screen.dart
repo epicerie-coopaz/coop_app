@@ -20,7 +20,13 @@ class MembersScreen extends StatefulWidget {
 class _MembersScreen extends State<MembersScreen> {
   final String title = 'Adhérents';
 
-  int toggleSort = 1;
+  Map<String, int> toggleSorts = {
+    "name": 1,
+    "email": 1,
+    "phone": 1,
+  };
+  int Function(Member, Member) memberCompare =
+      (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase());
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +63,8 @@ class _MembersScreen extends State<MembersScreen> {
         ?.apply(color: Theme.of(context).colorScheme.primary);
     var styleBody = Theme.of(context).textTheme.bodyMedium;
 
-    List<Member> membersSorted = model.memberSorted();
+    List<Member> membersSorted = model.members.toList();
+    membersSorted.sort(memberCompare);
 
     return Column(
       children: [
@@ -70,13 +77,14 @@ class _MembersScreen extends State<MembersScreen> {
                     Text('Nom', style: styleHeaders),
                     IconButton(
                         onPressed: () {
-                          model.setMemberSort((a, b) =>
-                              a.name
-                                  .toLowerCase()
-                                  .compareTo(b.name.toLowerCase()) *
-                              toggleSort);
                           setState(() {
-                            toggleSort = toggleSort * -1;
+                            memberCompare = (a, b) =>
+                                a.name
+                                    .toLowerCase()
+                                    .compareTo(b.name.toLowerCase()) *
+                                (toggleSorts['name'] ?? 1);
+                            toggleSorts['name'] =
+                                (toggleSorts['name'] ?? 1) * -1;
                           });
                         },
                         icon: const Icon(Icons.sort_by_alpha))
@@ -87,14 +95,14 @@ class _MembersScreen extends State<MembersScreen> {
                     Text('Email', style: styleHeaders),
                     IconButton(
                         onPressed: () {
-                          model.setMemberSort((a, b) =>
-                              a.email
-                                  .toLowerCase()
-                                  .compareTo(b.email.toLowerCase()) *
-                              toggleSort);
-
                           setState(() {
-                            toggleSort = toggleSort * -1;
+                            memberCompare = (a, b) =>
+                                a.email
+                                    .toLowerCase()
+                                    .compareTo(b.email.toLowerCase()) *
+                                (toggleSorts['email'] ?? 1);
+                            toggleSorts['email'] =
+                                (toggleSorts['email'] ?? 1) * -1;
                           });
                         },
                         icon: const Icon(Icons.sort_by_alpha))
@@ -105,13 +113,14 @@ class _MembersScreen extends State<MembersScreen> {
                     Text('Téléphone', style: styleHeaders),
                     IconButton(
                         onPressed: () {
-                          model.setMemberSort((a, b) =>
-                              a.phone
-                                  .toLowerCase()
-                                  .compareTo(b.phone.toLowerCase()) *
-                              toggleSort);
                           setState(() {
-                            toggleSort = toggleSort * -1;
+                            memberCompare = (a, b) =>
+                                a.phone
+                                    .toLowerCase()
+                                    .compareTo(b.phone.toLowerCase()) *
+                                (toggleSorts['phone'] ?? 1);
+                            toggleSorts['phone'] =
+                                (toggleSorts['phone'] ?? 1) * -1;
                           });
                         },
                         icon: const Icon(Icons.sort_by_alpha))

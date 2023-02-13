@@ -6,12 +6,21 @@ import 'package:coopaz_app/state/app_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class MembersScreen extends StatelessWidget {
+class MembersScreen extends StatefulWidget {
   const MembersScreen({super.key, required this.memberDao});
 
   final MemberDao memberDao;
 
+  @override
+  State<StatefulWidget> createState() {
+    return _MembersScreen();
+  }
+}
+
+class _MembersScreen extends State<MembersScreen> {
   final String title = 'Adhérents';
+
+  int toggleSort = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +31,7 @@ class MembersScreen extends StatelessWidget {
       if (model.members.isNotEmpty) {
         w = _membersList(context, model);
       } else {
-        memberDao.getMembers().then((m) => model.members = m);
+        widget.memberDao.getMembers().then((m) => model.members = m);
         w = const Loading(text: 'Chargement de la liste des membres...');
       }
       return Scaffold(
@@ -61,9 +70,14 @@ class MembersScreen extends StatelessWidget {
                     Text('Nom', style: styleHeaders),
                     IconButton(
                         onPressed: () {
-                          model.setMemberSort((a, b) => a.name
-                              .toLowerCase()
-                              .compareTo(b.name.toLowerCase()));
+                          model.setMemberSort((a, b) =>
+                              a.name
+                                  .toLowerCase()
+                                  .compareTo(b.name.toLowerCase()) *
+                              toggleSort);
+                          setState(() {
+                            toggleSort = toggleSort * -1;
+                          });
                         },
                         icon: const Icon(Icons.sort_by_alpha))
                   ])),
@@ -73,9 +87,15 @@ class MembersScreen extends StatelessWidget {
                     Text('Email', style: styleHeaders),
                     IconButton(
                         onPressed: () {
-                          model.setMemberSort((a, b) => a.email
-                              .toLowerCase()
-                              .compareTo(b.email.toLowerCase()));
+                          model.setMemberSort((a, b) =>
+                              a.email
+                                  .toLowerCase()
+                                  .compareTo(b.email.toLowerCase()) *
+                              toggleSort);
+
+                          setState(() {
+                            toggleSort = toggleSort * -1;
+                          });
                         },
                         icon: const Icon(Icons.sort_by_alpha))
                   ])),
@@ -85,9 +105,14 @@ class MembersScreen extends StatelessWidget {
                     Text('Téléphone', style: styleHeaders),
                     IconButton(
                         onPressed: () {
-                          model.setMemberSort((a, b) => a.phone
-                              .toLowerCase()
-                              .compareTo(b.phone.toLowerCase()));
+                          model.setMemberSort((a, b) =>
+                              a.phone
+                                  .toLowerCase()
+                                  .compareTo(b.phone.toLowerCase()) *
+                              toggleSort);
+                          setState(() {
+                            toggleSort = toggleSort * -1;
+                          });
                         },
                         icon: const Icon(Icons.sort_by_alpha))
                   ])),

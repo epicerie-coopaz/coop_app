@@ -3,6 +3,7 @@ import 'package:coopaz_app/logger.dart';
 import 'package:coopaz_app/podo/member.dart';
 import 'package:coopaz_app/ui/common_widgets/loading_widget.dart';
 import 'package:coopaz_app/state/app_model.dart';
+import 'package:coopaz_app/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -56,21 +57,6 @@ class _MembersScreen extends State<MembersScreen> {
     });
   }
 
-  int getSortCoef(String key) {
-    int coef = toggleSorts[key] ?? 1;
-    return coef;
-  }
-
-  Map<String, int> resetCoef(String key) {
-    toggleSorts[key] = (toggleSorts[key] ?? 1) * -1;
-    for (String k in toggleSorts.keys) {
-      if (k != key) {
-        toggleSorts[k] = 1;
-      }
-    }
-    return toggleSorts;
-  }
-
   Widget _membersList(BuildContext context, AppModel model) {
     var styleHeaders = Theme.of(context)
         .primaryTextTheme
@@ -88,58 +74,52 @@ class _MembersScreen extends State<MembersScreen> {
             child: Row(children: [
               Expanded(
                   flex: 2,
-                  child: Row(children: [
-                    Text('Nom', style: styleHeaders),
-                    IconButton(
-                        onPressed: () {
-                          int sortCoef = getSortCoef('name');
-                          setState(() {
-                            memberCompare = (a, b) =>
-                                a.name
-                                    .toLowerCase()
-                                    .compareTo(b.name.toLowerCase()) *
-                                sortCoef;
-                            toggleSorts = resetCoef('name');
-                          });
-                        },
-                        icon: const Icon(Icons.sort_by_alpha))
-                  ])),
+                  child: TextButton(
+                    child: Text('Nom', style: styleHeaders),
+                    onPressed: () {
+                      int sortCoef = getSortCoef('name', toggleSorts);
+                      setState(() {
+                        memberCompare = (a, b) =>
+                            a.name
+                                .toLowerCase()
+                                .compareTo(b.name.toLowerCase()) *
+                            sortCoef;
+                        toggleSorts = resetCoef('name', toggleSorts);
+                      });
+                    },
+                  )),
               Expanded(
                   flex: 3,
-                  child: Row(children: [
-                    Text('Email', style: styleHeaders),
-                    IconButton(
-                        onPressed: () {
-                          int sortCoef = getSortCoef('email');
-                          setState(() {
-                            memberCompare = (a, b) =>
-                                a.email
-                                    .toLowerCase()
-                                    .compareTo(b.email.toLowerCase()) *
-                                sortCoef;
-                            toggleSorts = resetCoef('email');
-                          });
-                        },
-                        icon: const Icon(Icons.sort_by_alpha))
-                  ])),
+                  child: TextButton(
+                    child: Text('Email', style: styleHeaders),
+                    onPressed: () {
+                      int sortCoef = getSortCoef('email', toggleSorts);
+                      setState(() {
+                        memberCompare = (a, b) =>
+                            a.email
+                                .toLowerCase()
+                                .compareTo(b.email.toLowerCase()) *
+                            sortCoef;
+                        toggleSorts = resetCoef('email', toggleSorts);
+                      });
+                    },
+                  )),
               Expanded(
                   flex: 1,
-                  child: Row(children: [
-                    Text('Téléphone', style: styleHeaders),
-                    IconButton(
-                        onPressed: () {
-                          int sortCoef = getSortCoef('phone');
-                          setState(() {
-                            memberCompare = (a, b) =>
-                                a.phone
-                                    .toLowerCase()
-                                    .compareTo(b.phone.toLowerCase()) *
-                                sortCoef;
-                            toggleSorts = resetCoef('phone');
-                          });
-                        },
-                        icon: const Icon(Icons.sort_by_alpha))
-                  ])),
+                  child: TextButton(
+                    child: Text('Téléphone', style: styleHeaders),
+                    onPressed: () {
+                      int sortCoef = getSortCoef('phone', toggleSorts);
+                      setState(() {
+                        memberCompare = (a, b) =>
+                            a.phone
+                                .toLowerCase()
+                                .compareTo(b.phone.toLowerCase()) *
+                            sortCoef;
+                        toggleSorts = resetCoef('phone', toggleSorts);
+                      });
+                    },
+                  )),
             ])),
         const Divider(
           thickness: 2,

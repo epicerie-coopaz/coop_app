@@ -1,17 +1,40 @@
 import 'package:coopaz_app/dao/product_dao.dart';
 import 'package:coopaz_app/logger.dart';
-import 'package:coopaz_app/podo/utils.dart';
+import 'package:coopaz_app/podo/product.dart';
 import 'package:coopaz_app/ui/common_widgets/loading_widget.dart';
 import 'package:coopaz_app/state/app_model.dart';
+import 'package:coopaz_app/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class ProductsScreen extends StatelessWidget {
+class ProductsScreen extends StatefulWidget {
   const ProductsScreen({super.key, required this.productDao});
 
   final ProductDao productDao;
 
+  @override
+  State<StatefulWidget> createState() {
+    return _ProductsScreen();
+  }
+}
+
+class _ProductsScreen extends State<ProductsScreen> {
   final String title = 'Produits';
+
+  Map<String, int> toggleSorts = {
+    "designation": 1,
+    "name": 1,
+    "family": 1,
+    "supplier": 1,
+    "unit": 1,
+    "barreCode": 1,
+    "reference": 1,
+    "buyer": 1,
+    "price": 1,
+    "stock": 1,
+  };
+  int Function(Product, Product) productCompare = (a, b) =>
+      a.designation.toLowerCase().compareTo(b.designation.toLowerCase());
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +45,7 @@ class ProductsScreen extends StatelessWidget {
       if (model.products.isNotEmpty) {
         w = _productsList(context, model);
       } else {
-        productDao.getProducts().then((p) => model.products = p);
+        widget.productDao.getProducts().then((p) => model.products = p);
         w = const Loading(text: 'Chargement de la liste des produits...');
       }
       return Scaffold(
@@ -41,7 +64,6 @@ class ProductsScreen extends StatelessWidget {
     });
   }
 
-
   Widget _productsList(BuildContext context, AppModel model) {
     var styleHeaders = Theme.of(context)
         .primaryTextTheme
@@ -49,33 +71,169 @@ class ProductsScreen extends StatelessWidget {
         ?.apply(color: Theme.of(context).colorScheme.primary);
     var styleBody = Theme.of(context).textTheme.bodyMedium;
 
+    List<Product> productsSorted = model.products.toList();
+    productsSorted.sort(productCompare);
+
     return Column(
       children: [
         Expanded(
             flex: 0,
-            child: Row(
-                children: [
-              Pair('Désignation', 3),
-              Pair('Nom', 1),
-              Pair('Famille', 1),
-              Pair('Fournisseur', 1),
-              Pair('Unité', 1),
-              Pair('Code barres', 1),
-              Pair('Ref.', 1),
-              Pair('Acheteur', 1),
-              Pair('Prix', 1),
-              Pair('Stock', 1)
-            ]
-                    .map(
-                      (e) => Expanded(
-                        flex: e.b,
-                        child: Text(
-                          e.a,
-                          style: styleHeaders,
-                        ),
-                      ),
-                    )
-                    .toList())),
+            child: Row(children: [
+              Expanded(
+                  flex: 3,
+                  child: TextButton(
+                    child: Text('Désignation', style: styleHeaders),
+                    onPressed: () {
+                      int sortCoef = getSortCoef('designation', toggleSorts);
+                      setState(() {
+                        productCompare = (a, b) =>
+                            a.designation
+                                .toLowerCase()
+                                .compareTo(b.designation.toLowerCase()) *
+                            sortCoef;
+                        toggleSorts = resetCoef('designation', toggleSorts);
+                      });
+                    },
+                  )),
+              Expanded(
+                  flex: 1,
+                  child: TextButton(
+                    child: Text('Nom', style: styleHeaders),
+                    onPressed: () {
+                      int sortCoef = getSortCoef('name', toggleSorts);
+                      setState(() {
+                        productCompare = (a, b) =>
+                            a.name
+                                .toLowerCase()
+                                .compareTo(b.name.toLowerCase()) *
+                            sortCoef;
+                        toggleSorts = resetCoef('name', toggleSorts);
+                      });
+                    },
+                  )),
+              Expanded(
+                  flex: 1,
+                  child: TextButton(
+                    child: Text('Famille', style: styleHeaders),
+                    onPressed: () {
+                      int sortCoef = getSortCoef('family', toggleSorts);
+                      setState(() {
+                        productCompare = (a, b) =>
+                            a.family
+                                .toLowerCase()
+                                .compareTo(b.family.toLowerCase()) *
+                            sortCoef;
+                        toggleSorts = resetCoef('family', toggleSorts);
+                      });
+                    },
+                  )),
+              Expanded(
+                  flex: 1,
+                  child: TextButton(
+                    child: Text('Fournisseur', style: styleHeaders),
+                    onPressed: () {
+                      int sortCoef = getSortCoef('supplier', toggleSorts);
+                      setState(() {
+                        productCompare = (a, b) =>
+                            a.supplier
+                                .toLowerCase()
+                                .compareTo(b.supplier.toLowerCase()) *
+                            sortCoef;
+                        toggleSorts = resetCoef('supplier', toggleSorts);
+                      });
+                    },
+                  )),
+              Expanded(
+                  flex: 1,
+                  child: TextButton(
+                    child: Text('Unité', style: styleHeaders),
+                    onPressed: () {
+                      int sortCoef = getSortCoef('unit', toggleSorts);
+                      setState(() {
+                        productCompare = (a, b) =>
+                            a.unit.unitAsString
+                                .toLowerCase()
+                                .compareTo(b.unit.unitAsString.toLowerCase()) *
+                            sortCoef;
+                        toggleSorts = resetCoef('unit', toggleSorts);
+                      });
+                    },
+                  )),
+              Expanded(
+                  flex: 1,
+                  child: TextButton(
+                    child: Text('Code barres', style: styleHeaders),
+                    onPressed: () {
+                      int sortCoef = getSortCoef('barreCode', toggleSorts);
+                      setState(() {
+                        productCompare = (a, b) =>
+                            a.barreCode
+                                .toLowerCase()
+                                .compareTo(b.barreCode.toLowerCase()) *
+                            sortCoef;
+                        toggleSorts = resetCoef('barreCode', toggleSorts);
+                      });
+                    },
+                  )),
+              Expanded(
+                  flex: 1,
+                  child: TextButton(
+                    child: Text('Ref.', style: styleHeaders),
+                    onPressed: () {
+                      int sortCoef = getSortCoef('reference', toggleSorts);
+                      setState(() {
+                        productCompare = (a, b) =>
+                            a.reference
+                                .toLowerCase()
+                                .compareTo(b.reference.toLowerCase()) *
+                            sortCoef;
+                        toggleSorts = resetCoef('reference', toggleSorts);
+                      });
+                    },
+                  )),
+              Expanded(
+                  flex: 1,
+                  child: TextButton(
+                    child: Text('Acheteur', style: styleHeaders),
+                    onPressed: () {
+                      int sortCoef = getSortCoef('buyer', toggleSorts);
+                      setState(() {
+                        productCompare = (a, b) =>
+                            a.buyer
+                                .toLowerCase()
+                                .compareTo(b.buyer.toLowerCase()) *
+                            sortCoef;
+                        toggleSorts = resetCoef('buyer', toggleSorts);
+                      });
+                    },
+                  )),
+              Expanded(
+                  flex: 1,
+                  child: TextButton(
+                    child: Text('Prix', style: styleHeaders),
+                    onPressed: () {
+                      int sortCoef = getSortCoef('price', toggleSorts);
+                      setState(() {
+                        productCompare =
+                            (a, b) => a.price.compareTo(b.price) * sortCoef;
+                        toggleSorts = resetCoef('price', toggleSorts);
+                      });
+                    },
+                  )),
+              Expanded(
+                  flex: 1,
+                  child: TextButton(
+                    child: Text('Stock', style: styleHeaders),
+                    onPressed: () {
+                      int sortCoef = getSortCoef('stock', toggleSorts);
+                      setState(() {
+                        productCompare =
+                            (a, b) => a.stock.compareTo(b.stock) * sortCoef;
+                        toggleSorts = resetCoef('stock', toggleSorts);
+                      });
+                    },
+                  ))
+            ])),
         const Divider(
           thickness: 2,
         ),
@@ -83,7 +241,7 @@ class ProductsScreen extends StatelessWidget {
             flex: 1,
             child: ListView(
               addAutomaticKeepAlives: false,
-              children: model.products.map((p) {
+              children: productsSorted.map((p) {
                 return Column(children: [
                   Row(
                     children: [

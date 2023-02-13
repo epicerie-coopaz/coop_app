@@ -56,6 +56,21 @@ class _MembersScreen extends State<MembersScreen> {
     });
   }
 
+  int getSortCoef(String key) {
+    int coef = toggleSorts[key] ?? 1;
+    return coef;
+  }
+
+  Map<String, int> resetCoef(String key) {
+    toggleSorts[key] = (toggleSorts[key] ?? 1) * -1;
+    for (String k in toggleSorts.keys) {
+      if (k != key) {
+        toggleSorts[k] = 1;
+      }
+    }
+    return toggleSorts;
+  }
+
   Widget _membersList(BuildContext context, AppModel model) {
     var styleHeaders = Theme.of(context)
         .primaryTextTheme
@@ -77,14 +92,14 @@ class _MembersScreen extends State<MembersScreen> {
                     Text('Nom', style: styleHeaders),
                     IconButton(
                         onPressed: () {
+                          int sortCoef = getSortCoef('name');
                           setState(() {
                             memberCompare = (a, b) =>
                                 a.name
                                     .toLowerCase()
                                     .compareTo(b.name.toLowerCase()) *
-                                (toggleSorts['name'] ?? 1);
-                            toggleSorts['name'] =
-                                (toggleSorts['name'] ?? 1) * -1;
+                                sortCoef;
+                            toggleSorts = resetCoef('name');
                           });
                         },
                         icon: const Icon(Icons.sort_by_alpha))
@@ -95,14 +110,14 @@ class _MembersScreen extends State<MembersScreen> {
                     Text('Email', style: styleHeaders),
                     IconButton(
                         onPressed: () {
+                          int sortCoef = getSortCoef('email');
                           setState(() {
                             memberCompare = (a, b) =>
                                 a.email
                                     .toLowerCase()
                                     .compareTo(b.email.toLowerCase()) *
-                                (toggleSorts['email'] ?? 1);
-                            toggleSorts['email'] =
-                                (toggleSorts['email'] ?? 1) * -1;
+                                sortCoef;
+                            toggleSorts = resetCoef('email');
                           });
                         },
                         icon: const Icon(Icons.sort_by_alpha))
@@ -113,14 +128,14 @@ class _MembersScreen extends State<MembersScreen> {
                     Text('Téléphone', style: styleHeaders),
                     IconButton(
                         onPressed: () {
+                          int sortCoef = getSortCoef('phone');
                           setState(() {
                             memberCompare = (a, b) =>
                                 a.phone
                                     .toLowerCase()
                                     .compareTo(b.phone.toLowerCase()) *
-                                (toggleSorts['phone'] ?? 1);
-                            toggleSorts['phone'] =
-                                (toggleSorts['phone'] ?? 1) * -1;
+                                sortCoef;
+                            toggleSorts = resetCoef('phone');
                           });
                         },
                         icon: const Icon(Icons.sort_by_alpha))

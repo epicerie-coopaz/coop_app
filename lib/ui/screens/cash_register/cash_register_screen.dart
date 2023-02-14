@@ -2,7 +2,7 @@ import 'package:coopaz_app/dao/member_dao.dart';
 import 'package:coopaz_app/dao/order_dao.dart';
 import 'package:coopaz_app/dao/product_dao.dart';
 import 'package:coopaz_app/state/cash_register.dart';
-import 'package:coopaz_app/ui/screens/cash_register/product_list.dart';
+import 'package:coopaz_app/ui/screens/cash_register/cart_list_panel.dart';
 import 'package:coopaz_app/ui/screens/cash_register/validation_panel.dart';
 import 'package:coopaz_app/ui/common_widgets/loading_widget.dart';
 import 'package:coopaz_app/state/app_model.dart';
@@ -35,7 +35,7 @@ class CashRegisterScreen extends StatelessWidget {
 
     Widget cartList;
     if (appModel.products.isNotEmpty) {
-      cartList = ProductList(
+      cartList = CartList(
         formKey: _formKey,
       );
     } else {

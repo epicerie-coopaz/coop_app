@@ -9,8 +9,8 @@ import 'package:intl/intl.dart';
 import 'package:coopaz_app/logger.dart';
 import 'package:provider/provider.dart';
 
-class ProductList extends StatefulWidget {
-  ProductList({super.key, required this.formKey});
+class CartList extends StatefulWidget {
+  CartList({super.key, required this.formKey});
 
   final GlobalKey<FormState> formKey;
   final NumberFormat numberFormat = NumberFormat('#,##0.00');
@@ -18,12 +18,12 @@ class ProductList extends StatefulWidget {
   final ScrollController scrollController = ScrollController();
 
   @override
-  State<ProductList> createState() {
-    return _ProductList();
+  State<CartList> createState() {
+    return _CartList();
   }
 }
 
-class _ProductList extends State<ProductList> {
+class _CartList extends State<CartList> {
   @override
   void initState() {
     super.initState();

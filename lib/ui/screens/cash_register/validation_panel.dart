@@ -168,6 +168,21 @@ class ValidationPanel extends StatelessWidget {
           },
           textAlign: TextAlign.right,
         ),
+      if (cashRegisterModel.selectedPaymentMethod == PaymentMethod.card)
+        Row(children: [
+          Expanded(
+              flex: 1,
+              child: Align(
+                  alignment: Alignment.topLeft,
+                  child: Text('Frais CB : ',
+                      style: TextStyle(fontSize: smallText)))),
+          Expanded(
+              flex: 1,
+              child: Align(
+                  alignment: Alignment.topLeft,
+                  child: Text('${cardFee.toStringAsFixed(2)}€',
+                      style: TextStyle(fontSize: smallText))))
+        ]),
       Container(
         padding: const EdgeInsets.only(top: 25),
         child: Row(children: [

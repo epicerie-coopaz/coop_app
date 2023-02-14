@@ -1,10 +1,12 @@
 //import 'dart:html';
 
+import 'package:coopaz_app/actions/cash_register.dart';
 import 'package:coopaz_app/podo/product.dart';
 import 'package:coopaz_app/podo/cart_item.dart';
 import 'package:coopaz_app/state/app_model.dart';
 import 'package:coopaz_app/state/cash_register.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:coopaz_app/logger.dart';
 import 'package:provider/provider.dart';
@@ -44,76 +46,81 @@ class _CartList extends State<CartList> {
     List<Row> productLineWidgets =
         _createProductLineWidgets(appModel, cashRegisterModel);
 
-    return Column(
-      children: [
-        Row(children: <Widget>[
-          Expanded(
-              flex: 7,
-              child: Text(
-                'Produit',
-                textScaleFactor: appModel.zoomText,
-                style: styleHeaders,
-              )),
-          Expanded(
-              flex: 1,
-              child: Text(
-                'Qté',
-                textScaleFactor: appModel.zoomText,
-                style: styleHeaders,
-                textAlign: TextAlign.right,
-              )),
-          Expanded(
-              flex: 1,
-              child: Text(
-                'Prix U.',
-                textScaleFactor: appModel.zoomText,
-                style: styleHeaders,
-                textAlign: TextAlign.right,
-              )),
-          Expanded(
-              flex: 1,
-              child: Text(
-                'Prix',
-                textScaleFactor: appModel.zoomText,
-                style: styleHeaders,
-                textAlign: TextAlign.right,
-              )),
-          Expanded(flex: 1, child: Container()),
-        ]),
-        Expanded(
-            child: ListView.builder(
-          itemCount: productLineWidgets.length,
-          controller: widget.scrollController,
-          itemBuilder: (context, index) {
-            return productLineWidgets[index];
-          },
-        )),
-        const SizedBox(height: 40),
-        Row(children: [
-          !cashRegisterModel.isAwaitingSendFormResponse
-              ? FloatingActionButton(
-                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  onPressed: () {
-                    log('+ pressed');
-                    _validateAll();
-                    cashRegisterModel.addToCart(CartItem());
+    return Shortcuts(
+        shortcuts: <LogicalKeySet, Intent>{
+          LogicalKeySet(LogicalKeyboardKey.enter): const AddNewCartItemIntent(),
+        },
+        child: Column(
+          children: [
+            Row(children: <Widget>[
+              Expanded(
+                  flex: 7,
+                  child: Text(
+                    'Produit',
+                    textScaleFactor: appModel.zoomText,
+                    style: styleHeaders,
+                  )),
+              Expanded(
+                  flex: 1,
+                  child: Text(
+                    'Qté',
+                    textScaleFactor: appModel.zoomText,
+                    style: styleHeaders,
+                    textAlign: TextAlign.right,
+                  )),
+              Expanded(
+                  flex: 1,
+                  child: Text(
+                    'Prix U.',
+                    textScaleFactor: appModel.zoomText,
+                    style: styleHeaders,
+                    textAlign: TextAlign.right,
+                  )),
+              Expanded(
+                  flex: 1,
+                  child: Text(
+                    'Prix',
+                    textScaleFactor: appModel.zoomText,
+                    style: styleHeaders,
+                    textAlign: TextAlign.right,
+                  )),
+              Expanded(flex: 1, child: Container()),
+            ]),
+            Expanded(
+                child: ListView.builder(
+              itemCount: productLineWidgets.length,
+              controller: widget.scrollController,
+              itemBuilder: (context, index) {
+                return productLineWidgets[index];
+              },
+            )),
+            const SizedBox(height: 40),
+            Row(children: [
+              !cashRegisterModel.isAwaitingSendFormResponse
+                  ? FloatingActionButton(
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      onPressed: () {
+                        log('+ pressed');
+                        _validateAll();
+                        cashRegisterModel.addToCart(CartItem());
 
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      if (widget.scrollController.hasClients) {
-                        widget.scrollController.animateTo(
-                            widget.scrollController.position.maxScrollExtent,
-                            duration: const Duration(milliseconds: 500),
-                            curve: Curves.easeOut);
-                      }
-                    });
-                  },
-                  child: const Icon(Icons.add),
-                )
-              : Container()
-        ]),
-      ],
-    );
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          if (widget.scrollController.hasClients) {
+                            widget.scrollController.animateTo(
+                                widget
+                                    .scrollController.position.maxScrollExtent,
+                                duration: const Duration(milliseconds: 500),
+                                curve: Curves.easeOut);
+                          }
+                        });
+                      },
+                      child: const Icon(Icons.add),
+                    )
+                  : Container()
+            ]),
+          ],
+        ));
   }
 
   bool _validateAll() {

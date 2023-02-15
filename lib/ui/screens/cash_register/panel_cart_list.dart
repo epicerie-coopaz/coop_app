@@ -109,6 +109,7 @@ class _CartList extends State<CartList> {
               Row(children: [
                 !cashRegisterModel.isAwaitingSendFormResponse
                     ? FloatingActionButton(
+                        focusNode: FocusNode(skipTraversal: true),
                         foregroundColor:
                             Theme.of(context).colorScheme.onPrimary,
                         backgroundColor: Theme.of(context).colorScheme.primary,

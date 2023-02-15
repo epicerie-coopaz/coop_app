@@ -100,13 +100,14 @@ class _CartList extends State<CartList> {
                 Expanded(flex: 1, child: Container()),
               ]),
               Expanded(
-                  child: ListView.builder(
+                  child: FocusTraversalGroup(
+                      child: ListView.builder(
                 itemCount: productLineWidgets.length,
                 controller: widget.scrollController,
                 itemBuilder: (context, index) {
                   return productLineWidgets[index];
                 },
-              )),
+              ))),
               const SizedBox(height: 40),
               Row(children: [
                 !cashRegisterModel.isAwaitingSendFormResponse

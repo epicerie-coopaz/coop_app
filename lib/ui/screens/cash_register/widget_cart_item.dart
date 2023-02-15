@@ -27,9 +27,13 @@ class CartItemWidget extends StatefulWidget {
 }
 
 class _CartItemWidget extends State<CartItemWidget> {
+  late FocusNode node;
+
   @override
   void initState() {
     super.initState();
+
+    node = FocusNode(debugLabel: 'productNode');
   }
 
   @override
@@ -50,114 +54,120 @@ class _CartItemWidget extends State<CartItemWidget> {
           '${widget.cartItem.product?.price}€/${widget.cartItem.product!.unit.unitAsString}';
     }
 
-    return Row(children: <Widget>[
-      Expanded(
-          flex: 7,
-          child: Autocomplete<Product>(
-            initialValue: TextEditingValue(
-                text: widget.cartItem.product?.designation ?? ''),
-            key: ValueKey(widget.cartItem),
-            displayStringForOption: (Product p) => p.designation,
-            optionsBuilder: (TextEditingValue textEditingValue) async {
-              if (textEditingValue.text == '') {
-                return const Iterable<Product>.empty();
-              }
-              return appModel.products.where((Product p) {
-                return p.stock > 0.0;
-              }).where((Product p) {
-                return p
-                    .toString()
-                    .toLowerCase()
-                    .contains(textEditingValue.text.toLowerCase());
-              });
-            },
-            fieldViewBuilder: (BuildContext context,
-                TextEditingController fieldTextEditingController,
-                FocusNode fieldFocusNode,
-                VoidCallback onFieldSubmitted) {
-              return TextFormField(
-                decoration: const InputDecoration(
-                  hintText: 'Produit',
-                ),
-                controller: fieldTextEditingController,
-                focusNode: fieldFocusNode,
-                style: TextStyle(fontSize: 14 * appModel.zoomText),
-                enabled: !cashRegisterModel.isAwaitingSendFormResponse,
-                validator: (String? value) {
-                  String? result;
-                  if (value?.isEmpty ?? false) {
-                    result = 'Produit invalide';
+    node.requestFocus();
+
+    return FocusTraversalGroup(
+        policy: OrderedTraversalPolicy(),
+        child: Row(children: <Widget>[
+          Expanded(
+              flex: 7,
+              child: Autocomplete<Product>(
+                initialValue: TextEditingValue(
+                    text: widget.cartItem.product?.designation ?? ''),
+                key: ValueKey(widget.cartItem),
+                displayStringForOption: (Product p) => p.designation,
+                optionsBuilder: (TextEditingValue textEditingValue) async {
+                  if (textEditingValue.text == '') {
+                    return const Iterable<Product>.empty();
                   }
-                  return result;
+                  return appModel.products.where((Product p) {
+                    return p.stock > 0.0;
+                  }).where((Product p) {
+                    return p
+                        .toString()
+                        .toLowerCase()
+                        .contains(textEditingValue.text.toLowerCase());
+                  });
                 },
-              );
-            },
-            onSelected: (p) {
-              cashRegisterModel.modifyCartItem(
-                  widget.index, CartItem(product: p));
-            },
-          )),
-      Expanded(
-          flex: 1,
-          child: !cashRegisterModel.isAwaitingSendFormResponse
-              ? Shortcuts(
-                  shortcuts: <LogicalKeySet, Intent>{
-                      LogicalKeySet(LogicalKeyboardKey.enter):
-                          const AddNewCartItemIntent(),
+                fieldViewBuilder: (BuildContext context,
+                    TextEditingController fieldTextEditingController,
+                    FocusNode fieldFocusNode,
+                    VoidCallback onFieldSubmitted) {
+                  return TextFormField(
+                    decoration: const InputDecoration(
+                      hintText: 'Produit',
+                    ),
+                    controller: fieldTextEditingController,
+                    focusNode: fieldFocusNode,
+                    style: TextStyle(fontSize: 14 * appModel.zoomText),
+                    enabled: !cashRegisterModel.isAwaitingSendFormResponse,
+                    validator: (String? value) {
+                      String? result;
+                      if (value?.isEmpty ?? false) {
+                        result = 'Produit invalide';
+                      }
+                      return result;
                     },
-                  child: TextFormField(
-                    controller:
-                        TextEditingController(text: widget.cartItem.qty ?? '')
+                  );
+                },
+                onSelected: (p) {
+                  cashRegisterModel.modifyCartItem(
+                      widget.index, CartItem(product: p));
+                },
+              )),
+          Expanded(
+              flex: 1,
+              child: !cashRegisterModel.isAwaitingSendFormResponse
+                  ? Shortcuts(
+                      shortcuts: <LogicalKeySet, Intent>{
+                          LogicalKeySet(LogicalKeyboardKey.enter):
+                              const AddNewCartItemIntent(),
+                        },
+                      child: TextFormField(
+                        controller: TextEditingController(
+                            text: widget.cartItem.qty ?? '')
                           ..selection = TextSelection.collapsed(
                               offset: (widget.cartItem.qty ?? '').length),
-                    decoration: const InputDecoration(
-                      hintText: 'Quantité',
-                    ),
-                    validator: (String? value) {
-                      if (value == null ||
-                          value.isEmpty ||
-                          double.tryParse(value) == null) {
-                        return 'Quantité invalide';
-                      }
-                      return null;
-                    },
-                    onChanged: (String value) {
-                      widget.cartItem.qty = value;
-                      cashRegisterModel.modifyCartItem(
-                          widget.index, widget.cartItem);
-                    },
-                    textAlign: TextAlign.right,
-                    style: TextStyle(
-                      fontSize: 14 * appModel.zoomText,
-                    ),
-                  ))
-              : Text(
-                  cashRegisterModel.cart[widget.index].qty ?? '',
+                        decoration: const InputDecoration(
+                          hintText: 'Quantité',
+                        ),
+                        validator: (String? value) {
+                          if (value == null ||
+                              value.isEmpty ||
+                              double.tryParse(value) == null) {
+                            return 'Quantité invalide';
+                          }
+                          return null;
+                        },
+                        onChanged: (String value) {
+                          widget.cartItem.qty = value;
+                          cashRegisterModel.modifyCartItem(
+                              widget.index, widget.cartItem);
+                        },
+                        textAlign: TextAlign.right,
+                        style: TextStyle(
+                          fontSize: 14 * appModel.zoomText,
+                        ),
+                      ))
+                  : Text(
+                      cashRegisterModel.cart[widget.index].qty ?? '',
+                      textAlign: TextAlign.right,
+                    )),
+          Expanded(
+              flex: 1,
+              child: Text(unitPriceAsString,
                   textAlign: TextAlign.right,
-                )),
-      Expanded(
-          flex: 1,
-          child: Text(unitPriceAsString,
-              textAlign: TextAlign.right, textScaleFactor: appModel.zoomText)),
-      Expanded(
-          flex: 1,
-          child: Text(
-            total,
-            textScaleFactor: appModel.zoomText,
-            textAlign: TextAlign.right,
-          )),
-      Expanded(
-          flex: 1,
-          child: !cashRegisterModel.isAwaitingSendFormResponse
-              ? IconButton(
-                  onPressed: () {
-                    log('Delete line pressed');
-                    cashRegisterModel.removeFromCart(widget.index);
-                  },
-                  icon: const Icon(Icons.delete),
-                  tooltip: 'Supprimer ligne',
-                )
-              : Container()),
-    ]);
+                  textScaleFactor: appModel.zoomText)),
+          Expanded(
+              flex: 1,
+              child: Text(
+                total,
+                textScaleFactor: appModel.zoomText,
+                textAlign: TextAlign.right,
+              )),
+          Expanded(
+              flex: 1,
+              child: !cashRegisterModel.isAwaitingSendFormResponse
+                  ? IconButton(
+                      focusNode: FocusNode(skipTraversal: true),
+                      onPressed: () {
+                        log('Delete line pressed');
+                        cashRegisterModel.removeFromCart(widget.index);
+                      },
+                      icon: const Icon(Icons.delete),
+                      tooltip: 'Supprimer ligne',
+                    )
+                  : Container()),
+        ]));
   }
 }

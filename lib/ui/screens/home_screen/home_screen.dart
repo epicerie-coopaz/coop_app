@@ -2,7 +2,7 @@ import 'package:coopaz_app/dao/member_dao.dart';
 import 'package:coopaz_app/dao/order_dao.dart';
 import 'package:coopaz_app/dao/product_dao.dart';
 import 'package:coopaz_app/state/cash_register.dart';
-import 'package:coopaz_app/ui/screens/cash_register/cash_register_screen.dart';
+import 'package:coopaz_app/ui/screens/cash_register/screen_cash_register.dart';
 import 'package:coopaz_app/ui/screens/members_screen/members_screen.dart';
 import 'package:coopaz_app/ui/screens/products_screen/products_screen.dart';
 import 'package:coopaz_app/state/app_model.dart';

@@ -1,6 +1,6 @@
 import 'package:coopaz_app/podo/cart_item.dart';
 import 'package:coopaz_app/state/cash_register.dart';
-import 'package:coopaz_app/ui/screens/cash_register/cart_list_panel.dart';
+import 'package:coopaz_app/ui/screens/cash_register/panel_cart_list.dart';
 import 'package:flutter/material.dart';
 
 class AddNewCartItemIntent extends Intent {

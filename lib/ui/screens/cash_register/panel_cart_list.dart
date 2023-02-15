@@ -1,13 +1,10 @@
 //import 'dart:html';
 
 import 'package:coopaz_app/actions/cash_register.dart';
-import 'package:coopaz_app/podo/product.dart';
-import 'package:coopaz_app/podo/cart_item.dart';
 import 'package:coopaz_app/state/app_model.dart';
 import 'package:coopaz_app/state/cash_register.dart';
 import 'package:coopaz_app/ui/screens/cash_register/widget_cart_item.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:coopaz_app/logger.dart';
 import 'package:provider/provider.dart';

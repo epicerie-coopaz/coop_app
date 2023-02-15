@@ -18,8 +18,6 @@ class CartItemWidget extends StatefulWidget {
   final CartItem cartItem;
   final NumberFormat numberFormat = NumberFormat('#,##0.00');
 
-  final ScrollController scrollController = ScrollController();
-
   @override
   State<CartItemWidget> createState() {
     return _CartItemWidget();
@@ -27,13 +25,9 @@ class CartItemWidget extends StatefulWidget {
 }
 
 class _CartItemWidget extends State<CartItemWidget> {
-  late FocusNode node;
-
   @override
   void initState() {
     super.initState();
-
-    node = FocusNode(debugLabel: 'productNode');
   }
 
   @override
@@ -54,8 +48,6 @@ class _CartItemWidget extends State<CartItemWidget> {
           '${widget.cartItem.product?.price}€/${widget.cartItem.product!.unit.unitAsString}';
     }
 
-    node.requestFocus();
-
     return FocusTraversalGroup(
         policy: OrderedTraversalPolicy(),
         child: Row(children: <Widget>[
@@ -66,7 +58,7 @@ class _CartItemWidget extends State<CartItemWidget> {
                     text: widget.cartItem.product?.designation ?? ''),
                 key: ValueKey(widget.cartItem),
                 displayStringForOption: (Product p) => p.designation,
-                optionsBuilder: (TextEditingValue textEditingValue) async {
+                optionsBuilder: (TextEditingValue textEditingValue) {
                   if (textEditingValue.text == '') {
                     return const Iterable<Product>.empty();
                   }
@@ -83,6 +75,7 @@ class _CartItemWidget extends State<CartItemWidget> {
                     TextEditingController fieldTextEditingController,
                     FocusNode fieldFocusNode,
                     VoidCallback onFieldSubmitted) {
+                  //fieldFocusNode.requestFocus();
                   return TextFormField(
                     decoration: const InputDecoration(
                       hintText: 'Produit',

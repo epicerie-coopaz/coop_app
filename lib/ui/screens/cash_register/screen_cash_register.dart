@@ -57,10 +57,9 @@ class CashRegisterScreen extends StatelessWidget {
 
     return Scaffold(
         appBar: AppBar(
-          title: Row(children: [
-            Text(title),
-            const Spacer(),
+          actions: [
             IconButton(
+                focusNode: FocusNode(skipTraversal: true),
                 onPressed: () async {
                   appModel.zoomText = appModel.zoomText - zoomStep;
                   log(appModel.zoomText.toString());
@@ -68,6 +67,7 @@ class CashRegisterScreen extends StatelessWidget {
                 icon: const Icon(Icons.text_decrease),
                 tooltip: 'Diminuer la taille du texte'),
             IconButton(
+                focusNode: FocusNode(skipTraversal: true),
                 onPressed: () async {
                   appModel.zoomText = appModel.zoomText + zoomStep;
                   log(appModel.zoomText.toString());
@@ -75,6 +75,7 @@ class CashRegisterScreen extends StatelessWidget {
                 icon: const Icon(Icons.text_increase),
                 tooltip: 'Agrandir la taille du texte'),
             IconButton(
+                focusNode: FocusNode(skipTraversal: true),
                 onPressed: () async {
                   appModel.products = [];
                   appModel.members = [];
@@ -82,12 +83,14 @@ class CashRegisterScreen extends StatelessWidget {
                 icon: const Icon(Icons.refresh),
                 tooltip: 'Recharger listes produits et adhérents'),
             IconButton(
+                focusNode: FocusNode(skipTraversal: true),
                 onPressed: () async {
                   cashRegisterModel.cleanCart();
                 },
                 icon: const Icon(Icons.clear),
                 tooltip: 'Effacer le formulaire')
-          ]),
+          ],
+          title: Text(title),
         ),
         body: Container(
             padding: const EdgeInsets.all(12.0),

@@ -43,15 +43,14 @@ class _MembersScreen extends State<MembersScreen> {
       }
       return Scaffold(
           appBar: AppBar(
-            title: Row(children: [
-              Text(title),
-              const Spacer(),
+            actions: [
               IconButton(
                   onPressed: () async {
                     model.members = [];
                   },
                   icon: const Icon(Icons.refresh))
-            ]),
+            ],
+            title: Text(title),
           ),
           body: Container(padding: const EdgeInsets.all(12.0), child: w));
     });

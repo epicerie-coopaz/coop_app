@@ -50,15 +50,14 @@ class _ProductsScreen extends State<ProductsScreen> {
       }
       return Scaffold(
           appBar: AppBar(
-            title: Row(children: [
-              Text(title),
-              const Spacer(),
+            actions: [
               IconButton(
                   onPressed: () async {
                     model.products = [];
                   },
                   icon: const Icon(Icons.refresh))
-            ]),
+            ],
+            title: Text(title),
           ),
           body: Container(padding: const EdgeInsets.all(12.0), child: w));
     });

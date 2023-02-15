@@ -19,6 +19,16 @@ class CartList extends StatefulWidget {
 
   final ScrollController scrollController = ScrollController();
 
+  bool validateAll() {
+    log(formKey.currentState.toString());
+    bool valid = false;
+    if (formKey.currentState != null) {
+      formKey.currentState!.save();
+      valid = formKey.currentState!.validate();
+    }
+    return valid;
+  }
+
   @override
   State<CartList> createState() {
     return _CartList();
@@ -46,91 +56,92 @@ class _CartList extends State<CartList> {
     List<Row> productLineWidgets =
         _createProductLineWidgets(appModel, cashRegisterModel);
 
-    return Shortcuts(
-        shortcuts: <LogicalKeySet, Intent>{
-          LogicalKeySet(LogicalKeyboardKey.enter): const AddNewCartItemIntent(),
+    return Actions(
+        dispatcher: const ActionDispatcher(),
+        actions: <Type, Action<Intent>>{
+          AddNewCartItemIntent: AddNewCartItemAction(cashRegisterModel, widget),
         },
-        child: Column(
-          children: [
-            Row(children: <Widget>[
-              Expanded(
-                  flex: 7,
-                  child: Text(
-                    'Produit',
-                    textScaleFactor: appModel.zoomText,
-                    style: styleHeaders,
-                  )),
-              Expanded(
-                  flex: 1,
-                  child: Text(
-                    'Qté',
-                    textScaleFactor: appModel.zoomText,
-                    style: styleHeaders,
-                    textAlign: TextAlign.right,
-                  )),
-              Expanded(
-                  flex: 1,
-                  child: Text(
-                    'Prix U.',
-                    textScaleFactor: appModel.zoomText,
-                    style: styleHeaders,
-                    textAlign: TextAlign.right,
-                  )),
-              Expanded(
-                  flex: 1,
-                  child: Text(
-                    'Prix',
-                    textScaleFactor: appModel.zoomText,
-                    style: styleHeaders,
-                    textAlign: TextAlign.right,
-                  )),
-              Expanded(flex: 1, child: Container()),
-            ]),
-            Expanded(
-                child: ListView.builder(
-              itemCount: productLineWidgets.length,
-              controller: widget.scrollController,
-              itemBuilder: (context, index) {
-                return productLineWidgets[index];
+        child: Builder(builder: (context) {
+          return Shortcuts(
+              shortcuts: <LogicalKeySet, Intent>{
+                LogicalKeySet(LogicalKeyboardKey.enter):
+                    const AddNewCartItemIntent(),
               },
-            )),
-            const SizedBox(height: 40),
-            Row(children: [
-              !cashRegisterModel.isAwaitingSendFormResponse
-                  ? FloatingActionButton(
-                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      onPressed: () {
-                        log('+ pressed');
-                        _validateAll();
-                        cashRegisterModel.addToCart(CartItem());
+              child: Column(
+                children: [
+                  Row(children: <Widget>[
+                    Expanded(
+                        flex: 7,
+                        child: Text(
+                          'Produit',
+                          textScaleFactor: appModel.zoomText,
+                          style: styleHeaders,
+                        )),
+                    Expanded(
+                        flex: 1,
+                        child: Text(
+                          'Qté',
+                          textScaleFactor: appModel.zoomText,
+                          style: styleHeaders,
+                          textAlign: TextAlign.right,
+                        )),
+                    Expanded(
+                        flex: 1,
+                        child: Text(
+                          'Prix U.',
+                          textScaleFactor: appModel.zoomText,
+                          style: styleHeaders,
+                          textAlign: TextAlign.right,
+                        )),
+                    Expanded(
+                        flex: 1,
+                        child: Text(
+                          'Prix',
+                          textScaleFactor: appModel.zoomText,
+                          style: styleHeaders,
+                          textAlign: TextAlign.right,
+                        )),
+                    Expanded(flex: 1, child: Container()),
+                  ]),
+                  Expanded(
+                      child: ListView.builder(
+                    itemCount: productLineWidgets.length,
+                    controller: widget.scrollController,
+                    itemBuilder: (context, index) {
+                      return productLineWidgets[index];
+                    },
+                  )),
+                  const SizedBox(height: 40),
+                  Row(children: [
+                    !cashRegisterModel.isAwaitingSendFormResponse
+                        ? FloatingActionButton(
+                            foregroundColor:
+                                Theme.of(context).colorScheme.onPrimary,
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primary,
+                            onPressed: () {
+                              log('+ pressed');
+                              Actions.maybeInvoke<AddNewCartItemIntent>(
+                                  context, const AddNewCartItemIntent());
 
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          if (widget.scrollController.hasClients) {
-                            widget.scrollController.animateTo(
-                                widget
-                                    .scrollController.position.maxScrollExtent,
-                                duration: const Duration(milliseconds: 500),
-                                curve: Curves.easeOut);
-                          }
-                        });
-                      },
-                      child: const Icon(Icons.add),
-                    )
-                  : Container()
-            ]),
-          ],
-        ));
-  }
-
-  bool _validateAll() {
-    log(widget.formKey.currentState.toString());
-    bool valid = false;
-    if (widget.formKey.currentState != null) {
-      widget.formKey.currentState!.save();
-      valid = widget.formKey.currentState!.validate();
-    }
-    return valid;
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                if (widget.scrollController.hasClients) {
+                                  widget.scrollController.animateTo(
+                                      widget.scrollController.position
+                                          .maxScrollExtent,
+                                      duration:
+                                          const Duration(milliseconds: 500),
+                                      curve: Curves.easeOut);
+                                }
+                              });
+                            },
+                            child: const Icon(Icons.add),
+                          )
+                        : Container()
+                  ]),
+                ],
+              ));
+        }));
   }
 
   List<Row> _createProductLineWidgets(
@@ -226,7 +237,6 @@ class _CartList extends State<CartList> {
                   onChanged: (String value) {
                     cartItem.qty = value;
                     cashRegisterModel.modifyCartItem(index, cartItem);
-                    _validateAll();
                   },
                   textAlign: TextAlign.right,
                   style: TextStyle(

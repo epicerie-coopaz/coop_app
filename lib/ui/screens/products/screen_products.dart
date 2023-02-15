@@ -145,22 +145,6 @@ class _ProductsScreen extends State<ProductsScreen> {
               Expanded(
                   flex: 1,
                   child: TextButton(
-                    child: Text('Unité', style: styleHeaders),
-                    onPressed: () {
-                      int sortCoef = getSortCoef('unit', toggleSorts);
-                      setState(() {
-                        productCompare = (a, b) =>
-                            a.unit.unitAsString
-                                .toLowerCase()
-                                .compareTo(b.unit.unitAsString.toLowerCase()) *
-                            sortCoef;
-                        toggleSorts = resetCoef('unit', toggleSorts);
-                      });
-                    },
-                  )),
-              Expanded(
-                  flex: 1,
-                  child: TextButton(
                     child: Text('Code barres', style: styleHeaders),
                     onPressed: () {
                       int sortCoef = getSortCoef('barreCode', toggleSorts);
@@ -209,7 +193,7 @@ class _ProductsScreen extends State<ProductsScreen> {
               Expanded(
                   flex: 1,
                   child: TextButton(
-                    child: Text('Prix', style: styleHeaders),
+                    child: Text('Prix U.', style: styleHeaders),
                     onPressed: () {
                       int sortCoef = getSortCoef('price', toggleSorts);
                       setState(() {
@@ -253,16 +237,13 @@ class _ProductsScreen extends State<ProductsScreen> {
                       Expanded(
                           flex: 1, child: Text(p.supplier, style: styleBody)),
                       Expanded(
-                          flex: 1,
-                          child: Text(p.unit.unitAsString, style: styleBody)),
-                      Expanded(
                           flex: 1, child: Text(p.barreCode, style: styleBody)),
                       Expanded(
                           flex: 1, child: Text(p.reference, style: styleBody)),
                       Expanded(flex: 1, child: Text(p.buyer, style: styleBody)),
                       Expanded(
                           flex: 1,
-                          child: Text('${p.price}€', style: styleBody)),
+                          child: Text('${p.price}€/${p.unit.unitAsString}', style: styleBody)),
                       Expanded(
                           flex: 1,
                           child: Text(p.stock.toString(), style: styleBody)),

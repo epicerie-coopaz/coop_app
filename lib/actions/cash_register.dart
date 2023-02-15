@@ -8,14 +8,14 @@ class AddNewCartItemIntent extends Intent {
 }
 
 class AddNewCartItemAction extends Action<AddNewCartItemIntent> {
-  AddNewCartItemAction(this.model, this._cartList);
+  AddNewCartItemAction(this.model, this.cartList);
 
   final CashRegisterModel model;
-  final CartList _cartList;
+  final CartList cartList;
 
   @override
   Object? invoke(covariant AddNewCartItemIntent intent) {
-    _cartList.validateAll();
+    cartList.validateAll();
     model.addToCart(CartItem());
 
     return null;

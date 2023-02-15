@@ -62,85 +62,78 @@ class _CartList extends State<CartList> {
           AddNewCartItemIntent: AddNewCartItemAction(cashRegisterModel, widget),
         },
         child: Builder(builder: (context) {
-          return Shortcuts(
-              shortcuts: <LogicalKeySet, Intent>{
-                LogicalKeySet(LogicalKeyboardKey.enter):
-                    const AddNewCartItemIntent(),
-              },
-              child: Column(
-                children: [
-                  Row(children: <Widget>[
-                    Expanded(
-                        flex: 7,
-                        child: Text(
-                          'Produit',
-                          textScaleFactor: appModel.zoomText,
-                          style: styleHeaders,
-                        )),
-                    Expanded(
-                        flex: 1,
-                        child: Text(
-                          'Qté',
-                          textScaleFactor: appModel.zoomText,
-                          style: styleHeaders,
-                          textAlign: TextAlign.right,
-                        )),
-                    Expanded(
-                        flex: 1,
-                        child: Text(
-                          'Prix U.',
-                          textScaleFactor: appModel.zoomText,
-                          style: styleHeaders,
-                          textAlign: TextAlign.right,
-                        )),
-                    Expanded(
-                        flex: 1,
-                        child: Text(
-                          'Prix',
-                          textScaleFactor: appModel.zoomText,
-                          style: styleHeaders,
-                          textAlign: TextAlign.right,
-                        )),
-                    Expanded(flex: 1, child: Container()),
-                  ]),
-                  Expanded(
-                      child: ListView.builder(
-                    itemCount: productLineWidgets.length,
-                    controller: widget.scrollController,
-                    itemBuilder: (context, index) {
-                      return productLineWidgets[index];
-                    },
-                  )),
-                  const SizedBox(height: 40),
-                  Row(children: [
-                    !cashRegisterModel.isAwaitingSendFormResponse
-                        ? FloatingActionButton(
-                            foregroundColor:
-                                Theme.of(context).colorScheme.onPrimary,
-                            backgroundColor:
-                                Theme.of(context).colorScheme.primary,
-                            onPressed: () {
-                              log('+ pressed');
-                              Actions.maybeInvoke<AddNewCartItemIntent>(
-                                  context, const AddNewCartItemIntent());
+          return Column(
+            children: [
+              Row(children: <Widget>[
+                Expanded(
+                    flex: 7,
+                    child: Text(
+                      'Produit',
+                      textScaleFactor: appModel.zoomText,
+                      style: styleHeaders,
+                    )),
+                Expanded(
+                    flex: 1,
+                    child: Text(
+                      'Qté',
+                      textScaleFactor: appModel.zoomText,
+                      style: styleHeaders,
+                      textAlign: TextAlign.right,
+                    )),
+                Expanded(
+                    flex: 1,
+                    child: Text(
+                      'Prix U.',
+                      textScaleFactor: appModel.zoomText,
+                      style: styleHeaders,
+                      textAlign: TextAlign.right,
+                    )),
+                Expanded(
+                    flex: 1,
+                    child: Text(
+                      'Prix',
+                      textScaleFactor: appModel.zoomText,
+                      style: styleHeaders,
+                      textAlign: TextAlign.right,
+                    )),
+                Expanded(flex: 1, child: Container()),
+              ]),
+              Expanded(
+                  child: ListView.builder(
+                itemCount: productLineWidgets.length,
+                controller: widget.scrollController,
+                itemBuilder: (context, index) {
+                  return productLineWidgets[index];
+                },
+              )),
+              const SizedBox(height: 40),
+              Row(children: [
+                !cashRegisterModel.isAwaitingSendFormResponse
+                    ? FloatingActionButton(
+                        foregroundColor:
+                            Theme.of(context).colorScheme.onPrimary,
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        onPressed: () {
+                          log('+ pressed');
+                          Actions.maybeInvoke<AddNewCartItemIntent>(
+                              context, const AddNewCartItemIntent());
 
-                              WidgetsBinding.instance.addPostFrameCallback((_) {
-                                if (widget.scrollController.hasClients) {
-                                  widget.scrollController.animateTo(
-                                      widget.scrollController.position
-                                          .maxScrollExtent,
-                                      duration:
-                                          const Duration(milliseconds: 500),
-                                      curve: Curves.easeOut);
-                                }
-                              });
-                            },
-                            child: const Icon(Icons.add),
-                          )
-                        : Container()
-                  ]),
-                ],
-              ));
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            if (widget.scrollController.hasClients) {
+                              widget.scrollController.animateTo(
+                                  widget.scrollController.position
+                                      .maxScrollExtent,
+                                  duration: const Duration(milliseconds: 500),
+                                  curve: Curves.easeOut);
+                            }
+                          });
+                        },
+                        child: const Icon(Icons.add),
+                      )
+                    : Container()
+              ]),
+            ],
+          );
         }));
   }
 
@@ -219,30 +212,35 @@ class _CartList extends State<CartList> {
       Expanded(
           flex: 1,
           child: !cashRegisterModel.isAwaitingSendFormResponse
-              ? TextFormField(
-                  controller: TextEditingController(text: cartItem.qty ?? '')
-                    ..selection = TextSelection.collapsed(
-                        offset: (cartItem.qty ?? '').length),
-                  decoration: const InputDecoration(
-                    hintText: 'Quantité',
-                  ),
-                  validator: (String? value) {
-                    if (value == null ||
-                        value.isEmpty ||
-                        double.tryParse(value) == null) {
-                      return 'Quantité invalide';
-                    }
-                    return null;
-                  },
-                  onChanged: (String value) {
-                    cartItem.qty = value;
-                    cashRegisterModel.modifyCartItem(index, cartItem);
-                  },
-                  textAlign: TextAlign.right,
-                  style: TextStyle(
-                    fontSize: 14 * appModel.zoomText,
-                  ),
-                )
+              ? Shortcuts(
+                  shortcuts: <LogicalKeySet, Intent>{
+                      LogicalKeySet(LogicalKeyboardKey.enter):
+                          const AddNewCartItemIntent(),
+                    },
+                  child: TextFormField(
+                    controller: TextEditingController(text: cartItem.qty ?? '')
+                      ..selection = TextSelection.collapsed(
+                          offset: (cartItem.qty ?? '').length),
+                    decoration: const InputDecoration(
+                      hintText: 'Quantité',
+                    ),
+                    validator: (String? value) {
+                      if (value == null ||
+                          value.isEmpty ||
+                          double.tryParse(value) == null) {
+                        return 'Quantité invalide';
+                      }
+                      return null;
+                    },
+                    onChanged: (String value) {
+                      cartItem.qty = value;
+                      cashRegisterModel.modifyCartItem(index, cartItem);
+                    },
+                    textAlign: TextAlign.right,
+                    style: TextStyle(
+                      fontSize: 14 * appModel.zoomText,
+                    ),
+                  ))
               : Text(
                   cashRegisterModel.cart[index].qty ?? '',
                   textAlign: TextAlign.right,

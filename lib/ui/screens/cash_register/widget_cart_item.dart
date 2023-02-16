@@ -65,10 +65,17 @@ class _CartItemWidget extends State<CartItemWidget> {
                   return appModel.products.where((Product p) {
                     return p.stock > 0.0;
                   }).where((Product p) {
-                    return p
-                        .toString()
-                        .toLowerCase()
-                        .contains(textEditingValue.text.toLowerCase());
+                    List<String> matchList =
+                        textEditingValue.text.toLowerCase().split(' ');
+                    bool matchAll = true;
+                    for (String match in matchList) {
+                      if (!p.toString().toLowerCase().contains(match)) {
+                        matchAll = false;
+                        break;
+                      }
+                    }
+
+                    return matchAll;
                   });
                 },
                 fieldViewBuilder: (BuildContext context,

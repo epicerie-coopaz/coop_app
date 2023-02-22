@@ -40,192 +40,192 @@ class ValidationPanel extends StatelessWidget {
 
     double total = subtotal + cardFee;
 
-    double smallText = 11 * appModel.zoomText;
-    double bigText = 14 * appModel.zoomText;
+    double smallText = appModel.smallText * appModel.zoomText;
+    double mediumText = appModel.mediumText * appModel.zoomText;
 
-    return Column(children: [
-      Container(
-          padding: const EdgeInsets.only(top: 8),
-          alignment: Alignment.bottomLeft,
-          child: Text('Adhérent :',
-              textScaleFactor: appModel.zoomText,
-              style: const TextStyle(fontWeight: FontWeight.w600))),
-      Container(
-          color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-          alignment: Alignment.bottomLeft,
-          child: Autocomplete<Member>(
-            key: ValueKey(cashRegisterModel.selectedMember?.name ?? ''),
-            initialValue: TextEditingValue(
-                text: cashRegisterModel.selectedMember?.name ?? ''),
-            displayStringForOption: (Member m) => m.name,
-            optionsBuilder: (TextEditingValue textEditingValue) async {
-              if (textEditingValue.text == '') {
-                return const Iterable<Member>.empty();
-              }
-              return appModel.members.where((Member m) {
-                return m
-                    .toString()
-                    .toLowerCase()
-                    .contains(textEditingValue.text.toLowerCase());
-              });
-            },
-            fieldViewBuilder: (BuildContext context,
-                TextEditingController fieldTextEditingController,
-                FocusNode fieldFocusNode,
-                VoidCallback onFieldSubmitted) {
-              return TextFormField(
-                enabled: !cashRegisterModel.isAwaitingSendFormResponse,
-                decoration: const InputDecoration(
-                  hintText: 'Nom adhérent',
-                ),
-                controller: fieldTextEditingController,
-                focusNode: fieldFocusNode,
-                style: TextStyle(fontSize: bigText),
-                validator: (String? value) {
-                  String? result;
-                  if (value?.isEmpty ?? false) {
-                    result = 'Adhérent invalide';
-                  }
-                  return result;
-                },
-              );
-            },
-            onSelected: (m) {
-              cashRegisterModel.selectedMember = m;
-            },
-          )),
-      Container(
-        padding: const EdgeInsets.only(top: 25),
-        child: Row(children: [
-          Expanded(
-              flex: 1,
-              child: Align(
-                  alignment: Alignment.topLeft,
-                  child: Text('Sous total : ',
-                      style: TextStyle(fontSize: smallText)))),
-          Expanded(
-              flex: 1,
-              child: Align(
-                  alignment: Alignment.topLeft,
-                  child: Text('${subtotal.toStringAsFixed(2)}€',
-                      style: TextStyle(fontSize: smallText))))
-        ]),
-      ),
-      Container(
-          padding: const EdgeInsets.only(top: 25),
-          alignment: Alignment.bottomLeft,
-          child: Text('Paiement : ', style: TextStyle(fontSize: smallText))),
-      Row(children: [
-        Expanded(
-            flex: 2,
-            child: !cashRegisterModel.isAwaitingSendFormResponse
-                ? DropdownButton<PaymentMethod>(
-                    value: cashRegisterModel.selectedPaymentMethod,
-                    elevation: 16,
-                    onChanged: (PaymentMethod? value) {
-                      // This is called when the user selects an item.
-                      cashRegisterModel.selectedPaymentMethod =
-                          value ?? PaymentMethod.card;
-                    },
-                    items: PaymentMethod.values
-                        .map<DropdownMenuItem<PaymentMethod>>(
-                            (PaymentMethod value) {
-                      return DropdownMenuItem<PaymentMethod>(
-                        value: value,
-                        child: Text(value.asString,
-                            style: TextStyle(fontSize: 11 * appModel.zoomText)),
-                      );
-                    }).toList(),
-                  )
-                : Text(cashRegisterModel.selectedPaymentMethod.asString,
-                    textScaleFactor: appModel.zoomText))
-      ]),
-      if (cashRegisterModel.selectedPaymentMethod == PaymentMethod.cheque)
-        TextFormField(
-          controller: TextEditingController(
-              text: cashRegisterModel.chequeOrTransferNumber)
-            ..selection = TextSelection.collapsed(
-                offset: (cashRegisterModel.chequeOrTransferNumber).length),
-          decoration: const InputDecoration(
-            hintText: 'N. chèque',
-          ),
-          onChanged: (String value) {
-            cashRegisterModel.chequeOrTransferNumber = value;
-          },
-          textAlign: TextAlign.right,
-        ),
-      if (cashRegisterModel.selectedPaymentMethod == PaymentMethod.transfer)
-        TextFormField(
-          controller: TextEditingController(
-              text: cashRegisterModel.chequeOrTransferNumber)
-            ..selection = TextSelection.collapsed(
-                offset: (cashRegisterModel.chequeOrTransferNumber).length),
-          decoration: const InputDecoration(
-            hintText: 'N. virement',
-          ),
-          onChanged: (String value) {
-            cashRegisterModel.chequeOrTransferNumber = value;
-          },
-          textAlign: TextAlign.right,
-        ),
-      if (cashRegisterModel.selectedPaymentMethod == PaymentMethod.card)
-        Row(children: [
-          Expanded(
-              flex: 1,
-              child: Align(
-                  alignment: Alignment.topLeft,
-                  child: Text('Frais CB : ',
-                      style: TextStyle(fontSize: smallText)))),
-          Expanded(
-              flex: 1,
-              child: Align(
-                  alignment: Alignment.topLeft,
-                  child: Text('${cardFee.toStringAsFixed(2)}€',
-                      style: TextStyle(fontSize: smallText))))
-        ]),
-      Container(
-        padding: const EdgeInsets.only(top: 25),
-        child: Row(children: [
-          Expanded(
-              flex: 1,
-              child: Align(
-                  alignment: Alignment.topLeft,
-                  child: Text('Total : ',
-                      textScaleFactor: appModel.zoomText,
-                      style: const TextStyle(fontWeight: FontWeight.bold)))),
-          Expanded(
-              flex: 1,
-              child: Align(
-                  alignment: Alignment.topLeft,
-                  child: Text('${total.toStringAsFixed(2)}€',
-                      textScaleFactor: appModel.zoomText,
-                      style: const TextStyle(fontWeight: FontWeight.bold))))
-        ]),
-      ),
-      if (cashRegisterModel.isAwaitingSendFormResponse == false)
-        Center(
-            child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 15.0),
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              foregroundColor: Theme.of(context).colorScheme.onPrimary,
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              minimumSize: const Size(100, 50),
+    return  Column( children : [ 
+        Expanded(child: 
+          ListView(children: [
+            Expanded(child:
+              Container(
+                padding: const EdgeInsets.only(top: 8),
+                alignment: Alignment.bottomLeft,
+                child: Text('Adhérent :',
+                    textScaleFactor: appModel.zoomText,
+                    style: const TextStyle(fontWeight: FontWeight.w600)))
+              ),
+            Container(
+                color: Theme.of(context).colorScheme.primaryContainer,
+                alignment: Alignment.bottomLeft,
+                child: Autocomplete<Member>(
+                  key: ValueKey(cashRegisterModel.selectedMember?.name ?? ''),
+                  initialValue: TextEditingValue(
+                      text: cashRegisterModel.selectedMember?.name ?? ''),
+                  displayStringForOption: (Member m) => m.name,
+                  optionsBuilder: (TextEditingValue textEditingValue) async {
+                    if (textEditingValue.text == '') {
+                      return const Iterable<Member>.empty();
+                    }
+                    return appModel.members.where((Member m) {
+                      return m
+                          .toString()
+                          .toLowerCase()
+                          .contains(textEditingValue.text.toLowerCase());
+                    });
+                  },
+                  fieldViewBuilder: (BuildContext context,
+                      TextEditingController fieldTextEditingController,
+                      FocusNode fieldFocusNode,
+                      VoidCallback onFieldSubmitted) {
+                    return TextFormField(
+                      enabled: !cashRegisterModel.isAwaitingSendFormResponse,
+                      decoration: const InputDecoration(
+                        hintText: 'Nom adhérent',
+                      ),
+                      controller: fieldTextEditingController,
+                      focusNode: fieldFocusNode,
+                      style: TextStyle(fontSize: mediumText),
+                      validator: (String? value) {
+                        String? result;
+                        if (value?.isEmpty ?? false) {
+                          result = 'Adhérent invalide';
+                        }
+                        return result;
+                      },
+                    );
+                  },
+                  onSelected: (m) {
+                    cashRegisterModel.selectedMember = m;
+                  },
+                )), 
+              Row(children: [
+                Expanded(
+                    flex: 1,
+                    child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Text('Sous total : ',
+                            style: TextStyle(fontSize: smallText)))),
+                Expanded(
+                    flex: 1,
+                    child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Text('${subtotal.toStringAsFixed(2)}€',
+                            style: TextStyle(fontSize: smallText))))
+              ]
             ),
-            onPressed: () {
-              if (_validateAll()) {
-                log('Send form !!!');
-                _sendForm(cashRegisterModel);
-              } else {
-                log('Form invalid');
-              }
-            },
-            child: Text('Valider', textScaleFactor: appModel.zoomText),
-          ),
-        ))
-      else
-        const Loading(text: "En attente du traitement de la facture..."),
-    ]);
+            Expanded(child: Container(
+                padding: const EdgeInsets.only(top: 25),
+                alignment: Alignment.bottomLeft,
+                child: Text('Paiement : ', style: TextStyle(fontSize: smallText)))),
+            
+              Expanded(
+                  flex: 2,
+                  child: !cashRegisterModel.isAwaitingSendFormResponse
+                      ? DropdownButton<PaymentMethod>(
+                          value: cashRegisterModel.selectedPaymentMethod,
+                          elevation: 16,
+                          onChanged: (PaymentMethod? value) {
+                            // This is called when the user selects an item.
+                            cashRegisterModel.selectedPaymentMethod =
+                                value ?? PaymentMethod.card;
+                          },
+                          items: PaymentMethod.values
+                              .map<DropdownMenuItem<PaymentMethod>>(
+                                  (PaymentMethod value) {
+                            return DropdownMenuItem<PaymentMethod>(
+                              value: value,
+                              child: Text(value.asString,
+                                  style: TextStyle(fontSize: smallText)),
+                            );
+                          }).toList(),
+                        )
+                      : Text(cashRegisterModel.selectedPaymentMethod.asString,
+                          textScaleFactor: appModel.zoomText))
+            ,
+            if (cashRegisterModel.selectedPaymentMethod == PaymentMethod.cheque)
+              TextFormField(
+                controller: TextEditingController(
+                    text: cashRegisterModel.chequeOrTransferNumber)
+                  ..selection = TextSelection.collapsed(
+                      offset: (cashRegisterModel.chequeOrTransferNumber).length),
+                decoration: const InputDecoration(
+                  hintText: 'N. chèque',
+                ),
+                onChanged: (String value) {
+                  cashRegisterModel.chequeOrTransferNumber = value;
+                },
+                textAlign: TextAlign.right,
+              ),
+            if (cashRegisterModel.selectedPaymentMethod == PaymentMethod.transfer)
+              TextFormField(
+                controller: TextEditingController(
+                    text: cashRegisterModel.chequeOrTransferNumber)
+                  ..selection = TextSelection.collapsed(
+                      offset: (cashRegisterModel.chequeOrTransferNumber).length),
+                decoration: const InputDecoration(
+                  hintText: 'N. virement',
+                ),
+                onChanged: (String value) {
+                  cashRegisterModel.chequeOrTransferNumber = value;
+                },
+                textAlign: TextAlign.right,
+              ),
+            if (cashRegisterModel.selectedPaymentMethod == PaymentMethod.card)
+              Row(children: [
+                Expanded(
+                    flex: 1,
+                    child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Text('Frais CB : ',
+                            style: TextStyle(fontSize: smallText)))),
+                Expanded(
+                    flex: 1,
+                    child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Text('${cardFee.toStringAsFixed(2)}€',
+                            style: TextStyle(fontSize: smallText))))
+              ]),
+            Row(children: [
+                Expanded(
+                    flex: 1,
+                    child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Text('Total : ',
+                            textScaleFactor: appModel.zoomText,
+                            style: const TextStyle(fontWeight: FontWeight.bold)))),
+                Expanded(
+                    flex: 1,
+                    child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Text('${total.toStringAsFixed(2)}€',
+                            textScaleFactor: appModel.zoomText,
+                            style: const TextStyle(fontWeight: FontWeight.bold))))
+              ]
+            ),
+            
+          ])) ,
+        if (cashRegisterModel.isAwaitingSendFormResponse == false)
+              Center(
+                  child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 25.0),
+                child: FloatingActionButton.extended(
+                  foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
+                  backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                  onPressed: () {
+                    if (_validateAll()) {
+                      log('Send form !!!');
+                      _sendForm(cashRegisterModel);
+                    } else {
+                      log('Form invalid');
+                    }
+                  },
+                  tooltip: 'Valider le formulaire et envoyer la facture',
+                  label: Text('Valider', textScaleFactor: appModel.zoomText),
+                ),
+              ))
+            else
+              const Loading(text: "En attente du traitement de la facture..."),
+      ] ) ;
   }
 
   bool _validateAll() {

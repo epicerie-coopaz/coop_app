@@ -6,6 +6,7 @@ import 'package:coopaz_app/podo/cart_item.dart';
 import 'package:coopaz_app/state/app_model.dart';
 import 'package:coopaz_app/state/cash_register.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:coopaz_app/logger.dart';
@@ -33,6 +34,7 @@ class _CartItemWidget extends State<CartItemWidget> {
   @override
   Widget build(BuildContext context) {
     AppModel appModel = context.watch<AppModel>();
+    double mediumText = 14 * appModel.zoomText;
     CashRegisterModel cashRegisterModel = context.watch<CashRegisterModel>();
 
     var total = '';
@@ -82,14 +84,13 @@ class _CartItemWidget extends State<CartItemWidget> {
                     TextEditingController fieldTextEditingController,
                     FocusNode fieldFocusNode,
                     VoidCallback onFieldSubmitted) {
-                  //fieldFocusNode.requestFocus();
                   return TextFormField(
                     decoration: const InputDecoration(
                       hintText: 'Produit',
                     ),
                     controller: fieldTextEditingController,
                     focusNode: fieldFocusNode,
-                    style: TextStyle(fontSize: 14 * appModel.zoomText),
+                    style: TextStyle(fontSize: mediumText),
                     enabled: !cashRegisterModel.isAwaitingSendFormResponse,
                     validator: (String? value) {
                       String? result;
@@ -99,6 +100,61 @@ class _CartItemWidget extends State<CartItemWidget> {
                       return result;
                     },
                   );
+                },
+                optionsViewBuilder: (context, onSelected, options) {
+                  return Material(
+                    elevation: 4.0,
+                    child: ListView.builder(
+                      padding: EdgeInsets.zero,
+                      shrinkWrap: true,
+                      itemCount: options.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        final Product option = options.elementAt(index);
+                        return InkWell(
+                          onTap: () {
+                            onSelected(option);
+                          },
+                          child: Builder(builder: (BuildContext context) {
+                            final bool highlight =
+                                AutocompleteHighlightedOption.of(context) ==
+                                    index;
+                            if (highlight) {
+                              SchedulerBinding.instance
+                                  .addPostFrameCallback((Duration timeStamp) {
+                                Scrollable.ensureVisible(context,
+                                    alignment: 0.5);
+                              });
+                            }
+                            var styleBody =
+                                Theme.of(context).textTheme.bodyMedium;
+                            return Container(
+                              color: highlight
+                                  ? Theme.of(context).focusColor
+                                  : null,
+                              padding: const EdgeInsets.all(16.0),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                      flex: 8,
+                                      child: Text(option.designation,
+                                          style: styleBody)),
+                                  Expanded(
+                                      flex: 3,
+                                      child: Text(
+                                          '${option.price}€/${option.unit.unitAsString}',
+                                          style: styleBody)),
+                                  Expanded(
+                                      flex: 2,
+                                      child: Text(option.stock.toString(),
+                                          style: styleBody)),
+                                ],
+                              ),
+                            );
+                          }),
+                        );
+                      },
+                    ),
+                  ); 
                 },
                 onSelected: (p) {
                   cashRegisterModel.modifyCartItem(
@@ -136,12 +192,15 @@ class _CartItemWidget extends State<CartItemWidget> {
                         },
                         textAlign: TextAlign.right,
                         style: TextStyle(
-                          fontSize: 14 * appModel.zoomText,
+                          fontSize: mediumText,
                         ),
                       ))
                   : Text(
                       cashRegisterModel.cart[widget.index].qty ?? '',
                       textAlign: TextAlign.right,
+                      style: TextStyle(
+                          fontSize: mediumText,
+                        ),
                     )),
           Expanded(
               flex: 1,

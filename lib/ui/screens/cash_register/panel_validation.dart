@@ -43,13 +43,13 @@ class ValidationPanel extends StatelessWidget {
     double smallText = 11 * appModel.zoomText;
     double mediumText = 14 * appModel.zoomText;
 
-    return Column(children: [
-      Container(
+    return ListView(children: [
+      Row(children: [Container(
           padding: const EdgeInsets.only(top: 8),
           alignment: Alignment.bottomLeft,
           child: Text('Adhérent :',
               textScaleFactor: appModel.zoomText,
-              style: const TextStyle(fontWeight: FontWeight.w600))),
+              style: const TextStyle(fontWeight: FontWeight.w600)))]),
       Container(
           color: Theme.of(context).colorScheme.primaryContainer,
           alignment: Alignment.bottomLeft,
@@ -93,10 +93,8 @@ class ValidationPanel extends StatelessWidget {
             onSelected: (m) {
               cashRegisterModel.selectedMember = m;
             },
-          )),
-      Container(
-        padding: const EdgeInsets.only(top: 25),
-        child: Row(children: [
+          )), 
+        Row(children: [
           Expanded(
               flex: 1,
               child: Align(
@@ -109,12 +107,12 @@ class ValidationPanel extends StatelessWidget {
                   alignment: Alignment.topLeft,
                   child: Text('${subtotal.toStringAsFixed(2)}€',
                       style: TextStyle(fontSize: smallText))))
-        ]),
+        ]//),
       ),
-      Container(
+      Row(children: [Container(
           padding: const EdgeInsets.only(top: 25),
           alignment: Alignment.bottomLeft,
-          child: Text('Paiement : ', style: TextStyle(fontSize: smallText))),
+          child: Text('Paiement : ', style: TextStyle(fontSize: smallText)))]),
       Row(children: [
         Expanded(
             flex: 2,
@@ -183,9 +181,9 @@ class ValidationPanel extends StatelessWidget {
                   child: Text('${cardFee.toStringAsFixed(2)}€',
                       style: TextStyle(fontSize: smallText))))
         ]),
-      Container(
+      /* Container(
         padding: const EdgeInsets.only(top: 25),
-        child: Row(children: [
+        child:  */Row(children: [
           Expanded(
               flex: 1,
               child: Align(
@@ -200,7 +198,7 @@ class ValidationPanel extends StatelessWidget {
                   child: Text('${total.toStringAsFixed(2)}€',
                       textScaleFactor: appModel.zoomText,
                       style: const TextStyle(fontWeight: FontWeight.bold))))
-        ]),
+        ]//),
       ),
       if (cashRegisterModel.isAwaitingSendFormResponse == false)
         Center(

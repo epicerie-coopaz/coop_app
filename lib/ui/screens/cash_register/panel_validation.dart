@@ -51,7 +51,7 @@ class ValidationPanel extends StatelessWidget {
               textScaleFactor: appModel.zoomText,
               style: const TextStyle(fontWeight: FontWeight.w600))),
       Container(
-          color: Theme.of(context).colorScheme.background,
+          color: Theme.of(context).colorScheme.primaryContainer,
           alignment: Alignment.bottomLeft,
           child: Autocomplete<Member>(
             key: ValueKey(cashRegisterModel.selectedMember?.name ?? ''),

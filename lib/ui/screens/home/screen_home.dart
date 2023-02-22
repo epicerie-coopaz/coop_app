@@ -40,7 +40,7 @@ class CoopazApp extends StatelessWidget {
                 brightness: Brightness.light,
                 primary: Color(0xFF4B6700),
                 onPrimary: Color(0xFFFFFFFF),
-                primaryContainer: Color.fromARGB(255, 210, 214, 199),
+                primaryContainer: Color.fromARGB(255, 225, 233, 199),
                 onPrimaryContainer: Color(0xFF141F00),
                 secondary: Color(0xFF984800),
                 onSecondary: Color(0xFFFFFFFF),
@@ -108,7 +108,7 @@ class HomeScreen extends StatelessWidget {
                 foregroundColor: Theme.of(context).colorScheme.onPrimary,
                 backgroundColor: Theme.of(context).colorScheme.primary,
                 minimumSize: const Size(200, 200),
-              ).copyWith(elevation: ButtonStyleButton.allOrNull(0.0)),
+              ),
               onPressed: () {
                 log('Cash register Clicked !');
 
@@ -121,7 +121,8 @@ class HomeScreen extends StatelessWidget {
                   ),
                 );
               },
-              child: const Text('Caisse'),
+              child: const Text('Caisse',
+                  textScaleFactor: 2),
             ),
             ElevatedButton(
                 onPressed: () {
@@ -135,12 +136,12 @@ class HomeScreen extends StatelessWidget {
                 },
                 style: ElevatedButton.styleFrom(
                         foregroundColor:
-                            Theme.of(context).colorScheme.onSecondaryContainer,
+                            Theme.of(context).colorScheme.onPrimaryContainer,
                         backgroundColor:
-                            Theme.of(context).colorScheme.secondaryContainer,
-                        minimumSize: const Size(200, 200))
-                    .copyWith(elevation: ButtonStyleButton.allOrNull(0.0)),
-                child: const Text('Produits')),
+                            Theme.of(context).colorScheme.primaryContainer,
+                        minimumSize: const Size(200, 200)),
+                child: const Text('Produits',
+                  textScaleFactor: 2)),
             ElevatedButton(
                 onPressed: () {
                   log('Members Clicked !');
@@ -152,12 +153,13 @@ class HomeScreen extends StatelessWidget {
                 },
                 style: ElevatedButton.styleFrom(
                         foregroundColor:
-                            Theme.of(context).colorScheme.onSecondaryContainer,
+                            Theme.of(context).colorScheme.onPrimaryContainer,
                         backgroundColor:
-                            Theme.of(context).colorScheme.secondaryContainer,
-                        minimumSize: const Size(200, 200))
-                    .copyWith(elevation: ButtonStyleButton.allOrNull(0.0)),
-                child: const Text('Adhérents')),
+                            Theme.of(context).colorScheme.primaryContainer,
+                        minimumSize: const Size(200, 200)),
+                child: const Text(
+                  'Adhérents',
+                  textScaleFactor: 2)),
           ],
         )));
   }

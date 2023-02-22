@@ -34,6 +34,7 @@ class _CartItemWidget extends State<CartItemWidget> {
   @override
   Widget build(BuildContext context) {
     AppModel appModel = context.watch<AppModel>();
+    double mediumText = 14 * appModel.zoomText;
     CashRegisterModel cashRegisterModel = context.watch<CashRegisterModel>();
 
     var total = '';
@@ -89,7 +90,7 @@ class _CartItemWidget extends State<CartItemWidget> {
                     ),
                     controller: fieldTextEditingController,
                     focusNode: fieldFocusNode,
-                    style: TextStyle(fontSize: 14 * appModel.zoomText),
+                    style: TextStyle(fontSize: mediumText),
                     enabled: !cashRegisterModel.isAwaitingSendFormResponse,
                     validator: (String? value) {
                       String? result;
@@ -153,7 +154,7 @@ class _CartItemWidget extends State<CartItemWidget> {
                         );
                       },
                     ),
-                  );
+                  ); 
                 },
                 onSelected: (p) {
                   cashRegisterModel.modifyCartItem(

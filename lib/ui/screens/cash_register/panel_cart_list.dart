@@ -49,6 +49,7 @@ class _CartList extends State<CartList> {
         ?.apply(color: Theme.of(context).colorScheme.primary);
 
     AppModel appModel = context.watch<AppModel>();
+    double bigText = 20 * appModel.zoomText;
     CashRegisterModel cashRegisterModel = context.watch<CashRegisterModel>();
 
     List<CartItemWidget> productLineWidgets =
@@ -108,7 +109,7 @@ class _CartList extends State<CartList> {
               const SizedBox(height: 40),
               Row(children: [
                 !cashRegisterModel.isAwaitingSendFormResponse
-                    ? FloatingActionButton(
+                    ? FloatingActionButton.extended(
                         focusNode: FocusNode(skipTraversal: true),
                         foregroundColor:
                             Theme.of(context).colorScheme.onPrimary,
@@ -128,7 +129,8 @@ class _CartList extends State<CartList> {
                             }
                           });
                         },
-                        child: const Icon(Icons.add),
+                        label: Icon(Icons.add, size: bigText),
+                        tooltip: 'Ajouter une ligne produit',
                       )
                     : Container()
               ]),

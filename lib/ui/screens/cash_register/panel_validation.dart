@@ -41,7 +41,7 @@ class ValidationPanel extends StatelessWidget {
     double total = subtotal + cardFee;
 
     double smallText = 11 * appModel.zoomText;
-    double bigText = 14 * appModel.zoomText;
+    double mediumText = 14 * appModel.zoomText;
 
     return Column(children: [
       Container(
@@ -80,7 +80,7 @@ class ValidationPanel extends StatelessWidget {
                 ),
                 controller: fieldTextEditingController,
                 focusNode: fieldFocusNode,
-                style: TextStyle(fontSize: bigText),
+                style: TextStyle(fontSize: mediumText),
                 validator: (String? value) {
                   String? result;
                   if (value?.isEmpty ?? false) {
@@ -205,13 +205,10 @@ class ValidationPanel extends StatelessWidget {
       if (cashRegisterModel.isAwaitingSendFormResponse == false)
         Center(
             child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 15.0),
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              foregroundColor: Theme.of(context).colorScheme.onPrimary,
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              minimumSize: const Size(100, 50),
-            ),
+          padding: const EdgeInsets.symmetric(vertical: 25.0),
+          child: FloatingActionButton.extended(
+            foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
+            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
             onPressed: () {
               if (_validateAll()) {
                 log('Send form !!!');
@@ -220,7 +217,8 @@ class ValidationPanel extends StatelessWidget {
                 log('Form invalid');
               }
             },
-            child: Text('Valider', textScaleFactor: appModel.zoomText),
+            tooltip: 'Valider le formulaire et envoyer la facture',
+            label: Text('Valider', textScaleFactor: appModel.zoomText),
           ),
         ))
       else

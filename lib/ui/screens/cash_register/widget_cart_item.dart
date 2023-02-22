@@ -192,12 +192,15 @@ class _CartItemWidget extends State<CartItemWidget> {
                         },
                         textAlign: TextAlign.right,
                         style: TextStyle(
-                          fontSize: 14 * appModel.zoomText,
+                          fontSize: mediumText,
                         ),
                       ))
                   : Text(
                       cashRegisterModel.cart[widget.index].qty ?? '',
                       textAlign: TextAlign.right,
+                      style: TextStyle(
+                          fontSize: mediumText,
+                        ),
                     )),
           Expanded(
               flex: 1,

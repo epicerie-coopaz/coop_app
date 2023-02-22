@@ -46,14 +46,14 @@ class ValidationPanel extends StatelessWidget {
     return  Column( children : [ 
         Expanded(child: 
           ListView(children: [
-            Row(children: [
+            Expanded(child:
               Container(
                 padding: const EdgeInsets.only(top: 8),
                 alignment: Alignment.bottomLeft,
                 child: Text('Adhérent :',
                     textScaleFactor: appModel.zoomText,
                     style: const TextStyle(fontWeight: FontWeight.w600)))
-              ]),
+              ),
             Container(
                 color: Theme.of(context).colorScheme.primaryContainer,
                 alignment: Alignment.bottomLeft,
@@ -111,13 +111,13 @@ class ValidationPanel extends StatelessWidget {
                         alignment: Alignment.topLeft,
                         child: Text('${subtotal.toStringAsFixed(2)}€',
                             style: TextStyle(fontSize: smallText))))
-              ]//),
+              ]
             ),
-            Row(children: [Container(
+            Expanded(child: Container(
                 padding: const EdgeInsets.only(top: 25),
                 alignment: Alignment.bottomLeft,
-                child: Text('Paiement : ', style: TextStyle(fontSize: smallText)))]),
-            Row(children: [
+                child: Text('Paiement : ', style: TextStyle(fontSize: smallText)))),
+            
               Expanded(
                   flex: 2,
                   child: !cashRegisterModel.isAwaitingSendFormResponse
@@ -141,7 +141,7 @@ class ValidationPanel extends StatelessWidget {
                         )
                       : Text(cashRegisterModel.selectedPaymentMethod.asString,
                           textScaleFactor: appModel.zoomText))
-            ]),
+            ,
             if (cashRegisterModel.selectedPaymentMethod == PaymentMethod.cheque)
               TextFormField(
                 controller: TextEditingController(
@@ -185,9 +185,7 @@ class ValidationPanel extends StatelessWidget {
                         child: Text('${cardFee.toStringAsFixed(2)}€',
                             style: TextStyle(fontSize: smallText))))
               ]),
-            /* Container(
-              padding: const EdgeInsets.only(top: 25),
-              child:  */Row(children: [
+            Row(children: [
                 Expanded(
                     flex: 1,
                     child: Align(
@@ -202,7 +200,7 @@ class ValidationPanel extends StatelessWidget {
                         child: Text('${total.toStringAsFixed(2)}€',
                             textScaleFactor: appModel.zoomText,
                             style: const TextStyle(fontWeight: FontWeight.bold))))
-              ]//),
+              ]
             ),
             
           ])) ,

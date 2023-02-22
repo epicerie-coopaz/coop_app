@@ -49,7 +49,7 @@ class _CartList extends State<CartList> {
         ?.apply(color: Theme.of(context).colorScheme.primary);
 
     AppModel appModel = context.watch<AppModel>();
-    double bigText = 20 * appModel.zoomText;
+    double bigText = appModel.bigText * appModel.zoomText;
     CashRegisterModel cashRegisterModel = context.watch<CashRegisterModel>();
 
     List<CartItemWidget> productLineWidgets =

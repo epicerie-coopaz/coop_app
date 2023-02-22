@@ -40,18 +40,20 @@ class ValidationPanel extends StatelessWidget {
 
     double total = subtotal + cardFee;
 
-    double smallText = 11 * appModel.zoomText;
-    double mediumText = 14 * appModel.zoomText;
+    double smallText = appModel.smallText * appModel.zoomText;
+    double mediumText = appModel.mediumText * appModel.zoomText;
 
     return  Column( children : [ 
         Expanded(child: 
           ListView(children: [
-            Row(children: [Container(
+            Row(children: [
+              Container(
                 padding: const EdgeInsets.only(top: 8),
                 alignment: Alignment.bottomLeft,
                 child: Text('Adhérent :',
                     textScaleFactor: appModel.zoomText,
-                    style: const TextStyle(fontWeight: FontWeight.w600)))]),
+                    style: const TextStyle(fontWeight: FontWeight.w600)))
+              ]),
             Container(
                 color: Theme.of(context).colorScheme.primaryContainer,
                 alignment: Alignment.bottomLeft,
@@ -133,7 +135,7 @@ class ValidationPanel extends StatelessWidget {
                             return DropdownMenuItem<PaymentMethod>(
                               value: value,
                               child: Text(value.asString,
-                                  style: TextStyle(fontSize: 11 * appModel.zoomText)),
+                                  style: TextStyle(fontSize: smallText)),
                             );
                           }).toList(),
                         )

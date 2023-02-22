@@ -30,7 +30,7 @@ class CashRegisterScreen extends StatelessWidget {
     log('build screen $title');
 
     AppModel appModel = context.watch<AppModel>();
-    double zoomStep = 0.2;
+    
     CashRegisterModel cashRegisterModel = context.watch<CashRegisterModel>();
 
     Widget cartList;
@@ -61,7 +61,7 @@ class CashRegisterScreen extends StatelessWidget {
             IconButton(
                 focusNode: FocusNode(skipTraversal: true),
                 onPressed: () async {
-                  appModel.zoomText = appModel.zoomText - zoomStep;
+                  appModel.zoomText = appModel.zoomText - appModel.zoomStep;
                   log(appModel.zoomText.toString());
                 },
                 icon: const Icon(Icons.text_decrease),
@@ -69,7 +69,7 @@ class CashRegisterScreen extends StatelessWidget {
             IconButton(
                 focusNode: FocusNode(skipTraversal: true),
                 onPressed: () async {
-                  appModel.zoomText = appModel.zoomText + zoomStep;
+                  appModel.zoomText = appModel.zoomText + appModel.zoomStep;
                   log(appModel.zoomText.toString());
                 },
                 icon: const Icon(Icons.text_increase),

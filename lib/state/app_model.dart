@@ -7,14 +7,21 @@ import 'package:flutter/foundation.dart';
 class AppModel extends ChangeNotifier {
   final List<Member> _members = [];
   final List<Product> _products = [];
-  double _textSize = 1.0;
 
   // Text Size section
-  double get zoomText => _textSize;
-  set zoomText(double textSize) {
-    _textSize = textSize;
+
+  double _textSizeFactor = 1.0;
+  double zoomStep = 0.2;
+
+  double get zoomText => _textSizeFactor;
+  set zoomText(double textSizeFactor) {
+    _textSizeFactor = textSizeFactor;
     notifyListeners();
   }
+
+  double smallText = 11;
+  double mediumText = 14;
+  double bigText = 20;
 
   // Products section
 

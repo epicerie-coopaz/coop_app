@@ -214,6 +214,7 @@ class ValidationPanel extends StatelessWidget {
             child: Container(
           padding: const EdgeInsets.symmetric(vertical: 25.0),
           child: FloatingActionButton.extended(
+            heroTag: null,
             foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
             backgroundColor: Theme.of(context).colorScheme.primaryContainer,
             onPressed: () {

@@ -6,6 +6,7 @@ import 'package:coopaz_app/ui/screens/cash_register/screen_cash_register.dart';
 import 'package:coopaz_app/ui/screens/members/screen_members.dart';
 import 'package:coopaz_app/ui/screens/products/screen_products.dart';
 import 'package:coopaz_app/state/app_model.dart';
+import 'package:coopaz_app/ui/screens/reception/screen_reception.dart';
 import 'package:flutter/material.dart';
 
 import 'package:coopaz_app/logger.dart';
@@ -111,7 +112,6 @@ class HomeScreen extends StatelessWidget {
               ),
               onPressed: () {
                 log('Cash register Clicked !');
-
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => CashRegisterScreen(
@@ -122,6 +122,24 @@ class HomeScreen extends StatelessWidget {
                 );
               },
               child: const Text('Caisse',
+                  textScaleFactor: 2),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                minimumSize: const Size(200, 200),
+              ),
+              onPressed: () {
+                log('Reception Clicked !');
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => ReceptionScreen(
+                        productDao: productDao),
+                  ),
+                );
+              },
+              child: const Text('Réception',
                   textScaleFactor: 2),
             ),
             ElevatedButton(

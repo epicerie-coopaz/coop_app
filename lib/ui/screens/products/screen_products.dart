@@ -1,5 +1,6 @@
-import 'package:coopaz_app/dao/product_dao.dart';
+import 'package:coopaz_app/dao/data_access.dart';
 import 'package:coopaz_app/logger.dart';
+import 'package:coopaz_app/podo/product.dart';
 import 'package:coopaz_app/ui/common_widgets/loading_widget.dart';
 import 'package:coopaz_app/state/app_model.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +11,7 @@ import 'widget_product_list.dart';
 class ProductsScreen extends StatelessWidget {
   const ProductsScreen({super.key, required this.productDao});
 
-  final ProductDao productDao;
+  final GoogleSheetDao<Product> productDao;
 
   final String title = 'Produits';
 
@@ -23,7 +24,7 @@ class ProductsScreen extends StatelessWidget {
       if (model.products.isNotEmpty) {
         w = const ProductList();
       } else {
-        productDao.getProducts().then((p) => model.products = p);
+        productDao.get().then((p) => model.products = p);
         w = const Loading(text: 'Chargement de la liste des produits...');
       }
       return Scaffold(

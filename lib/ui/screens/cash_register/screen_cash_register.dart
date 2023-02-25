@@ -1,6 +1,7 @@
-import 'package:coopaz_app/dao/member_dao.dart';
+import 'package:coopaz_app/dao/data_access.dart';
 import 'package:coopaz_app/dao/order_dao.dart';
-import 'package:coopaz_app/dao/product_dao.dart';
+import 'package:coopaz_app/podo/member.dart';
+import 'package:coopaz_app/podo/product.dart';
 import 'package:coopaz_app/state/cash_register.dart';
 import 'package:coopaz_app/ui/screens/cash_register/panel_cart_list.dart';
 import 'package:coopaz_app/ui/screens/cash_register/panel_validation.dart';
@@ -18,8 +19,8 @@ class CashRegisterScreen extends StatelessWidget {
       required this.productDao});
 
   final OrderDao orderDao;
-  final MemberDao memberDao;
-  final ProductDao productDao;
+  final GoogleSheetDao<Member> memberDao;
+  final GoogleSheetDao<Product> productDao;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -30,7 +31,7 @@ class CashRegisterScreen extends StatelessWidget {
     log('build screen $title');
 
     AppModel appModel = context.watch<AppModel>();
-    
+
     CashRegisterModel cashRegisterModel = context.watch<CashRegisterModel>();
 
     Widget cartList;
@@ -39,7 +40,7 @@ class CashRegisterScreen extends StatelessWidget {
         formKey: _formKey,
       );
     } else {
-      productDao.getProducts().then((p) => appModel.products = p);
+      productDao.get().then((p) => appModel.products = p);
       cartList = const Loading(text: 'Chargement de la liste des produits...');
     }
 
@@ -50,7 +51,7 @@ class CashRegisterScreen extends StatelessWidget {
         formKey: _formKey,
       );
     } else {
-      memberDao.getMembers().then((m) => appModel.members = m);
+      memberDao.get().then((m) => appModel.members = m);
       validationPanel =
           const Loading(text: 'Chargement de la liste des membres...');
     }

@@ -1,6 +1,7 @@
-import 'package:coopaz_app/dao/member_dao.dart';
+import 'package:coopaz_app/dao/data_access.dart';
 import 'package:coopaz_app/dao/order_dao.dart';
-import 'package:coopaz_app/dao/product_dao.dart';
+import 'package:coopaz_app/podo/member.dart';
+import 'package:coopaz_app/podo/product.dart';
 import 'package:coopaz_app/state/cash_register.dart';
 import 'package:coopaz_app/ui/screens/cash_register/screen_cash_register.dart';
 import 'package:coopaz_app/ui/screens/members/screen_members.dart';
@@ -18,8 +19,8 @@ class CoopazApp extends StatelessWidget {
       required this.memberDao,
       required this.productDao,
       required this.orderDao});
-  final MemberDao memberDao;
-  final ProductDao productDao;
+  final GoogleSheetDao<Member> memberDao;
+  final GoogleSheetDao<Product> productDao;
   final OrderDao orderDao;
 
   @override
@@ -85,8 +86,8 @@ class HomeScreen extends StatelessWidget {
       required this.productDao,
       required this.orderDao});
 
-  final MemberDao memberDao;
-  final ProductDao productDao;
+  final GoogleSheetDao<Member> memberDao;
+  final GoogleSheetDao<Product> productDao;
   final OrderDao orderDao;
 
   final String title = 'Logiciel Coopaz';
@@ -121,8 +122,7 @@ class HomeScreen extends StatelessWidget {
                   ),
                 );
               },
-              child: const Text('Caisse',
-                  textScaleFactor: 2),
+              child: const Text('Caisse', textScaleFactor: 2),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -134,13 +134,12 @@ class HomeScreen extends StatelessWidget {
                 log('Reception Clicked !');
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => ReceptionScreen(
-                        productDao: productDao),
+                    builder: (context) =>
+                        ReceptionScreen(productDao: productDao),
                   ),
                 );
               },
-              child: const Text('Réception',
-                  textScaleFactor: 2),
+              child: const Text('Réception', textScaleFactor: 2),
             ),
             ElevatedButton(
                 onPressed: () {
@@ -153,13 +152,12 @@ class HomeScreen extends StatelessWidget {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                        foregroundColor:
-                            Theme.of(context).colorScheme.onPrimaryContainer,
-                        backgroundColor:
-                            Theme.of(context).colorScheme.primaryContainer,
-                        minimumSize: const Size(200, 200)),
-                child: const Text('Produits',
-                  textScaleFactor: 2)),
+                    foregroundColor:
+                        Theme.of(context).colorScheme.onPrimaryContainer,
+                    backgroundColor:
+                        Theme.of(context).colorScheme.primaryContainer,
+                    minimumSize: const Size(200, 200)),
+                child: const Text('Produits', textScaleFactor: 2)),
             ElevatedButton(
                 onPressed: () {
                   log('Members Clicked !');
@@ -170,14 +168,12 @@ class HomeScreen extends StatelessWidget {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                        foregroundColor:
-                            Theme.of(context).colorScheme.onPrimaryContainer,
-                        backgroundColor:
-                            Theme.of(context).colorScheme.primaryContainer,
-                        minimumSize: const Size(200, 200)),
-                child: const Text(
-                  'Adhérents',
-                  textScaleFactor: 2)),
+                    foregroundColor:
+                        Theme.of(context).colorScheme.onPrimaryContainer,
+                    backgroundColor:
+                        Theme.of(context).colorScheme.primaryContainer,
+                    minimumSize: const Size(200, 200)),
+                child: const Text('Adhérents', textScaleFactor: 2)),
           ],
         )));
   }

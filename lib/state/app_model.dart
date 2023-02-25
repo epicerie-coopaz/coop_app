@@ -2,11 +2,13 @@ import 'dart:collection';
 
 import 'package:coopaz_app/podo/member.dart';
 import 'package:coopaz_app/podo/product.dart';
+import 'package:coopaz_app/podo/supplier.dart';
 import 'package:flutter/foundation.dart';
 
 class AppModel extends ChangeNotifier {
   final List<Member> _members = [];
   final List<Product> _products = [];
+  final List<Supplier> _suppliers = [];
 
   // Text Size section
 
@@ -41,6 +43,17 @@ class AppModel extends ChangeNotifier {
     if (!listEquals(_members, members)) {
       _members.clear();
       _members.addAll(members);
+      notifyListeners();
+    }
+  }
+
+  // Suppliers section
+
+  UnmodifiableListView<Supplier> get suppliers => UnmodifiableListView(_suppliers);
+  set suppliers(List<Supplier> suppliers) {
+    if (!listEquals(_suppliers, suppliers)) {
+      _suppliers.clear();
+      _suppliers.addAll(suppliers);
       notifyListeners();
     }
   }

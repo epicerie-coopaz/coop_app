@@ -11,6 +11,7 @@ import 'package:coopaz_app/dao/data_access.dart';
 import 'package:coopaz_app/dao/order_dao.dart';
 import 'package:coopaz_app/podo/member.dart';
 import 'package:coopaz_app/podo/product.dart';
+import 'package:coopaz_app/podo/supplier.dart';
 import 'package:coopaz_app/podo/units.dart';
 import 'package:coopaz_app/ui/screens/home/screen_home.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -75,11 +76,31 @@ void main() {
         appsScriptId: conf.appsScriptId,
         authManager: authManager);
 
+    var supplierDao = GoogleSheetDao<Supplier>(
+      googleSheetUrlApi: conf.urls.googleSheetsApi,
+      spreadSheetId: conf.spreadSheetId,
+      authManager: authManager,
+      sheetName: 'fournisseurs',
+      range: '!A3:J',
+      mapping: (l) => Supplier(
+        name: l[0].trim(),
+        reference: l[1].trim(),
+        address: l[2].trim(),
+        postalCode: l[3].trim(),
+        city: l[4].trim(),
+        activityType: l[5].trim(),
+        contactName: l[7].trim(),
+        email: l[8].trim(),
+        phone: l[9].trim(),
+      ),
+      filter: (l) => l.length > 10,
+    );
+
     // Build our app and trigger a frame.
     await tester.pumpWidget(CoopazApp(
-      memberDao: memberDao,
-      orderDao: orderDao,
-      productDao: productDao,
-    ));
+        memberDao: memberDao,
+        orderDao: orderDao,
+        productDao: productDao,
+        supplierDao: supplierDao));
   });
 }

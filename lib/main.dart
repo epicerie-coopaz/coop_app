@@ -6,6 +6,7 @@ import 'package:coopaz_app/podo/product.dart';
 import 'package:coopaz_app/podo/supplier.dart';
 import 'package:coopaz_app/podo/units.dart';
 import 'package:coopaz_app/ui/screens/home/screen_home.dart';
+import 'package:coopaz_app/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:coopaz_app/logger.dart';
 
@@ -70,7 +71,7 @@ Future<void> main() async {
       filter: (l) => l.length > 11,
     );
 
-    var supplier = GoogleSheetDao<Supplier>(
+    var supplierDao = GoogleSheetDao<Supplier>(
       googleSheetUrlApi: conf.urls.googleSheetsApi,
       spreadSheetId: conf.spreadSheetId,
       authManager: authManager,
@@ -78,16 +79,16 @@ Future<void> main() async {
       range: '!A3:J',
       mapping: (l) => Supplier(
         name: l[0].trim(),
-        reference: l[1].trim(),
-        address: l[2].trim(),
-        postalCode: l[3].trim(),
-        city: l[4].trim(),
-        activityType: l[5].trim(),
-        contactName: l[7].trim(),
-        email: l[8].trim(),
-        phone: l[9].trim(),
+        reference: tryElementAt<String>(l, 1)?.trim() ?? '',
+        address: tryElementAt<String>(l, 2)?.trim() ?? '',
+        postalCode: tryElementAt<String>(l, 3)?.trim() ?? '',
+        city: tryElementAt<String>(l, 4)?.trim() ?? '',
+        activityType: tryElementAt<String>(l, 5)?.trim() ?? '',
+        contactName: tryElementAt<String>(l, 7)?.trim() ?? '',
+        email: tryElementAt<String>(l, 8)?.trim() ?? '',
+        phone: tryElementAt<String>(l, 9)?.trim() ?? '',
       ),
-      filter: (l) => l.length > 10,
+      filter: (l) => l.isNotEmpty,
     );
 
     var orderDao = OrderDao(
@@ -97,10 +98,10 @@ Future<void> main() async {
 
     log('Starting Coopaz app...');
     runApp(CoopazApp(
-      memberDao: memberDao,
-      orderDao: orderDao,
-      productDao: productDao,
-    ));
+        memberDao: memberDao,
+        orderDao: orderDao,
+        productDao: productDao,
+        supplierDao: supplierDao));
     log('App started !');
   } catch (e, s) {
     runApp(MaterialApp(

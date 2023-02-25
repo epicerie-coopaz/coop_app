@@ -2,25 +2,30 @@ import 'package:coopaz_app/dao/data_access.dart';
 import 'package:coopaz_app/dao/order_dao.dart';
 import 'package:coopaz_app/podo/member.dart';
 import 'package:coopaz_app/podo/product.dart';
+import 'package:coopaz_app/podo/supplier.dart';
 import 'package:coopaz_app/state/cash_register.dart';
 import 'package:coopaz_app/ui/screens/cash_register/screen_cash_register.dart';
 import 'package:coopaz_app/ui/screens/members/screen_members.dart';
 import 'package:coopaz_app/ui/screens/products/screen_products.dart';
 import 'package:coopaz_app/state/app_model.dart';
 import 'package:coopaz_app/ui/screens/reception/screen_reception.dart';
+import 'package:coopaz_app/ui/screens/suppliers/screen_suppliers.dart';
 import 'package:flutter/material.dart';
 
 import 'package:coopaz_app/logger.dart';
 import 'package:provider/provider.dart';
 
 class CoopazApp extends StatelessWidget {
-  const CoopazApp(
-      {super.key,
-      required this.memberDao,
-      required this.productDao,
-      required this.orderDao});
+  const CoopazApp({
+    super.key,
+    required this.memberDao,
+    required this.productDao,
+    required this.supplierDao,
+    required this.orderDao,
+  });
   final GoogleSheetDao<Member> memberDao;
   final GoogleSheetDao<Product> productDao;
+  final GoogleSheetDao<Supplier> supplierDao;
   final OrderDao orderDao;
 
   @override
@@ -71,7 +76,10 @@ class CoopazApp extends StatelessWidget {
               ),
               useMaterial3: true),
           home: HomeScreen(
-              memberDao: memberDao, productDao: productDao, orderDao: orderDao),
+              memberDao: memberDao,
+              productDao: productDao,
+              orderDao: orderDao,
+              supplierDao: supplierDao),
           debugShowCheckedModeBanner: false,
         );
       },
@@ -84,10 +92,12 @@ class HomeScreen extends StatelessWidget {
       {super.key,
       required this.memberDao,
       required this.productDao,
+      required this.supplierDao,
       required this.orderDao});
 
   final GoogleSheetDao<Member> memberDao;
   final GoogleSheetDao<Product> productDao;
+  final GoogleSheetDao<Supplier> supplierDao;
   final OrderDao orderDao;
 
   final String title = 'Logiciel Coopaz';
@@ -174,6 +184,23 @@ class HomeScreen extends StatelessWidget {
                         Theme.of(context).colorScheme.primaryContainer,
                     minimumSize: const Size(200, 200)),
                 child: const Text('Adhérents', textScaleFactor: 2)),
+            ElevatedButton(
+                onPressed: () {
+                  log('Suppliers Clicked !');
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          SuppliersScreen(supplierDao: supplierDao),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                    foregroundColor:
+                        Theme.of(context).colorScheme.onPrimaryContainer,
+                    backgroundColor:
+                        Theme.of(context).colorScheme.primaryContainer,
+                    minimumSize: const Size(200, 200)),
+                child: const Text('Fournisseurs', textScaleFactor: 2)),
           ],
         )));
   }

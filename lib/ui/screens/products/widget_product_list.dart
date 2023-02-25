@@ -1,4 +1,3 @@
-import 'package:coopaz_app/logger.dart';
 import 'package:coopaz_app/podo/product.dart';
 import 'package:coopaz_app/state/app_model.dart';
 import 'package:coopaz_app/utils.dart';
@@ -15,7 +14,6 @@ class ProductList extends StatefulWidget {
 }
 
 class _ProductList extends State<ProductList> {
-  final String title = 'Produits';
 
   Map<String, int> toggleSorts = {
     "designation": 1,
@@ -34,7 +32,6 @@ class _ProductList extends State<ProductList> {
 
   @override
   Widget build(BuildContext context) {
-    log('Build screen $title');
 
     return Consumer<AppModel>(builder: (context, model, child) {
       var styleHeaders = Theme.of(context)

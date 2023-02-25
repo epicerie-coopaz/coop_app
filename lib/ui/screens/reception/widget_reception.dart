@@ -1,3 +1,4 @@
+import 'package:coopaz_app/ui/screens/reception/widget_supplier_autocomplete.dart';
 import 'package:flutter/material.dart';
 
 class Reception extends StatefulWidget {
@@ -16,7 +17,7 @@ class _Reception extends State<Reception> {
       Expanded(
         child: Column(children: [
           Row(
-            children: const [Expanded(child: Text("Fournisseur"))],
+            children: const [Expanded(child: Text("Fournisseur:")), Expanded(child: SupplierAutocomplete())],
           )
         ]),
       ),

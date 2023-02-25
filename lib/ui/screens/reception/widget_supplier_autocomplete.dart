@@ -1,6 +1,4 @@
-//import 'dart:html';
-
-import 'package:coopaz_app/podo/product.dart';
+import 'package:coopaz_app/podo/supplier.dart';
 import 'package:coopaz_app/state/app_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -16,20 +14,18 @@ class SupplierAutocomplete extends StatelessWidget {
     AppModel appModel = context.watch<AppModel>();
     double mediumText = 14 * appModel.zoomText;
 
-    return Autocomplete<Product>(
-      displayStringForOption: (Product p) => p.designation,
+    return Autocomplete<Supplier>(
+      displayStringForOption: (Supplier s) => s.name,
       optionsBuilder: (TextEditingValue textEditingValue) {
         if (textEditingValue.text == '') {
-          return const Iterable<Product>.empty();
+          return const Iterable<Supplier>.empty();
         }
-        return appModel.products.where((Product p) {
-          return p.stock > 0.0;
-        }).where((Product p) {
+        return appModel.suppliers.where((Supplier s) {
           List<String> matchList =
               textEditingValue.text.toLowerCase().split(' ');
           bool matchAll = true;
           for (String match in matchList) {
-            if (!p.toString().toLowerCase().contains(match)) {
+            if (!s.toString().toLowerCase().contains(match)) {
               matchAll = false;
               break;
             }
@@ -44,18 +40,11 @@ class SupplierAutocomplete extends StatelessWidget {
           VoidCallback onFieldSubmitted) {
         return TextFormField(
           decoration: const InputDecoration(
-            hintText: 'Produit',
+            hintText: 'Fournisseur',
           ),
           controller: fieldTextEditingController,
           focusNode: fieldFocusNode,
           style: TextStyle(fontSize: mediumText),
-          validator: (String? value) {
-            String? result;
-            if (value?.isEmpty ?? false) {
-              result = 'Produit invalide';
-            }
-            return result;
-          },
         );
       },
       optionsViewBuilder: (context, onSelected, options) {
@@ -66,7 +55,7 @@ class SupplierAutocomplete extends StatelessWidget {
             shrinkWrap: true,
             itemCount: options.length,
             itemBuilder: (BuildContext context, int index) {
-              final Product option = options.elementAt(index);
+              final Supplier option = options.elementAt(index);
               return InkWell(
                 onTap: () {
                   onSelected(option);
@@ -87,17 +76,11 @@ class SupplierAutocomplete extends StatelessWidget {
                     child: Row(
                       children: [
                         Expanded(
-                            flex: 8,
-                            child: Text(option.designation, style: styleBody)),
+                            flex: 1,
+                            child: Text(option.name, style: styleBody)),
                         Expanded(
-                            flex: 3,
-                            child: Text(
-                                '${option.price}€/${option.unit.unitAsString}',
-                                style: styleBody)),
-                        Expanded(
-                            flex: 2,
-                            child: Text(option.stock.toString(),
-                                style: styleBody)),
+                            flex: 1,
+                            child: Text(option.contactName, style: styleBody)),
                       ],
                     ),
                   );

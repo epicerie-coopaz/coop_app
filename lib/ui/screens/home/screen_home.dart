@@ -144,8 +144,10 @@ class HomeScreen extends StatelessWidget {
                 log('Reception Clicked !');
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) =>
-                        ReceptionScreen(productDao: productDao),
+                    builder: (context) => ReceptionScreen(
+                      productDao: productDao,
+                      supplierDao: supplierDao,
+                    ),
                   ),
                 );
               },

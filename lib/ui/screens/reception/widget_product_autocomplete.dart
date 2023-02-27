@@ -1,33 +1,35 @@
-import 'package:coopaz_app/podo/supplier.dart';
+//import 'dart:html';
+
+import 'package:coopaz_app/podo/product.dart';
 import 'package:coopaz_app/state/app_model.dart';
 import 'package:coopaz_app/state/reception.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 
-class SupplierAutocomplete extends StatelessWidget {
-  const SupplierAutocomplete({
-    super.key,
-  });
+class ProductAutocomplete extends StatelessWidget {
+  const ProductAutocomplete({super.key});
 
   @override
   Widget build(BuildContext context) {
     AppModel appModel = context.watch<AppModel>();
-    ReceptionModel receptionModel = context.watch<ReceptionModel>();
     double mediumText = 14 * appModel.zoomText;
+    ReceptionModel receptionModel = context.watch<ReceptionModel>();
 
-    return Autocomplete<Supplier>(
-      initialValue:
-          TextEditingValue(text: receptionModel.selectedSupplier?.name ?? ''),
-      key: ValueKey(receptionModel.selectedSupplier),
-      displayStringForOption: (Supplier s) => s.name,
+    return Autocomplete<Product>(
+      initialValue: TextEditingValue(
+          text: receptionModel.selectedProduct?.designation ?? ''),
+      key: ValueKey(receptionModel.selectedProduct),
+      displayStringForOption: (Product p) => p.designation,
       optionsBuilder: (TextEditingValue textEditingValue) {
-        List<Supplier> suppliers = appModel.suppliers.where((Supplier s) {
+        List<Product> products = appModel.products.where((Product? p) {
+          return p?.supplier == receptionModel.selectedSupplier?.name;
+        }).where((Product p) {
           List<String> matchList =
               textEditingValue.text.toLowerCase().split(' ');
           bool matchAll = true;
           for (String match in matchList) {
-            if (!s.toString().toLowerCase().contains(match)) {
+            if (!p.toString().toLowerCase().contains(match)) {
               matchAll = false;
               break;
             }
@@ -35,10 +37,8 @@ class SupplierAutocomplete extends StatelessWidget {
 
           return matchAll;
         }).toList();
-        suppliers.sort(
-          (a, b) => a.name.compareTo(b.name),
-        );
-        return suppliers;
+        products.sort((a, b) => a.designation.compareTo(b.designation));
+        return products;
       },
       fieldViewBuilder: (BuildContext context,
           TextEditingController fieldTextEditingController,
@@ -46,11 +46,19 @@ class SupplierAutocomplete extends StatelessWidget {
           VoidCallback onFieldSubmitted) {
         return TextFormField(
           decoration: const InputDecoration(
-            hintText: 'Fournisseur',
+            hintText: 'Produit',
           ),
           controller: fieldTextEditingController,
           focusNode: fieldFocusNode,
           style: TextStyle(fontSize: mediumText),
+          enabled: !receptionModel.isAwaitingSendFormResponse,
+          validator: (String? value) {
+            String? result;
+            if (value?.isEmpty ?? false) {
+              result = 'Produit invalide';
+            }
+            return result;
+          },
         );
       },
       optionsViewBuilder: (context, onSelected, options) {
@@ -61,7 +69,7 @@ class SupplierAutocomplete extends StatelessWidget {
             shrinkWrap: true,
             itemCount: options.length,
             itemBuilder: (BuildContext context, int index) {
-              final Supplier option = options.elementAt(index);
+              final Product option = options.elementAt(index);
               return InkWell(
                 onTap: () {
                   onSelected(option);
@@ -82,11 +90,17 @@ class SupplierAutocomplete extends StatelessWidget {
                     child: Row(
                       children: [
                         Expanded(
-                            flex: 1,
-                            child: Text(option.name, style: styleBody)),
+                            flex: 8,
+                            child: Text(option.designation, style: styleBody)),
                         Expanded(
-                            flex: 1,
-                            child: Text(option.contactName, style: styleBody)),
+                            flex: 3,
+                            child: Text(
+                                '${option.price}€/${option.unit.unitAsString}',
+                                style: styleBody)),
+                        Expanded(
+                            flex: 2,
+                            child: Text(option.stock.toString(),
+                                style: styleBody)),
                       ],
                     ),
                   );
@@ -96,9 +110,8 @@ class SupplierAutocomplete extends StatelessWidget {
           ),
         );
       },
-      onSelected: (s) {
-        receptionModel.selectedSupplier = s;
-        receptionModel.selectedProduct = null;
+      onSelected: (p) {
+        receptionModel.selectedProduct = p;
       },
     );
   }

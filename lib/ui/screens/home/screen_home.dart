@@ -4,6 +4,7 @@ import 'package:coopaz_app/podo/member.dart';
 import 'package:coopaz_app/podo/product.dart';
 import 'package:coopaz_app/podo/supplier.dart';
 import 'package:coopaz_app/state/cash_register.dart';
+import 'package:coopaz_app/state/reception.dart';
 import 'package:coopaz_app/ui/screens/cash_register/screen_cash_register.dart';
 import 'package:coopaz_app/ui/screens/members/screen_members.dart';
 import 'package:coopaz_app/ui/screens/products/screen_products.dart';
@@ -37,6 +38,9 @@ class CoopazApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (context) => CashRegisterModel(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => ReceptionModel(),
         ),
       ],
       builder: (context, child) {

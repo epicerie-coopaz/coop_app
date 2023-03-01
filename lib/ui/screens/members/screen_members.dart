@@ -1,4 +1,4 @@
-import 'package:coopaz_app/dao/member_dao.dart';
+import 'package:coopaz_app/dao/data_access.dart';
 import 'package:coopaz_app/logger.dart';
 import 'package:coopaz_app/podo/member.dart';
 import 'package:coopaz_app/ui/common_widgets/loading_widget.dart';
@@ -10,7 +10,7 @@ import 'package:provider/provider.dart';
 class MembersScreen extends StatefulWidget {
   const MembersScreen({super.key, required this.memberDao});
 
-  final MemberDao memberDao;
+  final GoogleSheetDao<Member> memberDao;
 
   @override
   State<StatefulWidget> createState() {
@@ -38,7 +38,7 @@ class _MembersScreen extends State<MembersScreen> {
       if (model.members.isNotEmpty) {
         w = _membersList(context, model);
       } else {
-        widget.memberDao.getMembers().then((m) => model.members = m);
+        widget.memberDao.get().then((m) => model.members = m);
         w = const Loading(text: 'Chargement de la liste des membres...');
       }
       return Scaffold(

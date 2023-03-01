@@ -12,3 +12,11 @@ Map<String, int> resetCoef(String key, Map<String, int> toggleSorts) {
   }
   return toggleSorts;
 }
+
+T? tryElementAt<T>(List<T> list, int index) {
+  try {
+    return list.elementAt(index);
+  } on RangeError {
+    return null;
+  }
+}

@@ -5,6 +5,24 @@ import 'package:coopaz_app/podo/member.dart';
 import 'package:coopaz_app/podo/payment_method.dart';
 import 'package:flutter/foundation.dart';
 
+class CashRegisterTabModel extends ChangeNotifier {
+  final List<CashRegisterModel> _cashRegiserTabs = [CashRegisterModel()];
+
+  deleteTab(int index) {
+    _cashRegiserTabs.removeAt(index);
+    notifyListeners();
+  }
+
+  addTab() {
+    _cashRegiserTabs.add(CashRegisterModel());
+    notifyListeners();
+  }
+
+  UnmodifiableListView<CashRegisterModel> get cashRegisterTabs {
+    return UnmodifiableListView(_cashRegiserTabs);
+  }
+}
+
 class CashRegisterModel extends ChangeNotifier {
   final List<CartItem> _cart = [CartItem()];
   Member? _selectedMember;

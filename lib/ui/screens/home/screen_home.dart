@@ -42,9 +42,6 @@ class CoopazApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (context) => ReceptionModel(),
         ),
-        ChangeNotifierProvider(
-          create: (context) => CashRegisterTabModel(),
-        ),
       ],
       builder: (context, child) {
         return MaterialApp(

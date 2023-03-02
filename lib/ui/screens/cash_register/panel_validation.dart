@@ -81,7 +81,8 @@ class ValidationPanel extends StatelessWidget {
                         FocusNode fieldFocusNode,
                         VoidCallback onFieldSubmitted) {
                       return TextFormField(
-                        enabled: !cashRegisterModel.isAwaitingSendFormResponse,
+                        enabled:
+                            !cashRegisterModel.getIsAwaitingSendFormResponse,
                         decoration: const InputDecoration(
                           hintText: 'Nom adhérent',
                         ),
@@ -127,7 +128,7 @@ class ValidationPanel extends StatelessWidget {
         Row(children: [
           Expanded(
               flex: 2,
-              child: !cashRegisterModel.isAwaitingSendFormResponse
+              child: !cashRegisterModel.getIsAwaitingSendFormResponse
                   ? DropdownButton<PaymentMethod>(
                       value: cashRegisterModel.selectedPaymentMethod,
                       elevation: 16,
@@ -209,7 +210,7 @@ class ValidationPanel extends StatelessWidget {
                       style: const TextStyle(fontWeight: FontWeight.bold))))
         ]),
       ])),
-      if (cashRegisterModel.isAwaitingSendFormResponse == false)
+      if (cashRegisterModel.getIsAwaitingSendFormResponse == false)
         Center(
             child: Container(
           padding: const EdgeInsets.symmetric(vertical: 25.0),
@@ -243,7 +244,7 @@ class ValidationPanel extends StatelessWidget {
   }
 
   _sendForm(CashRegisterModel model) async {
-    model.isAwaitingSendFormResponse = true;
+    model.getIsAwaitingSendFormResponse = true;
 
     // send data to macro
     String chequeOrTransferNumber = '';
@@ -258,6 +259,6 @@ class ValidationPanel extends StatelessWidget {
     formKey.currentState?.reset();
 
     model.cleanCart();
-    model.isAwaitingSendFormResponse = false;
+    model.getIsAwaitingSendFormResponse = false;
   }
 }

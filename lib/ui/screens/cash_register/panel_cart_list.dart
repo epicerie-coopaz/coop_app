@@ -108,7 +108,7 @@ class _CartList extends State<CartList> {
               ))),
               const SizedBox(height: 40),
               Row(children: [
-                !cashRegisterModel.isAwaitingSendFormResponse
+                !cashRegisterModel.getIsAwaitingSendFormResponse
                     ? FloatingActionButton.extended(
                         heroTag: null,
                         focusNode: FocusNode(skipTraversal: true),

@@ -5,34 +5,26 @@ import 'package:coopaz_app/podo/member.dart';
 import 'package:coopaz_app/podo/payment_method.dart';
 import 'package:flutter/foundation.dart';
 
-class CashRegisterTabModel extends ChangeNotifier {
-  final List<CashRegisterModel> _cashRegiserTabs = [CashRegisterModel()];
-
+class CashRegisterModel extends ChangeNotifier {
+  List<CashRegister> _cashRegisterTabs = [CashRegister()];
   deleteTab(int index) {
-    _cashRegiserTabs.removeAt(index);
+    _cashRegisterTabs.removeAt(index);
     notifyListeners();
   }
 
   addTab() {
-    _cashRegiserTabs.add(CashRegisterModel());
+    _cashRegisterTabs.add(CashRegister());
     notifyListeners();
   }
 
-  UnmodifiableListView<CashRegisterModel> get cashRegisterTabs {
-    return UnmodifiableListView(_cashRegiserTabs);
+  UnmodifiableListView<CashRegister> get cashRegisterTabs {
+    return UnmodifiableListView(_cashRegisterTabs);
   }
-}
 
-class CashRegisterModel extends ChangeNotifier {
-  final List<CartItem> _cart = [CartItem()];
-  Member? _selectedMember;
-  PaymentMethod _selectedPaymentMethod = PaymentMethod.card;
-  String _chequeOrTransferNumber = '';
-  bool _isAwaitingSendFormResponse = false;
-
-  bool get isAwaitingSendFormResponse => _isAwaitingSendFormResponse;
-  set isAwaitingSendFormResponse(b) {
-    _isAwaitingSendFormResponse = b;
+  bool getIsAwaitingSendFormResponse(int tabIndex) =>
+      _cashRegisterTabs[tabIndex].isAwaitingSendFormResponse;
+  setIsAwaitingSendFormResponse(b, int tabIndex) {
+    _cashRegisterTabs[tabIndex].isAwaitingSendFormResponse = b;
     notifyListeners();
   }
 
@@ -80,5 +72,57 @@ class CashRegisterModel extends ChangeNotifier {
     _selectedMember = null;
     _chequeOrTransferNumber = '';
     notifyListeners();
+  }
+}
+
+class CashRegister {
+  final List<CartItem> _cart = [CartItem()];
+  Member? _selectedMember;
+  PaymentMethod _selectedPaymentMethod = PaymentMethod.card;
+  String _chequeOrTransferNumber = '';
+  bool _isAwaitingSendFormResponse = false;
+
+  bool get isAwaitingSendFormResponse => _isAwaitingSendFormResponse;
+  set isAwaitingSendFormResponse(b) {
+    _isAwaitingSendFormResponse = b;
+  }
+
+  String get chequeOrTransferNumber => _chequeOrTransferNumber;
+  set chequeOrTransferNumber(s) {
+    _chequeOrTransferNumber = s;
+  }
+
+  PaymentMethod get selectedPaymentMethod => _selectedPaymentMethod;
+  set selectedPaymentMethod(pm) {
+    _selectedPaymentMethod = pm;
+  }
+
+  Member? get selectedMember => _selectedMember;
+  set selectedMember(m) {
+    _selectedMember = m;
+  }
+
+  UnmodifiableListView<CartItem> get cart {
+    return UnmodifiableListView(_cart);
+  }
+
+  void addToCart(CartItem item) {
+    _cart.add(item);
+  }
+
+  void modifyCartItem(int i, CartItem cartItem) {
+    _cart[i] = cartItem;
+  }
+
+  void removeFromCart(int i) {
+    _cart.removeAt(i);
+  }
+
+  void cleanCart() {
+    _cart.clear();
+    _cart.add(CartItem());
+    _selectedPaymentMethod = PaymentMethod.card;
+    _selectedMember = null;
+    _chequeOrTransferNumber = '';
   }
 }

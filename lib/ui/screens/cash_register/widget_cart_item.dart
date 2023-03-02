@@ -56,7 +56,7 @@ class _CartItemWidget extends State<CartItemWidget> {
                   index: widget.index, cartItem: widget.cartItem)),
           Expanded(
               flex: 1,
-              child: !cashRegisterModel.isAwaitingSendFormResponse
+              child: !cashRegisterModel.getIsAwaitingSendFormResponse
                   ? Shortcuts(
                       shortcuts: <LogicalKeySet, Intent>{
                           LogicalKeySet(LogicalKeyboardKey.enter):
@@ -109,7 +109,7 @@ class _CartItemWidget extends State<CartItemWidget> {
               )),
           Expanded(
               flex: 1,
-              child: !cashRegisterModel.isAwaitingSendFormResponse
+              child: !cashRegisterModel.getIsAwaitingSendFormResponse
                   ? IconButton(
                       focusNode: FocusNode(skipTraversal: true),
                       onPressed: () {

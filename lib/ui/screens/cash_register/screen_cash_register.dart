@@ -27,93 +27,94 @@ class CashRegisterScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     log('build screen $title');
     AppModel appModel = context.watch<AppModel>();
-    CashRegisterModel cashRegisterModel = context.watch<CashRegisterModel>();
-    CashRegisterTabModel cashRegisterTabModel =
-        context.watch<CashRegisterTabModel>();
 
-    Widget w;
+    CashRegisterModel cashRegisterModel =
+        context.watch<CashRegisterModel>();
+
+    List<Widget> tabs;
     if (appModel.products.isNotEmpty && appModel.members.isNotEmpty) {
-      w = CashRegisterTab(
-        orderDao: orderDao,
-      );
+      tabs =  [for (var i = 0; i <= cashRegisterModel.cashRegisterTabs; i++) i]
+          .asMap()
+          .map((key, _) => MapEntry(
+                key,
+                CashRegisterTab(orderDao: orderDao, tabIndex: key),
+              ))
+          .values
+          .toList();
     } else {
       productDao.get().then((p) => appModel.products = p);
       memberDao.get().then((m) => appModel.members = m);
-      w = const Loading(
-          text: 'Chargement de la liste des produits et adhérents...');
+      tabs = const [
+        Loading(text: 'Chargement de la liste des produits et adhérents...')
+      ];
     }
 
-    List<Widget> tabs = cashRegisterTabModel.cashRegisterTabs
-        .asMap()
-        .map((key, value) => MapEntry(
-              key,
-              Tab(
-                  child: Row(children: [
-                Text(
-                  "Facture ${key + 1}",
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-                IconButton(
-                    focusNode: FocusNode(skipTraversal: true),
-                    onPressed: () async {
-                      cashRegisterTabModel.deleteTab(key);
-                    },
-                    icon: const Icon(Icons.remove_shopping_cart_outlined),
-                    tooltip: 'Supprimer facture')
-              ])),
-            ))
-        .values
-        .toList();
-
     return DefaultTabController(
-        length: cashRegisterTabModel.cashRegisterTabs.length,
+        length: cashRegisterModel.cashRegisterTabs,
         child: Scaffold(
-            appBar: AppBar(
-              bottom: TabBar(
-                tabs: tabs,
-              ),
-              actions: [
-                IconButton(
-                    focusNode: FocusNode(skipTraversal: true),
-                    onPressed: () async {
-                      cashRegisterTabModel.addTab();
-                    },
-                    icon: const Icon(Icons.add_shopping_cart_outlined),
-                    tooltip: 'Nouvelle facture'),
-                IconButton(
-                    focusNode: FocusNode(skipTraversal: true),
-                    onPressed: () async {
-                      appModel.zoomText = appModel.zoomText - appModel.zoomStep;
-                      log(appModel.zoomText.toString());
-                    },
-                    icon: const Icon(Icons.text_decrease),
-                    tooltip: 'Diminuer la taille du texte'),
-                IconButton(
-                    focusNode: FocusNode(skipTraversal: true),
-                    onPressed: () async {
-                      appModel.zoomText = appModel.zoomText + appModel.zoomStep;
-                      log(appModel.zoomText.toString());
-                    },
-                    icon: const Icon(Icons.text_increase),
-                    tooltip: 'Agrandir la taille du texte'),
-                IconButton(
-                    focusNode: FocusNode(skipTraversal: true),
-                    onPressed: () async {
-                      appModel.products = [];
-                      appModel.members = [];
-                    },
-                    icon: const Icon(Icons.refresh),
-                    tooltip: 'Recharger listes produits et adhérents'),
-                IconButton(
-                    focusNode: FocusNode(skipTraversal: true),
-                    onPressed: () async {
-                      cashRegisterModel.cleanCart();
-                    },
-                    icon: const Icon(Icons.clear),
-                    tooltip: 'Effacer le formulaire')
-              ],
-              title: Text(title),
+          appBar: AppBar(
+            bottom: TabBar(
+              tabs: [for (var i = 0; i <= cashRegisterModel.cashRegisterTabs; i++) i]
+                  .asMap()
+                  .map((key, value) => MapEntry(
+                        key,
+                        Tab(
+                            child: Row(children: [
+                          Text(
+                            "Facture ${key + 1}",
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                          IconButton(
+                              focusNode: FocusNode(skipTraversal: true),
+                              onPressed: () async {
+                                cashRegisterModel.deleteTab(key);
+                              },
+                              icon: const Icon(
+                                  Icons.remove_shopping_cart_outlined),
+                              tooltip: 'Supprimer facture')
+                        ])),
+                      ))
+                  .values
+                  .toList(),
             ),
-            body: w));
+            actions: [
+              IconButton(
+                  focusNode: FocusNode(skipTraversal: true),
+                  onPressed: () async {
+                    cashRegisterModel.addTab();
+                  },
+                  icon: const Icon(Icons.add_shopping_cart_outlined),
+                  tooltip: 'Nouvelle facture'),
+              IconButton(
+                  focusNode: FocusNode(skipTraversal: true),
+                  onPressed: () async {
+                    appModel.zoomText = appModel.zoomText - appModel.zoomStep;
+                    log(appModel.zoomText.toString());
+                  },
+                  icon: const Icon(Icons.text_decrease),
+                  tooltip: 'Diminuer la taille du texte'),
+              IconButton(
+                  focusNode: FocusNode(skipTraversal: true),
+                  onPressed: () async {
+                    appModel.zoomText = appModel.zoomText + appModel.zoomStep;
+                    log(appModel.zoomText.toString());
+                  },
+                  icon: const Icon(Icons.text_increase),
+                  tooltip: 'Agrandir la taille du texte'),
+              IconButton(
+                  focusNode: FocusNode(skipTraversal: true),
+                  onPressed: () async {
+                    appModel.products = [];
+                    appModel.members = [];
+                  },
+                  icon: const Icon(Icons.refresh),
+                  tooltip: 'Recharger listes produits et adhérents'),
+            ],
+            title: Text(title),
+          ),
+          body: TabBarView(
+            children: tabs,
+          ),
+        ));
   }
 }

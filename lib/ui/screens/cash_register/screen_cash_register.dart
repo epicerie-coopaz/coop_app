@@ -27,14 +27,17 @@ class CashRegisterScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     log('build screen $title');
     AppModel appModel = context.watch<AppModel>();
-    CashRegisterModel cashRegisterModel = context.watch<CashRegisterModel>();
     CashRegisterTabModel cashRegisterTabModel =
         context.watch<CashRegisterTabModel>();
 
     Widget w;
     if (appModel.products.isNotEmpty && appModel.members.isNotEmpty) {
-      w = CashRegisterTab(
-        orderDao: orderDao,
+      w = TabBarView(
+        children: cashRegisterTabModel.cashRegisterTabs.map((tabNumber) {
+          return CashRegisterTab(
+            orderDao: orderDao,
+          );
+        }).toList(),
       );
     } else {
       productDao.get().then((p) => appModel.products = p);
@@ -50,15 +53,16 @@ class CashRegisterScreen extends StatelessWidget {
               Tab(
                   child: Row(children: [
                 Text(
-                  "Facture ${key + 1}",
+                  "Facture $value",
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
+                const Spacer(),
                 IconButton(
                     focusNode: FocusNode(skipTraversal: true),
                     onPressed: () async {
                       cashRegisterTabModel.deleteTab(key);
                     },
-                    icon: const Icon(Icons.remove_shopping_cart_outlined),
+                    icon: const Icon(Icons.delete),
                     tooltip: 'Supprimer facture')
               ])),
             ))
@@ -103,14 +107,7 @@ class CashRegisterScreen extends StatelessWidget {
                       appModel.members = [];
                     },
                     icon: const Icon(Icons.refresh),
-                    tooltip: 'Recharger listes produits et adhérents'),
-                IconButton(
-                    focusNode: FocusNode(skipTraversal: true),
-                    onPressed: () async {
-                      cashRegisterModel.cleanCart();
-                    },
-                    icon: const Icon(Icons.clear),
-                    tooltip: 'Effacer le formulaire')
+                    tooltip: 'Recharger listes produits et adhérents')
               ],
               title: Text(title),
             ),

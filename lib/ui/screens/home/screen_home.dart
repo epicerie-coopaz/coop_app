@@ -37,9 +37,6 @@ class CoopazApp extends StatelessWidget {
           create: (context) => AppModel(),
         ),
         ChangeNotifierProvider(
-          create: (context) => CashRegisterModel(),
-        ),
-        ChangeNotifierProvider(
           create: (context) => ReceptionModel(),
         ),
         ChangeNotifierProvider(

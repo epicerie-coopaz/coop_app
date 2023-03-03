@@ -1,12 +1,13 @@
 import 'dart:collection';
 
+import 'package:coopaz_app/logger.dart';
 import 'package:coopaz_app/podo/cart_item.dart';
 import 'package:coopaz_app/podo/member.dart';
 import 'package:coopaz_app/podo/payment_method.dart';
 import 'package:flutter/foundation.dart';
 
 class CashRegisterTabModel extends ChangeNotifier {
-  final List<CashRegisterModel> _cashRegiserTabs = [CashRegisterModel()];
+  final List<int> _cashRegiserTabs = [1];
 
   deleteTab(int index) {
     _cashRegiserTabs.removeAt(index);
@@ -14,16 +15,23 @@ class CashRegisterTabModel extends ChangeNotifier {
   }
 
   addTab() {
-    _cashRegiserTabs.add(CashRegisterModel());
+    int tabNumber = 1;
+    if(_cashRegiserTabs.isNotEmpty){
+      tabNumber = _cashRegiserTabs.last + 1;
+    }
+    _cashRegiserTabs.add(tabNumber);
     notifyListeners();
   }
 
-  UnmodifiableListView<CashRegisterModel> get cashRegisterTabs {
+  UnmodifiableListView<int> get cashRegisterTabs {
     return UnmodifiableListView(_cashRegiserTabs);
   }
 }
 
 class CashRegisterModel extends ChangeNotifier {
+  CashRegisterModel() {
+    log("New state");
+  }
   final List<CartItem> _cart = [CartItem()];
   Member? _selectedMember;
   PaymentMethod _selectedPaymentMethod = PaymentMethod.card;

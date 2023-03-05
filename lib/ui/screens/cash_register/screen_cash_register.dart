@@ -55,6 +55,7 @@ class CashRegisterScreen extends StatelessWidget {
                 Text(
                   "Facture $value",
                   style: Theme.of(context).textTheme.bodyMedium,
+                  textScaleFactor: appModel.zoomText,
                 ),
                 const Spacer(),
                 IconButton(
@@ -73,7 +74,14 @@ class CashRegisterScreen extends StatelessWidget {
         length: cashRegisterTabModel.cashRegisterTabs.length,
         child: Scaffold(
             appBar: AppBar(
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
               bottom: TabBar(
+                indicator: BoxDecoration(
+                  borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(10),
+                      topRight: Radius.circular(10)),
+                  color: Theme.of(context).colorScheme.surface,
+                ),
                 tabs: tabs,
               ),
               actions: [

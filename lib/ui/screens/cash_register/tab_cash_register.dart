@@ -12,8 +12,6 @@ class CashRegisterTab extends StatefulWidget {
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  final String title = 'Caisse';
-
   @override
   State<CashRegisterTab> createState() {
     return _CashRegisterTab();

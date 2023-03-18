@@ -18,6 +18,13 @@ const PAYMENT_METHOD_CARD = 'CB';
 const PAYMENT_METHOD_TRANSFER = 'virement';
 const PAYMENT_METHOD_CHEQUE = 'cheque';
 
+class OrderItem {
+  constructor(product, qty) {
+    this.product = product;
+    this.qty = qty;
+  }
+}
+
 
 /**
  * DO NOT USE FOR ANYTHING OTHER THAN TESTING !
@@ -25,7 +32,21 @@ const PAYMENT_METHOD_CHEQUE = 'cheque';
  * Change the parameters to whatever is needed for testing
  */
 function testProcessInvoice() {
-  processOrder('laurie.besinet@gmail.com', 'CARD', [{ 'product': 'GRENADE FRUITS BIO PAYS LANDAIS KILO 806', 'qty': 5.2 }], '718718718-5');
+  processOrder('team.radinet@gmail.com', 'CB', [{ 'product': 'GRENADE FRUITS BIO PAYS LANDAIS KILO 806', 'qty': 5.2 }], '718718718-5');
+}
+
+/**
+ * Public
+ * 
+ * Process the reception sent by the coopaz client
+ * 
+ * Parameters:
+ *  List<Product> receptionProducts: List of product objects for the current reception. 
+ *    A product object should have this fields: {'product': 'GRENADE FRUITS BIO PAYS LANDAIS KILO 806', 'qty': 5.2}
+ *  String chequeNumber: the cheque number. Can be set to '' if paymentMethod != 'cheque'
+ */
+function processReception(receptionProducts) {
+  Logger.log(`Starting script...`);
 }
 
 /**
@@ -33,14 +54,12 @@ function testProcessInvoice() {
  * 
  * Process the invoice sent by the coopaz client
  * 
- * Parameters:
- *  String emailAddress: a valid email address Should be referenced in members sheet
- *  String paymentMethod: 'CB', 'virement' or 'cheque'
- *  List<Product> orderProducts: List of product objects for the current order. 
- *    A product object should have this fields: {'product': 'GRENADE FRUITS BIO PAYS LANDAIS KILO 806', 'qty': 5.2}
- *  String chequeNumber: the cheque number. Can be set to '' if paymentMethod != 'cheque'
+ *  @param {string[]} emailAddress a valid email address Should be referenced in members sheet
+ *  @param {string[]} paymentMethod 'CB', 'virement' or 'cheque'
+ *  @param {OrderItem[]} orderItems
+ *  @param {string[]} info the cheque number or bank info. Can be set to ''.
  */
-function processOrder(emailAddress, paymentMethod, orderProducts, chequeNumber) {
+function processOrder(emailAddress, paymentMethod, orderItems, info) {
   Logger.log(`Starting script...`);
 
   let date = Utilities.formatDate(new Date(), Session.getTimeZone(), DATE_FORMAT)
@@ -68,19 +87,19 @@ function processOrder(emailAddress, paymentMethod, orderProducts, chequeNumber) 
   if (paymentMethod != PAYMENT_METHOD_CARD && paymentMethod != PAYMENT_METHOD_TRANSFER && paymentMethod != PAYMENT_METHOD_CHEQUE) {
     throw `Payment method invalid: ${paymentMethod}`;
   }
-  if (orderProducts == undefined || orderProducts == null || !(orderProducts.length > 0)) {
-    throw `Order product list invalid: ${orderProducts}`;
+  if (orderItems == undefined || orderItems == null || !(orderItems.length > 0)) {
+    throw `Order product list invalid: ${orderItems}`;
   }
 
-  let [orderAmount, cardFees, orderProductsWithTotal] = _updateStock(orderProducts, allProductsRange, allProductsValues, CARD_FEE_RATE, paymentMethod);
+  let [orderAmount, cardFees, orderProductsWithTotal] = _updateStock(orderItems, allProductsRange, allProductsValues, CARD_FEE_RATE, paymentMethod);
 
   Logger.log(`Updating stock done. orderAmount=${orderAmount}, cardFees=${cardFees}`);
 
-  _addToHistory(date, historySheet, memberName, orderAmount, cardFees, paymentMethod, chequeNumber);
+  _addToHistory(date, historySheet, memberName, orderAmount, cardFees, paymentMethod, info);
 
   Logger.log(`Add to history sheet done`);
 
-  let invoiceTicket = _createInvoiceTicket(ss, templateSheet, date, memberName, orderProductsWithTotal, chequeNumber, paymentMethod, cardFees);
+  let invoiceTicket = _createInvoiceTicket(ss, templateSheet, date, memberName, orderProductsWithTotal, info, paymentMethod, cardFees);
 
   Logger.log(`Invoice ticket created`);
 
@@ -97,7 +116,7 @@ function processOrder(emailAddress, paymentMethod, orderProducts, chequeNumber) 
  * Private
  * Create an invoice ticket in a dedicated sheet
  */
-function _createInvoiceTicket(spreadSheet, templateSheet, date, clientName, orderProducts, chequeNumber, paymentMethod, cardFees) {
+function _createInvoiceTicket(spreadSheet, templateSheet, date, clientName, orderProducts, info, paymentMethod, cardFees) {
 
   let newSheetName = date + '_' + clientName;
   let newSheet = templateSheet.copyTo(spreadSheet).setName(newSheetName);
@@ -117,7 +136,7 @@ function _createInvoiceTicket(spreadSheet, templateSheet, date, clientName, orde
   pastePaiement.setValue(paymentMethod);
 
   let pasteNumeroCheque = newSheet.getRange(47, 2, 1, 1);
-  pasteNumeroCheque.setValue(chequeNumber);
+  pasteNumeroCheque.setValue(info);
 
   let pasteCardFees = newSheet.getRange(47, 5, 1, 1);
   pasteCardFees.setValue(cardFees);
@@ -135,7 +154,7 @@ function _createInvoiceTicket(spreadSheet, templateSheet, date, clientName, orde
  * Private
  * Add to History sheet
  */
-function _addToHistory(date, historySheet, memberName, orderAmount, fees, paymentMethod, chequeNumber) {
+function _addToHistory(date, historySheet, memberName, orderAmount, fees, paymentMethod, info) {
 
   let recapFirstEmptyRow = historySheet.getLastRow() + 1;
 
@@ -154,7 +173,7 @@ function _addToHistory(date, historySheet, memberName, orderAmount, fees, paymen
   pasteRecaPaiement.setValue(paymentMethod);
 
   let pasteNumeroCheque = historySheet.getRange(recapFirstEmptyRow, 6, 1, 1);
-  pasteNumeroCheque.setValue(chequeNumber);
+  pasteNumeroCheque.setValue(info);
 
 }
 
@@ -162,21 +181,26 @@ function _addToHistory(date, historySheet, memberName, orderAmount, fees, paymen
  * Private
  * Update stock in products sheet
  * Return the total sum of the order and the bank fees if using a credit card
+ * @param {OrderItem[]} orderItems
+ * @param {string} allProductsRange
+ * @param {string} allProductsValues
+ * @param {string} cardFeeRate
+ * @param {string} paymentMethod
  */
-function _updateStock(orderProducts, allProductsRange, allProductsValues, cardFeeRate, paymentMethod) {
+function _updateStock(orderItems, allProductsRange, allProductsValues, cardFeeRate, paymentMethod) {
   // Update the products sheet based on the products in the invoice and return the total sum of the invoice
   let orderSum = 0.0;
   let fees = 0.0;
   let orderProductsWithTotal = [];
 
-  for (let i = 0; i < orderProducts.length; i++) {
+  for (let i = 0; i < orderItems.length; i++) {
 
-    let productName = orderProducts[i]['product'].trim();
-    let quantity = Number(orderProducts[i]['qty']);
+    let productName = orderItems[i].product.trim();
+    let quantity = Number(orderItems[i].qty);
 
 
     // If there is no product name or quantity we ignore this invalid input.
-    if (productName == '' || !(quantity > 0.0)) {
+    if (productName == '' || quantity <= 0.0){
       break
     } else {
 

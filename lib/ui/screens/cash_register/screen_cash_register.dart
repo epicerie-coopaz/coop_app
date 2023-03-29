@@ -27,14 +27,14 @@ class CashRegisterScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     log('build screen $title');
     AppModel appModel = context.watch<AppModel>();
-    CashRegisterTabModel cashRegisterTabModel =
-        context.watch<CashRegisterTabModel>();
+    CashRegisterModel cashRegisterTabModel = context.watch<CashRegisterModel>();
 
     Widget w;
     if (appModel.products.isNotEmpty && appModel.members.isNotEmpty) {
       w = TabBarView(
-        children: cashRegisterTabModel.cashRegisterTabs.map((tabNumber) {
+        children: cashRegisterTabModel.cashRegisterTabs.keys.map((tabNumber) {
           return CashRegisterTab(
+            tab: tabNumber,
             orderDao: orderDao,
           );
         }).toList(),
@@ -47,13 +47,12 @@ class CashRegisterScreen extends StatelessWidget {
     }
 
     List<Widget> tabs = cashRegisterTabModel.cashRegisterTabs
-        .asMap()
         .map((key, value) => MapEntry(
               key,
               Tab(
                   child: Row(children: [
                 Text(
-                  "Facture $value",
+                  "Facture $key",
                   style: Theme.of(context).textTheme.bodyMedium,
                   textScaleFactor: appModel.zoomText,
                 ),

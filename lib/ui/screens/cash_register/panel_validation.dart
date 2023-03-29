@@ -10,8 +10,12 @@ import 'package:provider/provider.dart';
 
 class ValidationPanel extends StatelessWidget {
   const ValidationPanel(
-      {super.key, required this.orderDao, required this.formKey});
+      {super.key,
+      required this.tab,
+      required this.orderDao,
+      required this.formKey});
 
+  final int tab;
   final GlobalKey<FormState> formKey;
   final OrderDao orderDao;
 
@@ -28,13 +32,13 @@ class ValidationPanel extends StatelessWidget {
 
     double subtotal = context
         .watch<CashRegisterModel>()
-        .cart
+        .cart(tab)
         .map((e) =>
             (double.tryParse(e.qty ?? '0') ?? 0.0) * (e.product?.price ?? 0.0))
         .fold(0.0, (prev, e) => prev + e);
 
     double cardFee = 0.0;
-    if (cashRegisterModel.selectedPaymentMethod == PaymentMethod.card) {
+    if (cashRegisterModel.selectedPaymentMethod(tab) == PaymentMethod.card) {
       cardFee = subtotal * ValidationPanel.cardFeeRate;
     }
 
@@ -61,9 +65,11 @@ class ValidationPanel extends StatelessWidget {
                   color: Theme.of(context).colorScheme.primaryContainer,
                   alignment: Alignment.bottomLeft,
                   child: Autocomplete<Member>(
-                    key: ValueKey(cashRegisterModel.selectedMember?.name ?? ''),
+                    key: ValueKey(
+                        cashRegisterModel.selectedMember(tab)?.name ?? ''),
                     initialValue: TextEditingValue(
-                        text: cashRegisterModel.selectedMember?.name ?? ''),
+                        text:
+                            cashRegisterModel.selectedMember(tab)?.name ?? ''),
                     displayStringForOption: (Member m) => m.name,
                     optionsBuilder: (TextEditingValue textEditingValue) async {
                       if (textEditingValue.text == '') {
@@ -81,7 +87,8 @@ class ValidationPanel extends StatelessWidget {
                         FocusNode fieldFocusNode,
                         VoidCallback onFieldSubmitted) {
                       return TextFormField(
-                        enabled: !cashRegisterModel.isAwaitingSendFormResponse,
+                        enabled:
+                            !cashRegisterModel.isAwaitingSendFormResponse(tab),
                         decoration: const InputDecoration(
                           hintText: 'Nom adhérent',
                         ),
@@ -98,7 +105,7 @@ class ValidationPanel extends StatelessWidget {
                       );
                     },
                     onSelected: (m) {
-                      cashRegisterModel.selectedMember = m;
+                      cashRegisterModel.setSelectedMember(tab, m);
                     },
                   )))
         ]),
@@ -127,14 +134,14 @@ class ValidationPanel extends StatelessWidget {
         Row(children: [
           Expanded(
               flex: 2,
-              child: !cashRegisterModel.isAwaitingSendFormResponse
+              child: !cashRegisterModel.isAwaitingSendFormResponse(tab)
                   ? DropdownButton<PaymentMethod>(
-                      value: cashRegisterModel.selectedPaymentMethod,
+                      value: cashRegisterModel.selectedPaymentMethod(tab),
                       elevation: 16,
                       onChanged: (PaymentMethod? value) {
                         // This is called when the user selects an item.
-                        cashRegisterModel.selectedPaymentMethod =
-                            value ?? PaymentMethod.card;
+                        cashRegisterModel.setSelectedPaymentMethod(
+                            tab, value ?? PaymentMethod.card);
                       },
                       items: PaymentMethod.values
                           .map<DropdownMenuItem<PaymentMethod>>(
@@ -146,38 +153,41 @@ class ValidationPanel extends StatelessWidget {
                         );
                       }).toList(),
                     )
-                  : Text(cashRegisterModel.selectedPaymentMethod.asString,
+                  : Text(cashRegisterModel.selectedPaymentMethod(tab).asString,
                       textScaleFactor: appModel.zoomText))
         ]),
-        if (cashRegisterModel.selectedPaymentMethod == PaymentMethod.cheque)
+        if (cashRegisterModel.selectedPaymentMethod(tab) ==
+            PaymentMethod.cheque)
           TextFormField(
             controller: TextEditingController(
-                text: cashRegisterModel.chequeOrTransferNumber)
+                text: cashRegisterModel.chequeOrTransferNumber(tab))
               ..selection = TextSelection.collapsed(
-                  offset: (cashRegisterModel.chequeOrTransferNumber).length),
+                  offset: cashRegisterModel.chequeOrTransferNumber(tab).length),
             decoration: const InputDecoration(
               hintText: 'N. chèque',
             ),
             onChanged: (String value) {
-              cashRegisterModel.chequeOrTransferNumber = value;
+              cashRegisterModel.setChequeOrTransferNumber(tab, value);
             },
             textAlign: TextAlign.right,
           ),
-        if (cashRegisterModel.selectedPaymentMethod == PaymentMethod.transfer)
+        if (cashRegisterModel.selectedPaymentMethod(tab) ==
+            PaymentMethod.transfer)
           TextFormField(
             controller: TextEditingController(
-                text: cashRegisterModel.chequeOrTransferNumber)
+                text: cashRegisterModel.chequeOrTransferNumber(tab))
               ..selection = TextSelection.collapsed(
-                  offset: (cashRegisterModel.chequeOrTransferNumber).length),
+                  offset:
+                      (cashRegisterModel.chequeOrTransferNumber(tab)).length),
             decoration: const InputDecoration(
               hintText: 'N. virement',
             ),
             onChanged: (String value) {
-              cashRegisterModel.chequeOrTransferNumber = value;
+              cashRegisterModel.setChequeOrTransferNumber(tab, value);
             },
             textAlign: TextAlign.right,
           ),
-        if (cashRegisterModel.selectedPaymentMethod == PaymentMethod.card)
+        if (cashRegisterModel.selectedPaymentMethod(tab) == PaymentMethod.card)
           Row(children: [
             Expanded(
                 flex: 1,
@@ -209,7 +219,7 @@ class ValidationPanel extends StatelessWidget {
                       style: const TextStyle(fontWeight: FontWeight.bold))))
         ]),
       ])),
-      if (cashRegisterModel.isAwaitingSendFormResponse == false)
+      if (cashRegisterModel.isAwaitingSendFormResponse(tab) == false)
         Center(
             child: Container(
           padding: const EdgeInsets.symmetric(vertical: 25.0),
@@ -243,21 +253,24 @@ class ValidationPanel extends StatelessWidget {
   }
 
   _sendForm(CashRegisterModel model) async {
-    model.isAwaitingSendFormResponse = true;
+    model.setIsAwaitingSendFormResponse(tab, true);
 
     // send data to macro
     String chequeOrTransferNumber = '';
 
-    if (model.selectedPaymentMethod != PaymentMethod.card) {
-      chequeOrTransferNumber = model.chequeOrTransferNumber;
+    if (model.selectedPaymentMethod(tab) != PaymentMethod.card) {
+      chequeOrTransferNumber = model.chequeOrTransferNumber(tab);
     }
 
-    await orderDao.createOrder(model.selectedMember?.email ?? '', model.cart,
-        model.selectedPaymentMethod, chequeOrTransferNumber);
+    await orderDao.createOrder(
+        model.selectedMember(tab)?.email ?? '',
+        model.cart(tab),
+        model.selectedPaymentMethod(tab),
+        chequeOrTransferNumber);
     // reset form
     formKey.currentState?.reset();
 
-    model.cleanCart();
-    model.isAwaitingSendFormResponse = false;
+    model.cleanCart(tab);
+    model.setIsAwaitingSendFormResponse(tab, false);
   }
 }

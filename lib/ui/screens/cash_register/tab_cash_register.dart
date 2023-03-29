@@ -6,8 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class CashRegisterTab extends StatefulWidget {
-  CashRegisterTab({super.key, required this.orderDao});
+  CashRegisterTab({super.key, required this.tab, required this.orderDao});
 
+  final int tab;
   final OrderDao orderDao;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -18,7 +19,8 @@ class CashRegisterTab extends StatefulWidget {
   }
 }
 
-class _CashRegisterTab extends State<CashRegisterTab> with AutomaticKeepAliveClientMixin{
+class _CashRegisterTab extends State<CashRegisterTab>
+    with AutomaticKeepAliveClientMixin {
   @override
   void initState() {
     super.initState();
@@ -27,31 +29,29 @@ class _CashRegisterTab extends State<CashRegisterTab> with AutomaticKeepAliveCli
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return ChangeNotifierProvider(create: (context) {
-      return CashRegisterModel();
-    }, builder: (context, child) {
-      return Container(
-          padding: const EdgeInsets.all(12.0),
-          child: Form(
-            key: widget._formKey,
-            child: Row(children: [
-              Expanded(
-                  flex: 5,
-                  child: CartList(
-                    formKey: widget._formKey,
-                  )),
-              const VerticalDivider(),
-              Expanded(
-                  flex: 1,
-                  child: ValidationPanel(
-                    orderDao: widget.orderDao,
-                    formKey: widget._formKey,
-                  ))
-            ]),
-          ));
-    });
+    return Container(
+        padding: const EdgeInsets.all(12.0),
+        child: Form(
+          key: widget._formKey,
+          child: Row(children: [
+            Expanded(
+                flex: 5,
+                child: CartList(
+                  formKey: widget._formKey,
+                  tab: widget.tab,
+                )),
+            const VerticalDivider(),
+            Expanded(
+                flex: 1,
+                child: ValidationPanel(
+                  tab: widget.tab,
+                  orderDao: widget.orderDao,
+                  formKey: widget._formKey,
+                ))
+          ]),
+        ));
   }
-  
+
   @override
   bool get wantKeepAlive => true;
 }

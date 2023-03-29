@@ -10,8 +10,9 @@ import 'package:coopaz_app/logger.dart';
 import 'package:provider/provider.dart';
 
 class CartList extends StatefulWidget {
-  CartList({super.key, required this.formKey});
+  CartList({super.key, required this.formKey, required this.tab});
 
+  final int tab;
   final GlobalKey<FormState> formKey;
   final NumberFormat numberFormat = NumberFormat('#,##0.00');
 
@@ -58,7 +59,8 @@ class _CartList extends State<CartList> {
     return Actions(
         dispatcher: const ActionDispatcher(),
         actions: <Type, Action<Intent>>{
-          AddNewCartItemIntent: AddNewCartItemAction(cashRegisterModel, widget),
+          AddNewCartItemIntent:
+              AddNewCartItemAction(widget.tab, cashRegisterModel, widget),
         },
         child: Builder(builder: (context) {
           return Column(
@@ -108,7 +110,7 @@ class _CartList extends State<CartList> {
               ))),
               const SizedBox(height: 40),
               Row(children: [
-                !cashRegisterModel.isAwaitingSendFormResponse
+                !cashRegisterModel.isAwaitingSendFormResponse(widget.tab)
                     ? FloatingActionButton.extended(
                         heroTag: null,
                         focusNode: FocusNode(skipTraversal: true),
@@ -143,8 +145,9 @@ class _CartList extends State<CartList> {
   List<CartItemWidget> _createProductLineWidgets(
       AppModel appModel, CashRegisterModel cashRegisterModel) {
     List<CartItemWidget> products = [];
-    for (var entry in cashRegisterModel.cart.asMap().entries) {
+    for (var entry in cashRegisterModel.cart(widget.tab).asMap().entries) {
       var product = CartItemWidget(
+        tab: widget.tab,
         index: entry.key,
         cartItem: entry.value,
       );

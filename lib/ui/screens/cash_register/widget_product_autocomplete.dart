@@ -9,8 +9,13 @@ import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 
 class ProductAutocomplete extends StatelessWidget {
-  const ProductAutocomplete({super.key, required this.index, required this.cartItem});
+  const ProductAutocomplete(
+      {super.key,
+      required this.tab,
+      required this.index,
+      required this.cartItem});
 
+  final int tab;
   final int index;
   final CartItem cartItem;
 
@@ -21,8 +26,7 @@ class ProductAutocomplete extends StatelessWidget {
     CashRegisterModel cashRegisterModel = context.watch<CashRegisterModel>();
 
     return Autocomplete<Product>(
-      initialValue:
-          TextEditingValue(text: cartItem.product?.designation ?? ''),
+      initialValue: TextEditingValue(text: cartItem.product?.designation ?? ''),
       key: ValueKey(cartItem),
       displayStringForOption: (Product p) => p.designation,
       optionsBuilder: (TextEditingValue textEditingValue) {
@@ -56,7 +60,7 @@ class ProductAutocomplete extends StatelessWidget {
           controller: fieldTextEditingController,
           focusNode: fieldFocusNode,
           style: TextStyle(fontSize: mediumText),
-          enabled: !cashRegisterModel.isAwaitingSendFormResponse,
+          enabled: !cashRegisterModel.isAwaitingSendFormResponse(tab),
           validator: (String? value) {
             String? result;
             if (value?.isEmpty ?? false) {
@@ -116,7 +120,7 @@ class ProductAutocomplete extends StatelessWidget {
         );
       },
       onSelected: (p) {
-        cashRegisterModel.modifyCartItem(index, CartItem(product: p));
+        cashRegisterModel.modifyCartItem(tab, index, CartItem(product: p));
       },
     );
   }

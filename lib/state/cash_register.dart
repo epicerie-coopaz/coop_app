@@ -6,32 +6,84 @@ import 'package:coopaz_app/podo/member.dart';
 import 'package:coopaz_app/podo/payment_method.dart';
 import 'package:flutter/foundation.dart';
 
-class CashRegisterTabModel extends ChangeNotifier {
-  final List<int> _cashRegiserTabs = [1];
+class CashRegisterModel extends ChangeNotifier {
+  final Map<int, CashRegister> _cashRegiserTabs = {1: CashRegister()};
 
   deleteTab(int index) {
-    _cashRegiserTabs.removeAt(index);
+    _cashRegiserTabs.remove(index);
     notifyListeners();
   }
 
   addTab() {
     int tabNumber = 1;
-    if(_cashRegiserTabs.isNotEmpty){
-      tabNumber = _cashRegiserTabs.last + 1;
+    if (_cashRegiserTabs.isNotEmpty) {
+      tabNumber = _cashRegiserTabs.keys.last + 1;
     }
-    _cashRegiserTabs.add(tabNumber);
+    _cashRegiserTabs[tabNumber] = CashRegister();
     notifyListeners();
   }
 
-  UnmodifiableListView<int> get cashRegisterTabs {
-    return UnmodifiableListView(_cashRegiserTabs);
+  UnmodifiableMapView<int, CashRegister> get cashRegisterTabs {
+    return UnmodifiableMapView(_cashRegiserTabs);
+  }
+
+  bool isAwaitingSendFormResponse(int tab) =>
+      _cashRegiserTabs[tab]!.isAwaitingSendFormResponse;
+  setIsAwaitingSendFormResponse(int tab, bool b) {
+    _cashRegiserTabs[tab]?.isAwaitingSendFormResponse = b;
+    notifyListeners();
+  }
+
+  String chequeOrTransferNumber(int tab) =>
+      _cashRegiserTabs[tab]!.chequeOrTransferNumber;
+  setChequeOrTransferNumber(int tab, s) {
+    _cashRegiserTabs[tab]!.chequeOrTransferNumber = s;
+    notifyListeners();
+  }
+
+  PaymentMethod selectedPaymentMethod(int tab) =>
+      _cashRegiserTabs[tab]!.selectedPaymentMethod;
+  setSelectedPaymentMethod(int tab, pm) {
+    _cashRegiserTabs[tab]!.selectedPaymentMethod = pm;
+    notifyListeners();
+  }
+
+  Member? selectedMember(int tab) => _cashRegiserTabs[tab]!.selectedMember;
+  setSelectedMember(int tab, m) {
+    _cashRegiserTabs[tab]!.selectedMember = m;
+    notifyListeners();
+  }
+
+  UnmodifiableListView<CartItem> cart(int tab) {
+    return UnmodifiableListView(_cashRegiserTabs[tab]!.cart);
+  }
+
+  void addToCart(int tab, CartItem item) {
+    _cashRegiserTabs[tab]!.addToCart(item);
+    notifyListeners();
+  }
+
+  void modifyCartItem(int tab, int i, CartItem cartItem) {
+    _cashRegiserTabs[tab]!.modifyCartItem(i, cartItem);
+    notifyListeners();
+  }
+
+  void removeFromCart(int tab, int i) {
+    _cashRegiserTabs[tab]!.removeFromCart(i);
+    notifyListeners();
+  }
+
+  void cleanCart(int tab) {
+    _cashRegiserTabs[tab]!.cleanCart();
+    notifyListeners();
   }
 }
 
-class CashRegisterModel extends ChangeNotifier {
-  CashRegisterModel() {
-    log("New state");
+class CashRegister {
+  CashRegister() {
+    log("New CashRegister");
   }
+
   final List<CartItem> _cart = [CartItem()];
   Member? _selectedMember;
   PaymentMethod _selectedPaymentMethod = PaymentMethod.card;
@@ -41,25 +93,21 @@ class CashRegisterModel extends ChangeNotifier {
   bool get isAwaitingSendFormResponse => _isAwaitingSendFormResponse;
   set isAwaitingSendFormResponse(b) {
     _isAwaitingSendFormResponse = b;
-    notifyListeners();
   }
 
   String get chequeOrTransferNumber => _chequeOrTransferNumber;
   set chequeOrTransferNumber(s) {
     _chequeOrTransferNumber = s;
-    notifyListeners();
   }
 
   PaymentMethod get selectedPaymentMethod => _selectedPaymentMethod;
   set selectedPaymentMethod(pm) {
     _selectedPaymentMethod = pm;
-    notifyListeners();
   }
 
   Member? get selectedMember => _selectedMember;
   set selectedMember(m) {
     _selectedMember = m;
-    notifyListeners();
   }
 
   UnmodifiableListView<CartItem> get cart {
@@ -68,17 +116,14 @@ class CashRegisterModel extends ChangeNotifier {
 
   void addToCart(CartItem item) {
     _cart.add(item);
-    notifyListeners();
   }
 
   void modifyCartItem(int i, CartItem cartItem) {
     _cart[i] = cartItem;
-    notifyListeners();
   }
 
   void removeFromCart(int i) {
     _cart.removeAt(i);
-    notifyListeners();
   }
 
   void cleanCart() {
@@ -87,6 +132,5 @@ class CashRegisterModel extends ChangeNotifier {
     _selectedPaymentMethod = PaymentMethod.card;
     _selectedMember = null;
     _chequeOrTransferNumber = '';
-    notifyListeners();
   }
 }

@@ -10,8 +10,13 @@ import 'package:coopaz_app/logger.dart';
 import 'package:provider/provider.dart';
 
 class CartItemWidget extends StatefulWidget {
-  CartItemWidget({super.key, required this.index, required this.cartItem});
+  CartItemWidget(
+      {super.key,
+      required this.tab,
+      required this.index,
+      required this.cartItem});
 
+  final int tab;
   final int index;
   final CartItem cartItem;
   final NumberFormat numberFormat = NumberFormat('#,##0.00');
@@ -53,10 +58,12 @@ class _CartItemWidget extends State<CartItemWidget> {
           Expanded(
               flex: 7,
               child: ProductAutocomplete(
-                  index: widget.index, cartItem: widget.cartItem)),
+                  tab: widget.tab,
+                  index: widget.index,
+                  cartItem: widget.cartItem)),
           Expanded(
               flex: 1,
-              child: !cashRegisterModel.isAwaitingSendFormResponse
+              child: !cashRegisterModel.isAwaitingSendFormResponse(widget.tab)
                   ? Shortcuts(
                       shortcuts: <LogicalKeySet, Intent>{
                           LogicalKeySet(LogicalKeyboardKey.enter):
@@ -81,7 +88,7 @@ class _CartItemWidget extends State<CartItemWidget> {
                         onChanged: (String value) {
                           widget.cartItem.qty = value;
                           cashRegisterModel.modifyCartItem(
-                              widget.index, widget.cartItem);
+                              widget.tab, widget.index, widget.cartItem);
                         },
                         textAlign: TextAlign.right,
                         style: TextStyle(
@@ -89,7 +96,8 @@ class _CartItemWidget extends State<CartItemWidget> {
                         ),
                       ))
                   : Text(
-                      cashRegisterModel.cart[widget.index].qty ?? '',
+                      cashRegisterModel.cart(widget.tab)[widget.index].qty ??
+                          '',
                       textAlign: TextAlign.right,
                       style: TextStyle(
                         fontSize: mediumText,
@@ -109,12 +117,13 @@ class _CartItemWidget extends State<CartItemWidget> {
               )),
           Expanded(
               flex: 1,
-              child: !cashRegisterModel.isAwaitingSendFormResponse
+              child: !cashRegisterModel.isAwaitingSendFormResponse(widget.tab)
                   ? IconButton(
                       focusNode: FocusNode(skipTraversal: true),
                       onPressed: () {
                         log('Delete line pressed');
-                        cashRegisterModel.removeFromCart(widget.index);
+                        cashRegisterModel.removeFromCart(
+                            widget.tab, widget.index);
                       },
                       icon: const Icon(Icons.delete),
                       tooltip: 'Supprimer ligne',

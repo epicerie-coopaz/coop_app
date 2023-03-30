@@ -9,7 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:coopaz_app/logger.dart';
 import 'package:provider/provider.dart';
 
-class CartList extends StatefulWidget {
+class CartList extends StatelessWidget {
   CartList({super.key, required this.formKey, required this.tab});
 
   final int tab;
@@ -26,18 +26,6 @@ class CartList extends StatefulWidget {
       valid = formKey.currentState!.validate();
     }
     return valid;
-  }
-
-  @override
-  State<CartList> createState() {
-    return _CartList();
-  }
-}
-
-class _CartList extends State<CartList> {
-  @override
-  void initState() {
-    super.initState();
   }
 
   @override
@@ -60,7 +48,7 @@ class _CartList extends State<CartList> {
         dispatcher: const ActionDispatcher(),
         actions: <Type, Action<Intent>>{
           AddNewCartItemIntent:
-              AddNewCartItemAction(widget.tab, cashRegisterModel, widget),
+              AddNewCartItemAction(tab, cashRegisterModel, this),
         },
         child: Builder(builder: (context) {
           return Column(
@@ -103,14 +91,14 @@ class _CartList extends State<CartList> {
                   child: FocusTraversalGroup(
                       child: ListView.builder(
                 itemCount: productLineWidgets.length,
-                controller: widget.scrollController,
+                controller: scrollController,
                 itemBuilder: (context, index) {
                   return productLineWidgets[index];
                 },
               ))),
               const SizedBox(height: 40),
               Row(children: [
-                !cashRegisterModel.isAwaitingSendFormResponse(widget.tab)
+                !cashRegisterModel.isAwaitingSendFormResponse(tab)
                     ? FloatingActionButton.extended(
                         heroTag: null,
                         focusNode: FocusNode(skipTraversal: true),
@@ -123,10 +111,9 @@ class _CartList extends State<CartList> {
                               context, const AddNewCartItemIntent());
 
                           WidgetsBinding.instance.addPostFrameCallback((_) {
-                            if (widget.scrollController.hasClients) {
-                              widget.scrollController.animateTo(
-                                  widget.scrollController.position
-                                      .maxScrollExtent,
+                            if (scrollController.hasClients) {
+                              scrollController.animateTo(
+                                  scrollController.position.maxScrollExtent,
                                   duration: const Duration(milliseconds: 500),
                                   curve: Curves.easeOut);
                             }
@@ -145,9 +132,9 @@ class _CartList extends State<CartList> {
   List<CartItemWidget> _createProductLineWidgets(
       AppModel appModel, CashRegisterModel cashRegisterModel) {
     List<CartItemWidget> products = [];
-    for (var entry in cashRegisterModel.cart(widget.tab).asMap().entries) {
+    for (var entry in cashRegisterModel.cart(tab).asMap().entries) {
       var product = CartItemWidget(
-        tab: widget.tab,
+        tab: tab,
         index: entry.key,
       );
       products.add(product);

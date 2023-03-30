@@ -149,7 +149,6 @@ class _CartList extends State<CartList> {
       var product = CartItemWidget(
         tab: widget.tab,
         index: entry.key,
-        cartItem: entry.value,
       );
       products.add(product);
     }

@@ -1,9 +1,7 @@
 import 'package:coopaz_app/dao/order_dao.dart';
-import 'package:coopaz_app/state/cash_register.dart';
 import 'package:coopaz_app/ui/screens/cash_register/panel_cart_list.dart';
 import 'package:coopaz_app/ui/screens/cash_register/panel_validation.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class CashRegisterTab extends StatefulWidget {
   CashRegisterTab({super.key, required this.tab, required this.orderDao});
@@ -19,8 +17,7 @@ class CashRegisterTab extends StatefulWidget {
   }
 }
 
-class _CashRegisterTab extends State<CashRegisterTab>
-    with AutomaticKeepAliveClientMixin {
+class _CashRegisterTab extends State<CashRegisterTab> {
   @override
   void initState() {
     super.initState();
@@ -28,7 +25,6 @@ class _CashRegisterTab extends State<CashRegisterTab>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
     return Container(
         padding: const EdgeInsets.all(12.0),
         child: Form(
@@ -51,7 +47,4 @@ class _CashRegisterTab extends State<CashRegisterTab>
           ]),
         ));
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }

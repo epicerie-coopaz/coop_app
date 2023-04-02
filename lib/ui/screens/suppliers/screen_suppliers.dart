@@ -22,7 +22,7 @@ class SuppliersScreen extends StatelessWidget {
     return Consumer<AppModel>(builder: (context, model, child) {
       Widget w;
       if (model.suppliers.isNotEmpty) {
-        w = const SupplierList();
+        w = SupplierList();
       } else {
         supplierDao.get().then((s) => model.suppliers = s);
         w = const Loading(text: 'Chargement de la liste des fournisseurs...');

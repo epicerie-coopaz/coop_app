@@ -8,7 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:coopaz_app/logger.dart';
 import 'package:provider/provider.dart';
 
-class CartItemWidget extends StatelessWidget {
+class CartItemWidget extends StatefulWidget {
   CartItemWidget({
     super.key,
     required this.tab,
@@ -20,18 +20,41 @@ class CartItemWidget extends StatelessWidget {
   final NumberFormat numberFormat = NumberFormat('#,##0.00');
 
   @override
+  State<CartItemWidget> createState() => _CartItemWidget();
+}
+
+class _CartItemWidget extends State<CartItemWidget> {
+  late FocusNode myFocusNode;
+
+  @override
+  void initState() {
+    super.initState();
+
+    myFocusNode = FocusNode();
+  }
+
+  @override
+  void dispose() {
+    // Clean up the focus node when the Form is disposed.
+    myFocusNode.dispose();
+
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     AppModel appModel = context.watch<AppModel>();
     double mediumText = 14 * appModel.zoomText;
     CashRegisterModel cashRegisterModel = context.watch<CashRegisterModel>();
 
-    var cartItem = cashRegisterModel.cashRegisterTabs[tab]!.cart[index];
+    var cartItem =
+        cashRegisterModel.cashRegisterTabs[widget.tab]!.cart[widget.index];
 
     var total = '';
     double? unitPrice = cartItem.product?.price;
     double? qty = double.tryParse(cartItem.qty ?? '');
     if (unitPrice != null && qty != null) {
-      total = '${numberFormat.format(unitPrice * qty)} €';
+      total = '${widget.numberFormat.format(unitPrice * qty)} €';
     }
 
     String unitPriceAsString = '';
@@ -46,16 +69,17 @@ class CartItemWidget extends StatelessWidget {
           Expanded(
               flex: 7,
               child: ProductAutocomplete(
-                  tab: tab, index: index, cartItem: cartItem)),
+                  tab: widget.tab, index: widget.index, cartItem: cartItem)),
           Expanded(
               flex: 1,
-              child: !cashRegisterModel.isAwaitingSendFormResponse(tab)
+              child: !cashRegisterModel.isAwaitingSendFormResponse(widget.tab)
                   ? Shortcuts(
                       shortcuts: <LogicalKeySet, Intent>{
                           LogicalKeySet(LogicalKeyboardKey.enter):
                               const AddNewCartItemIntent(),
                         },
                       child: TextFormField(
+                        focusNode: myFocusNode,
                         controller:
                             TextEditingController(text: cartItem.qty ?? '')
                               ..selection = TextSelection.collapsed(
@@ -74,7 +98,7 @@ class CartItemWidget extends StatelessWidget {
                         onChanged: (String value) {
                           cartItem.qty = value;
                           cashRegisterModel.modifyCartItem(
-                              tab, index, cartItem);
+                              widget.tab, widget.index, cartItem);
                         },
                         textAlign: TextAlign.right,
                         style: TextStyle(
@@ -82,7 +106,8 @@ class CartItemWidget extends StatelessWidget {
                         ),
                       ))
                   : Text(
-                      cashRegisterModel.cart(tab)[index].qty ?? '',
+                      cashRegisterModel.cart(widget.tab)[widget.index].qty ??
+                          '',
                       textAlign: TextAlign.right,
                       style: TextStyle(
                         fontSize: mediumText,
@@ -102,12 +127,13 @@ class CartItemWidget extends StatelessWidget {
               )),
           Expanded(
               flex: 1,
-              child: !cashRegisterModel.isAwaitingSendFormResponse(tab)
+              child: !cashRegisterModel.isAwaitingSendFormResponse(widget.tab)
                   ? IconButton(
                       focusNode: FocusNode(skipTraversal: true),
                       onPressed: () {
                         log('Delete line pressed');
-                        cashRegisterModel.removeFromCart(tab, index);
+                        cashRegisterModel.removeFromCart(
+                            widget.tab, widget.index);
                       },
                       icon: const Icon(Icons.delete),
                       tooltip: 'Supprimer ligne',

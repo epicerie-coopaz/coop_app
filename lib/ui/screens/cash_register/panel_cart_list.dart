@@ -30,7 +30,7 @@ class CartList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    log('build productList');
+    log('build $runtimeType');
 
     var styleHeaders = Theme.of(context)
         .primaryTextTheme

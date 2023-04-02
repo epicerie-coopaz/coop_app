@@ -22,7 +22,7 @@ class ProductsScreen extends StatelessWidget {
     return Consumer<AppModel>(builder: (context, model, child) {
       Widget w;
       if (model.products.isNotEmpty) {
-        w = const ProductList();
+        w = ProductList();
       } else {
         productDao.get().then((p) => model.products = p);
         w = const Loading(text: 'Chargement de la liste des produits...');

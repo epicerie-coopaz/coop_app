@@ -1,5 +1,4 @@
 import 'package:coopaz_app/actions/cash_register.dart';
-import 'package:coopaz_app/podo/cart_item.dart';
 import 'package:coopaz_app/state/app_model.dart';
 import 'package:coopaz_app/state/cash_register.dart';
 import 'package:coopaz_app/ui/screens/cash_register/widget_product_autocomplete.dart';
@@ -10,27 +9,36 @@ import 'package:coopaz_app/logger.dart';
 import 'package:provider/provider.dart';
 
 class CartItemWidget extends StatefulWidget {
-  CartItemWidget(
-      {super.key,
-      required this.tab,
-      required this.index,
-      required this.cartItem});
+  CartItemWidget({
+    super.key,
+    required this.tab,
+    required this.index,
+  });
 
   final int tab;
   final int index;
-  final CartItem cartItem;
   final NumberFormat numberFormat = NumberFormat('#,##0.00');
 
   @override
-  State<CartItemWidget> createState() {
-    return _CartItemWidget();
-  }
+  State<CartItemWidget> createState() => _CartItemWidget();
 }
 
 class _CartItemWidget extends State<CartItemWidget> {
+  late FocusNode myFocusNode;
+
   @override
   void initState() {
     super.initState();
+
+    myFocusNode = FocusNode();
+  }
+
+  @override
+  void dispose() {
+    // Clean up the focus node when the Form is disposed.
+    myFocusNode.dispose();
+
+    super.dispose();
   }
 
   @override
@@ -39,17 +47,20 @@ class _CartItemWidget extends State<CartItemWidget> {
     double mediumText = 14 * appModel.zoomText;
     CashRegisterModel cashRegisterModel = context.watch<CashRegisterModel>();
 
+    var cartItem =
+        cashRegisterModel.cashRegisterTabs[widget.tab]!.cart[widget.index];
+
     var total = '';
-    double? unitPrice = widget.cartItem.product?.price;
-    double? qty = double.tryParse(widget.cartItem.qty ?? '');
+    double? unitPrice = cartItem.product?.price;
+    double? qty = double.tryParse(cartItem.qty ?? '');
     if (unitPrice != null && qty != null) {
       total = '${widget.numberFormat.format(unitPrice * qty)} €';
     }
 
     String unitPriceAsString = '';
-    if (widget.cartItem.product != null) {
+    if (cartItem.product != null) {
       unitPriceAsString =
-          '${widget.cartItem.product?.price}€/${widget.cartItem.product!.unit.unitAsString}';
+          '${cartItem.product?.price}€/${cartItem.product!.unit.unitAsString}';
     }
 
     return FocusTraversalGroup(
@@ -58,9 +69,7 @@ class _CartItemWidget extends State<CartItemWidget> {
           Expanded(
               flex: 7,
               child: ProductAutocomplete(
-                  tab: widget.tab,
-                  index: widget.index,
-                  cartItem: widget.cartItem)),
+                  tab: widget.tab, index: widget.index, cartItem: cartItem)),
           Expanded(
               flex: 1,
               child: !cashRegisterModel.isAwaitingSendFormResponse(widget.tab)
@@ -70,10 +79,11 @@ class _CartItemWidget extends State<CartItemWidget> {
                               const AddNewCartItemIntent(),
                         },
                       child: TextFormField(
-                        controller: TextEditingController(
-                            text: widget.cartItem.qty ?? '')
-                          ..selection = TextSelection.collapsed(
-                              offset: (widget.cartItem.qty ?? '').length),
+                        focusNode: myFocusNode,
+                        controller:
+                            TextEditingController(text: cartItem.qty ?? '')
+                              ..selection = TextSelection.collapsed(
+                                  offset: (cartItem.qty ?? '').length),
                         decoration: const InputDecoration(
                           hintText: 'Quantité',
                         ),
@@ -86,9 +96,9 @@ class _CartItemWidget extends State<CartItemWidget> {
                           return null;
                         },
                         onChanged: (String value) {
-                          widget.cartItem.qty = value;
+                          cartItem.qty = value;
                           cashRegisterModel.modifyCartItem(
-                              widget.tab, widget.index, widget.cartItem);
+                              widget.tab, widget.index, cartItem);
                         },
                         textAlign: TextAlign.right,
                         style: TextStyle(

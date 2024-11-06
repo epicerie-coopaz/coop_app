@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  <style>
+    /* Style du corps et des éléments */
+    body {
+      display: flex;
+      flex-direction: column;
+      font-family: Arial, sans-serif;
+    }
+    #header {
+      background-color: #4CAF50;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      font-size: 24px;
+      width: 100%;
+    }
+    .container {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
+    .facture {
+      //display: flex;
+      width: 100%;
+    }
+    #menu {
+      position: fixed;
+      left: 0;
+      width: 200px;
+      background-color: #f2f2f2;
+      padding: 10px;
+      box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    .menu-button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px;
+      margin: 5px 0;
+      cursor: pointer;
+      border-radius: 5px;
+      width: 100%;
+      font-size: 16px;
+      transition: background-color 0.3s, transform 0.2s;
+      /* Ajout de la transition */
+    }
+    .menu-button:hover {
+      background-color: #45a049;
+      transform: scale(1.05);
+      /* Légère augmentation de la taille */
+    }
+    #productList {
+      flex-grow: 1;
+      border-collapse: collapse;
+      margin-left: 10px;
+    }
+    #productList tbody tr {
+      transition: background-color 0.3s;
+      /* Transition pour le changement de couleur */
+    }
+    #productList tbody tr:hover {
+      background-color: #f0f8ff;
+      /* Change de couleur au survol */
+    }
+    #productList {
+      transition: all 0.5s;
+      /* Transition pour les modifications de la table */
+    }
+    th,
+    td {
+      padding: 10px;
+      border: 1px solid #ddd;
+    }
+    .out-of-stock {
+      color: red;
+      background-color: #ffe6e6;
+    }
+    #total {
+      font-weight: bold;
+      text-align: right;
+    }
+    th:nth-child(1),
+    td:nth-child(1) {
+      width: 40%;
+    }
+    th:nth-child(2),
+    td:nth-child(2) {
+      width: 20%;
+    }
+    th:nth-child(3),
+    td:nth-child(3) {
+      width: 15%;
+    }
+    th:nth-child(4),
+    td:nth-child(4) {
+      width: 15%;
+    }
+    th:nth-child(5),
+    td:nth-child(5) {
+      width: 10%;
+    }
+    #addProductButton {
+      background-color: #4CAF50;
+      /* Couleur de fond */
+      color: white;
+      /* Couleur du texte */
+      border: none;
+      /* Pas de bordure */
+      border-radius: 5px;
+      /* Coins arrondis */
+      padding: 10px 15px;
+      /* Espacement intérieur */
+      cursor: pointer;
+      /* Curseur en main */
+      font-size: 16px;
+      /* Taille de la police */
+      transition: background-color 0.3s;
+      /* Effet de transition */
+      margin: 10px 0;
+      /* Espacement vertical */
+    }
+    #addProductButton:hover {
+      background-color: #45a049;
+      /* Couleur au survol */
+    }
+    #addProductContainer {
+      text-align: center;
+      /* Centrer le bouton */
+      margin-bottom: 20px;
+      /* Espacement en bas */
+    }
+    #addProductButtonreception {
+      background-color: #4eb4eb;
+      /* Couleur de fond */
+      color: white;
+      /* Couleur du texte */
+      border: none;
+      /* Pas de bordure */
+      border-radius: 5px;
+      /* Coins arrondis */
+      padding: 10px 15px;
+      /* Espacement intérieur */
+      cursor: pointer;
+      /* Curseur en main */
+      font-size: 16px;
+      /* Taille de la police */
+      transition: background-color 0.3s;
+      /* Effet de transition */
+      margin: 10px 0;
+      /* Espacement vertical */
+    }
+    #addProductButtonreception:hover {
+      background-color: #318ce7;
+      /* Couleur au survol */
+    }
+    #addProductContainer {
+      text-align: center;
+      /* Centrer le bouton */
+      margin-bottom: 20px;
+      /* Espacement en bas */
+    }
+    #right-menu {
+      width: 100%;
+      /* Ajustez la largeur selon vos besoins */
+      background-color: #e0e0e0;
+      padding: 10px;
+      /* Ajoutez un peu de padding */
+      box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      /* Coins arrondis */
+      margin-left: 20px;
+      /* Ajoutez un peu d'espace à gauche */
+      margin-top: 50px;
+      /* Ajoutez un peu d'espace à gauche */
+    }
+    #right-menu h2 {
+      font-size: 20px;
+      /* Taille de police pour les titres */
+      color: #333;
+      /* Couleur du texte */
+    }
+    #right-menu select {
+      width: 100%;
+      /* Pour que le select prenne toute la largeur */
+      padding: 10px;
+      /* Padding pour un meilleur aspect */
+      border: 1px solid #ccc;
+      /* Bordure autour du select */
+      border-radius: 5px;
+      /* Coins arrondis */
+      margin-bottom: 10px;
+      /* Espace entre les éléments */
+    }
+    #validateButton {
+      background-color: #4CAF50;
+      /* Couleur du bouton */
+      color: white;
+      /* Couleur du texte */
+      border: none;
+      /* Pas de bordure */
+      padding: 40px 55px;
+      /* Padding du bouton */
+      border-radius: 5px;
+      /* Coins arrondis pour le bouton */
+      cursor: pointer;
+      /* Curseur en main */
+      transition: background-color 0.3s;
+      /* Transition douce */
+    }
+    #validateButton:hover {
+      background-color: #45a049;
+      /* Couleur du bouton au survol */
+    }
+    #adherentEmail {
+      margin-top: 10px;
+      /* Espacement au-dessus */
+      font-weight: bold;
+      /* Texte en gras */
+      color: #555;
+      /* Couleur du texte */
+    }
+    #total {
+      font-weight: bold;
+      text-align: right;
+      font-size: 18px;
+      /* Augmenter la taille de la police */
+      margin-top: 20px;
+      /* Ajouter un espace au-dessus */
+    }
+    #validateButton {
+      float: right;
+      /* Aligner le bouton à droite */
+      margin-top: 20px;
+      /* Ajouter un espace au-dessus */
+    }
+    #logo {
+      position: absolute;
+      /* Permet de positionner le logo par rapport au conteneur parent */
+      top: 10px;
+      /* Ajustez la valeur selon vos besoins */
+      right: 20px;
+      /* Ajustez la valeur selon vos besoins */
+      width: 56px;
+      /* Largeur du logo */
+      height: 56px;
+      /* Hauteur du logo */
+    }
+    .popup {
+      opacity: 0;
+      /* Commencez invisible */
+      transform: scale(0.9);
+      /* Réduisez légèrement */
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      /* Ajoutez une transition */
+    }
+    .popup.show {
+      opacity: 1;
+      /* Rend visible */
+      transform: scale(1);
+      /* Restaurez la taille */
+    }
+    @keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+    }
+    .spinner {
+        border: 4px solid rgba(0, 0, 0, 0.1);
+        border-radius: 50%;
+        border-top: 4px solid #3498db;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    .deleteRow {
+    color: red; /* Couleur rouge pour la croix */
+    cursor: pointer; /* Pointeur pour indiquer que c'est cliquable */
+    font-size: 20px; /* Taille de la croix */
+    line-height: 1; /* Hauteur de ligne pour centrer la croix */
+    }
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .popup-content {
+      background: #4CAF50;
+      position : fixed;
+      left : 50%;
+      top : 50%;
+      transform : translate(-50%, -50%);
+      color : #fff;
+      border : 1px solid #ccc;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow : 2px 2px 10px rgba(0, 0, 0, 0.2)';
+      }
+  </style>
+</head>
+<body>
+  <header id="header">Logiciel de caisse Coop'az</header>
+  <img src="https://scontent-bru2-1.xx.fbcdn.net/v/t39.30808-6/304383743_535490041712950_2937999491346330678_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=_Sds-7SSXQgQ7kNvgFkPOjQ&_nc_zt=23&_nc_ht=scontent-bru2-1.xx&_nc_gid=ATe01421g4Z-YWApmKNnhFT&oh=00_AYDTFDN4ZkLjhth7pF_kojfSjcSOMq1ATwJ5G1TDsaHO2Q&oe=6728187B" alt="Logo" id="logo">
+  <div class="container">
+    <div id="menu">
+      <h2>Menu</h2>
+      <button class="menu-button" onclick="loadHome()">Accueil</button>
+      <button class="menu-button" onclick="loadFacture()">Facture </button>
+      <button class="menu-button" onclick="loadReception()">Réception</button>
+      <button class="menu-button" onclick="loadFournisseur()">Fournisseur</button>
+    </div>
+    <div id="content">
+      <h2>Bienvenue sur la Page d'Accueil</h2>
+      <p>Ceci est la page d'accueil de votre logiciel de caisse.</p>
+      <p>Utilisez le menu à gauche pour naviguer dans le logiciel.</p>
+    </div>
+  </div>
+  <script>
+    function loadHome() {
+      const content = document.getElementById('content');
+      content.innerHTML = `
+        <h2>Bienvenue sur la Page d'Accueil</h2>
+        <p>Ceci est la page d'accueil de votre logiciel de caisse.</p>
+        <p>Utilisez le menu à gauche pour naviguer dans le logiciel.</p>
+      `;
+    }
+    function loadFacture() {
+      const content = document.getElementById('content');
+      content.innerHTML = `
+      <div class="facture">
+          <table id="productList">
+          <thead>
+            <tr>
+              <th>Produit</th>
+              <th>Prix Unitaire</th>
+              <th>Stock</th>
+              <th>Quantité</th>
+               <th>Remise (%)</th> <!-- Nouvelle colonne pour la remise -->
+              <th>Total Ligne</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Les lignes de produits seront ajoutées ici -->
+          </tbody>
+        </table>
+        <div id="addProductContainer">
+          <button id="addProductButton" onclick="addRow()">Ajouter un produit</button>
+        </div>
+        <div id="right-menu">
+          <h2>Adhérents</h2>
+          <select id="adherentsDropdown" onchange="updateEmail()"></select>
+          <div id="adherentEmail"></div>
+          <div id="cotisationContainer" style="display: none;">
+            <label for="cotisationAmount">Montant de cotisation :</label>
+            <input type="number" id="cotisationAmount" value="0" min="5" step="1" oninput="calculateTotal()">
+        </div>
+          <h2>Méthode de Paiement</h2>
+          <select id="paymentMethodDropdown">
+              <option value="" disabled selected>Sélectionnez un mode de paiement</option>
+              <option value="CB">CB</option>
+              <option value="Chèque">Chèque</option>
+          </select>
+          <div id="total">Total Général: 0 €</div>
+          <button id="validateButton" onclick="validate()">Valider</button>
+        </div>
+      </div>
+      `;
+        getProducts();
+        getAdherents();
+        getCotisations(); // Ajoute cette ligne pour charger les cotisations
+        
+          }
+    function loadReception() {
+      const content = document.getElementById('content');
+      content.innerHTML = `
+      <div class="reception">
+          <h1>Réception des Produits</h1>
+        <select id="supplierDropdown" onchange="updateProductDropdown(),handleSupplierChange()">
+            <option value="">-- Choisissez un fournisseur --</option>
+            <!-- Les fournisseurs seront chargés ici -->
+        </select>
+        <table id="receptionTable">
+            <thead>
+                <tr>
+                    <th>Produit</th>
+                    <th>Prix Actuel</th>
+                    <th>Mettre à jour le Prix</th>
+                    <th>Stock Actuel</th>
+                    <th>Mettre à jour le Stock</th>
+                    <th>Quantité Réceptionnée</th>
+                    <th>Montant Total</th>
+                    <th>Delete</th> <!-- Nouvelle colonne pour les actions -->
+                </tr>
+            </thead>
+            <tbody>
+            <div id="error-message-reception" style="color: red; display: none;">
+    Sélectionnez d'abord un fournisseur.
+</div>
+            </tbody>
+        </table>
+        <div id="totalAmount">Total Réception : 0 €</div>
+        <button id="addProductButtonreception" onclick="createNewProduct()">Créer un nouveau produit</button>
+        <button id="addProductButton" onclick="addNewLine()">Ajouter une nouvelle ligne</button>
+        <button id="validateButton" onclick="validateReception()">Valider la réception</button>
+          </div>
+    </div>
+      `;    
+loadSuppliers();  
+            }
+
+
+
+    function showLoader() {
+    const loader = document.createElement('div');
+    loader.id = 'loader';
+    loader.style.position = 'fixed';
+    loader.style.top = '0';
+    loader.style.left = '0';
+    loader.style.width = '100%';
+    loader.style.height = '100%';
+    loader.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+    loader.style.display = 'flex';
+    loader.style.alignItems = 'center';
+    loader.style.justifyContent = 'center';
+    loader.style.zIndex = '1000';
+    loader.innerHTML = '<h2>Traitement de la facture en cours...</h2><div class="spinner"></div>';
+    document.body.appendChild(loader);
+}
+function hideLoader() {
+    const loader = document.getElementById('loader');
+    if (loader) {
+        document.body.removeChild(loader);
+    }
+}
+    function getProducts() {
+      google.script.run.withSuccessHandler(function(data) {
+          products = data;
+          console.log(products);
+          addRow();
+      }).getProducts();
+    }
+    function getAdherents() {
+      google.script.run.withSuccessHandler(function(data) {
+          adherents = data;
+          const adherentsDropdown = document.getElementById('adherentsDropdown');
+          adherentsDropdown.innerHTML = '<option value="">Sélectionner un adhérent</option>';
+          adherents.forEach(adherent => {
+              const option = document.createElement('option');
+              option.value = adherent.name; // Utilise le nom comme valeur
+              option.textContent = adherent.name;
+              adherentsDropdown.appendChild(option);
+          });
+          $(adherentsDropdown).select2({ placeholder: 'Sélectionnez un adhérent', allowClear: true });
+      }).getAdherentsWithCotisation();
+    }
+    function getCotisations() {
+    google.script.run.withSuccessHandler(function(data) {
+        cotisations = data; // 'data' doit contenir un objet avec les informations de cotisation
+    }).getCotisations(); // Assure-toi que cette fonction soit bien définie dans le backend
+}
+function updateEmail() {
+    const selectedAdherentName = document.getElementById('adherentsDropdown').value;
+    const selectedAdherent = adherents.find(adherent => adherent.name === selectedAdherentName);
+    if (selectedAdherent) {
+        const emailDiv = document.getElementById('adherentEmail');
+        emailDiv.innerText = `Email: ${selectedAdherent.email}`;
+        const status = selectedAdherent.cotisation === "ok" ? "à jour" : "non à jour";
+        // Vérification de la cotisation dans l'onglet "cotisations"
+        const currentMonthYear = new Date().toLocaleString('fr-FR', { month: 'long', year: 'numeric' });
+        const cotisationStatus = cotisations[selectedAdherentName]?.[currentMonthYear];
+        if (cotisationStatus === "ok") {
+            emailDiv.style.color = "black";
+            document.getElementById('cotisationContainer').style.display = "none"; // Cacher le champ
+        } else {
+            emailDiv.style.color = "red"; // Changer le texte en rouge
+            emailDiv.innerText += ` | Statut de cotisation: non à jour`;
+            document.getElementById('cotisationContainer').style.display = "block"; // Afficher le champ
+        }
+    } else {
+        document.getElementById('adherentEmail').innerText = '';
+        document.getElementById('cotisationContainer').style.display = "none"; // Cacher le champ
+    }
+}
+  function sortProducts(products) {
+    // Trier les produits : d'abord par stock, puis par nom
+    return products.sort((a, b) => {
+        if (a.stock === 0 && b.stock === 0) {
+            return 0; // Les deux sont hors stock
+        } else if (a.stock === 0) {
+            return 1; // 'a' est hors stock, donc on le met en bas
+        } else if (b.stock === 0) {
+            return -1; // 'b' est hors stock, donc on le met en bas
+        }
+        return a.name.localeCompare(b.name); // Trier par ordre alphabétique
+    });
+}
+    function addRow() {
+      const productList = document.getElementById('productList').getElementsByTagName('tbody')[0];
+      const row = productList.insertRow();
+      row.style.opacity = 0;
+      const cell1 = row.insertCell(0); // Colonne produit
+      const cell2 = row.insertCell(1); // Colonne prix
+      const cell3 = row.insertCell(2); // Colonne stock
+      const cell4 = row.insertCell(3); // Colonne quantité
+      const cell5 = row.insertCell(4); // Colonne discount
+      const cell6 = row.insertCell(5); // Colonne total
+      const cell7 = row.insertCell(6); // Colonne supprimer
+      const cell8 = row.insertCell(7); // Colonne modifier le stock
+      // Animation de glissement
+          setTimeout(() => {
+              row.style.opacity = 1; // Rendre la ligne visible avec une transition
+          }, 10); // Attendre un peu avant de démarrer la transition
+      const select = document.createElement('select');
+      select.classList.add('product-select');
+      select.innerHTML = `<option value="">Sélectionner un produit</option>`; // Ligne par défaut
+      const sortedProducts = sortProducts(products);
+      products.forEach(product => {
+          const option = document.createElement('option');
+          option.value = product.price;
+          option.dataset.price = product.price;
+          option.dataset.stock = product.stock;
+          option.dataset.name = product.name; // Ajouter le nom du produit pour la mise à jour
+          option.textContent = product.name;
+          if (product.stock <= 0) {
+              option.classList.add('out-of-stock');
+          }
+          select.appendChild(option);
+      });
+        cell1.appendChild(select);
+        $(select).select2({
+            placeholder: 'Recherchez un produit',
+            allowClear: true,
+            templateResult: function(option) {
+                if ($(option.element).hasClass('out-of-stock')) {
+                    return $('<span style="color:red;">' + option.text + ' (Stock négatif)</span>');
+                }
+                return option.text;
+            }
+        });
+        select.onchange = function() {
+            const selectedOption = select.selectedOptions[0];
+            cell2.innerText = `${selectedOption ? selectedOption.dataset.price : 0} €`;
+            if (selectedOption) {
+            if (selectedOption.dataset.name.toLowerCase().includes("piece")) {
+                cell3.innerText = `${selectedOption.dataset.stock} unités`;
+            } else if (selectedOption.dataset.name.toLowerCase().includes("kilo")) {
+                cell3.innerText = `${selectedOption.dataset.stock} Kg`;
+            } else {
+                cell3.innerText = `${selectedOption.dataset.stock} unités`; // Par défaut "unités"
+            }
+        } else {
+            cell3.innerText = "0 unités";
+        }
+         // Vérifiez si le produit contient le mot "piece"
+        if (selectedOption && selectedOption.dataset.name.toLowerCase().includes("piece")) {
+            quantityInput.setAttribute("step", "1"); // Quantité forcée à un entier
+            quantityInput.value = 1; // Définir la quantité à 1 si le produit contient "piece"
+        } else {
+            quantityInput.setAttribute("step", "0.01"); // Permettre des quantités décimales
+            quantityInput.value = 0; // Réinitialiser à 0 si le produit ne contient pas "piece"
+        }
+        calculateRowTotal(row);
+            // Vérification pour ajouter une nouvelle ligne si un produit est sélectionné
+        if (selectedOption && selectedOption.value) {
+            addRow(); // Ajouter une nouvelle ligne
+        }
+        };
+        const quantityInput = document.createElement('input');
+        quantityInput.type = 'number';
+        quantityInput.value = 0;
+        quantityInput.step = 0.01;
+        quantityInput.min = 0; // Vous pouvez définir un minimum pour permettre les quantités de 0 et plus.
+        quantityInput.oninput = function() {
+        const selectedOption = select.selectedOptions[0];
+        // Si le produit contient "piece" et que la quantité est décimale
+        if (selectedOption && selectedOption.dataset.name.toLowerCase().includes("piece")) {
+            const value = quantityInput.value;
+            if (value.includes('.')) {
+                alert("La quantité d'un produit contenant 'piece' doit être un entier.");
+                quantityInput.value = Math.floor(value); // Réinitialiser à l'entier inférieur
+            }
+        }
+        calculateRowTotal(row);
+    };
+        
+        cell4.appendChild(quantityInput);
+
+
+        // Discount input
+      const discountInput = document.createElement('input');
+      discountInput.type = 'number';
+      discountInput.value = 0;
+      discountInput.step = 5;
+      discountInput.min = 0;
+      discountInput.oninput = function() {
+          const selectedOption = select.selectedOptions[0];
+          if (selectedOption && selectedOption.dataset.name.toLowerCase().includes("piece")) {
+              const value = discountInput.value;
+              if (value.includes('.')) {
+                  alert("La remise d'un produit contenant 'piece' doit être un entier.");
+                  discountInput.value = Math.floor(value); // Round down
+              }
+          }
+          calculateRowTotal(row);
+      };
+      cell5.appendChild(discountInput);
+        // Total de la ligne (initialisé à 0)
+        cell6.innerText = '0.00 €';
+        // Ajouter l'icône de suppression
+        const deleteIcon = document.createElement('span');
+        deleteIcon.innerHTML = '❌'; // Utilisez une croix comme symbole ou une image si vous le souhaitez
+        deleteIcon.style.cursor = 'pointer';
+        deleteIcon.style.marginLeft = '10px';
+        deleteIcon.onclick = function() {
+        deleteRow(row);
+        };
+        cell7.appendChild(deleteIcon);    
+        // Ajouter l'icône de modification du stock
+        const editIcon = document.createElement('span');
+        editIcon.innerHTML = '✏️'; // Utilisez une icône ou un emoji
+        editIcon.style.cursor = 'pointer';
+        editIcon.style.marginLeft = '10px';
+        editIcon.onclick = function() {
+            openStockPopup(select.selectedOptions[0]); // Ouvrir la popup avec le produit sélectionné
+        };
+        cell8.appendChild(editIcon);
+    }
+    function deleteRow(row) {
+      if (confirm("Êtes-vous sûr de vouloir supprimer cette ligne ?")) {
+          const productList = document.getElementById('productList').getElementsByTagName('tbody')[0];
+          productList.deleteRow(row.rowIndex - 1);
+          calculateTotal();
+      }
+    }
+      function calculateRowTotal(row) {
+        const select = row.cells[0].querySelector('select');
+        const quantityInput = row.cells[3].querySelector('input');
+        const discountInput = row.cells[4].querySelector('input');
+        const price = select ? parseFloat(select.value) : 0;
+        const quantity = quantityInput ? parseFloat(quantityInput.value) : 0; // Remplacer parseInt par parseFloat
+        const discount = discountInput ? parseFloat(discountInput.value) : 0; // Remplacer parseInt par parseFloat
+        row.cells[5].innerText = `${(price * quantity - (price * quantity*(discount/100))).toFixed(2)} €`; // Mettre à jour le total de la ligne
+        calculateTotal(); // Recalculer le total général
+    }
+
+
+
+    function calculateTotal() {
+    const rows = document.querySelectorAll('#productList tbody tr');
+    let total = 0;
+    rows.forEach(row => {
+        const totalCell = row.cells[5].innerText;
+        total += parseFloat(totalCell.replace(' €', '')) || 0;
+    });
+    // Ajouter le montant de la cotisation
+    const cotisationAmount = parseFloat(document.getElementById('cotisationAmount').value) || 0;
+    total += cotisationAmount; // Ajouter le montant de cotisation au total
+    document.getElementById('total').innerText = `Total Général: ${total.toFixed(2)} €`;
+}
+function validate() {
+    showLoader();
+    const adherent = document.getElementById('adherentsDropdown').value;
+    const paymentMethod = document.getElementById('paymentMethodDropdown').value;
+    const total = parseFloat(document.getElementById('total').innerText.replace('Total Général: ', '').replace(' €', ''));
+    const dateTime = new Date().toISOString();
+    const cotisationAmount = parseFloat(document.getElementById('cotisationAmount').value) || 0; // Récupérer le montant de cotisation
+    const purchases = [];
+    const rows = document.querySelectorAll('#productList tbody tr');
+    
+    // Renommer la variable pour éviter le conflit
+    const invoiceRows = document.querySelectorAll('#productList tbody tr');
+    for (const row of invoiceRows) {
+        const select = row.cells[0].querySelector('select');
+        const quantityInput = row.cells[3].querySelector('input');
+        const discountInput = row.cells[4].querySelector('input'); // Champ de remise (assurez-vous que la remise est dans la 5ème colonne)
+        const quantity = parseFloat(quantityInput.value) || 0; // Utiliser parseFloat pour permettre les quantités décimales
+        const discount = parseFloat(discountInput.value) || 0; // Récupérer la remise
+        // Vérifier que le produit est sélectionné avant de vérifier la quantité
+        if (select.value && quantity === 0) {
+            alert("Veuillez entrer une quantité supérieure à 0 pour tous les produits sélectionnés.");
+            return; // Sortir de la fonction si une quantité est 0
+        }
+    }
+    
+    let orderDetails = ''; // Initialiser la variable pour stocker les détails
+    rows.forEach(row => {
+        const select = row.cells[0].querySelector('select');
+        const quantityInput = row.cells[3].querySelector('input');
+        const discountInput = row.cells[4].querySelector('input'); // Remise pour chaque ligne
+        const productName = select.options[select.selectedIndex].dataset.name; // Récupérer le nom du produit
+        const quantity = parseFloat(quantityInput.value) || 0; // Utiliser parseFloat pour permettre les quantités décimales
+        const discount = parseFloat(discountInput.value) || 0; // Remise sur le produit
+        const price = parseFloat(select.value) || 0; // Utiliser parseFloat pour permettre les prix décimaux
+        const lineTotalBeforeDiscount = price * quantity;
+        const discountAmount = (lineTotalBeforeDiscount * discount) / 100; // Calcul de la remise en pourcentage
+        const totalLine = (lineTotalBeforeDiscount - discountAmount).toFixed(2); // Appliquer la remise et calculer le total de la ligne
+        
+        if (productName && quantity > 0) {
+            purchases.push({
+                productName: productName,
+                quantity: quantity,
+                price: price, // Ajouter le prix au produit
+                discount: discount, // Ajouter la remise dans les achats
+                modifiedStock: -quantity // Enregistrer une valeur négative pour diminuer le stock
+            });
+            
+            // Construire le détail de la commande avec ou sans remise
+            if (discount > 0) {
+                orderDetails += `${productName} - ${quantity} x ${price.toFixed(2)} €  = ${lineTotalBeforeDiscount.toFixed(2)} € (Remise: ${discount.toFixed(2)}%) = ${totalLine} €\n`;
+            } else {
+                orderDetails += `${productName} - ${quantity} x ${price.toFixed(2)} €  = ${lineTotalBeforeDiscount.toFixed(2)} € = ${totalLine} €\n`;
+            }
+        }
+    });
+
+    
+    if (adherent && paymentMethod && total > 0) {
+            google.script.run.withSuccessHandler(() => {
+            console.log('Vente enregistrée et cotisation mise à jour');
+            const currentMonthYear = new Date().toLocaleString('fr-FR', { month: 'long', year: 'numeric' });
+            const cotisationStatus = cotisations[adherent]?.[currentMonthYear];
+            if (cotisationStatus !== "ok") {
+                // Met à jour la cotisation seulement si elle n'est pas à jour
+                google.script.run.updateCotisation(adherent, currentMonthYear, cotisationAmount);
+            }
+            
+            // Construction de l'email
+            const invoiceEmail = `
+                <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+                    <p>Bonjour,</p>
+                    <p>Vous trouverez ci-dessous votre dernière facture Coop'az.</p>
+                    <h2 style="color: #4CAF50;">Facture</h2>
+                    <p><strong>Adhérent :</strong> ${adherent}</p>
+                    <p><strong>Date :</strong> ${new Date().toLocaleString('fr-FR')}</p>
+                    <h3>Détails de la commande :</h3>
+                    <pre>${orderDetails}</pre> <!-- Utilisez un <pre> pour conserver la mise en forme -->
+                    ${cotisationAmount > 0 ? `<p><strong>Montant de la cotisation :</strong> ${cotisationAmount.toFixed(2)} €</p>` : ''}
+                    <h3 style="color: #4CAF50;">Total : ${total.toFixed(2)} €</h3>
+                    <p><strong>Méthode de Paiement :</strong> ${paymentMethod}</p>
+                    <p>Merci pour votre commande</p>
+                    <img src="https://scontent-bru2-1.xx.fbcdn.net/v/t39.30808-6/304383743_535490041712950_2937999491346330678_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=_Sds-7SSXQgQ7kNvgFkPOjQ&_nc_zt=23&_nc_ht=scontent-bru2-1.xx&_nc_gid=ATe01421g4Z-YWApmKNnhFT&oh=00_AYDTFDN4ZkLjhth7pF_kojfSjcSOMq1ATwJ5G1TDsaHO2Q&oe=6728187B" alt="Logo" style="width: 100px; height: auto;">
+                </div>
+            `;
+            const email = adherents.find(a => a.name === adherent).email; // Récupère l'email de l'adhérent
+            // Envoie l'email
+            google.script.run.sendEmailToAdherent(email, invoiceEmail);
+            hideLoader();
+            alert('Vente enregistrée !');
+            resetForm();
+            getProducts();
+            loadHome();
+        }).saveSale(adherent, paymentMethod, total, dateTime, purchases);
+    } else {
+        alert('Veuillez remplir tous les champs requis.');
+    }
+}
+
+    function resetForm() {
+        document.getElementById('adherentsDropdown').value = '';
+        document.getElementById('paymentMethodDropdown').value = '';
+        const rows = document.querySelectorAll('#productList tbody tr');
+        rows.forEach(row => row.remove()); // Supprimer toutes les lignes
+    }
+    function updateProductPrice(selectedOption, newPrice) {
+    // Mettre à jour le prix dans l'option sélectionnée
+    selectedOption.dataset.price = newPrice;
+    selectedOption.value = newPrice;
+    // Mettre à jour l'affichage du prix dans la cellule de prix
+    const row = selectedOption.closest('tr');
+    row.cells[1].innerText = `${newPrice} €`;
+    // Recalculer le total de la ligne et le total général
+    calculateRowTotal(row);
+}
+    function openStockPopup(selectedOption) {
+      if (!selectedOption) {
+          alert("Veuillez sélectionner un produit avant de modifier le stock.");
+          return;
+      }
+      const productName = selectedOption.dataset.name;
+      const currentStock = selectedOption.dataset.stock;
+      const currentPrice = selectedOption.dataset.price;
+      // Création de la popup
+      const popup = document.createElement('div');
+      popup.classList.add('popup');
+      popup.style.position = 'fixed';
+      popup.style.left = '50%';
+      popup.style.top = '50%';
+      popup.style.transform = 'translate(-50%, -50%)';
+      popup.style.backgroundColor = '#4CAF50';
+      popup.style.color = '#fff';
+      popup.style.border = '1px solid #ccc';
+      popup.style.padding = '20px';
+      popup.style.zIndex = '1000';
+      popup.style.boxShadow = '2px 2px 10px rgba(0, 0, 0, 0.2)';
+      popup.style.borderRadius = '8px'; // Coins arrondis
+      // Ajoutez la classe 'show' après l'ajout de la popup
+      setTimeout(() => {
+          popup.classList.add('show');
+      }, 10);
+      // Contenu HTML de la popup
+      popup.innerHTML = `
+          <h2>Modifier le stock et le prix de ${productName}</h2>
+          <label for="newStock">Nouveau Stock:</label>
+          <input type="number" id="newStock" value="${currentStock}" min="0"><br><br>
+          <label for="newPrice">Nouveau Prix:</label>
+          <input type="number" id="newPrice" value="${currentPrice}" min="0" step="0.01"><br><br>
+          <button id="saveStockButton">Enregistrer</button>
+          <button id="cancelButton">Annuler</button>
+      `;
+      // Ajouter la popup au DOM
+      document.body.appendChild(popup);
+      // Enregistrer les nouvelles valeurs de stock et de prix
+      document.getElementById('saveStockButton').onclick = function() {
+          const newStock = parseInt(document.getElementById('newStock').value, 10);
+          const newPrice = parseFloat(document.getElementById('newPrice').value);
+          // Mise à jour des données dans l'option sélectionnée
+          selectedOption.dataset.stock = newStock;
+          selectedOption.dataset.price = newPrice;
+          // Mise à jour de l'affichage dans la ligne du tableau
+          updateStockInRow(selectedOption);
+          updateProductPrice(selectedOption, parseFloat(newPrice));
+          // Fermer la popup
+          document.body.removeChild(popup);
+          // Mise à jour dans Google Sheets
+          updateSingleProductStockAndPrice(productName, newStock, newPrice);
+      };
+        // Lorsque vous fermez la popup
+          document.getElementById('cancelButton').onclick = function() {
+          popup.classList.remove('show'); // Retirez la classe
+          setTimeout(() => {
+              document.body.removeChild(popup);
+          }, 30000); // Retardez la suppression pour laisser le temps à l'animation
+      };
+      // Annuler et fermer la popup
+          document.getElementById('cancelButton').onclick = function() {
+          document.body.removeChild(popup);
+      };
+    }
+    function updateStockInRow(selectedOption) {
+      const rows = document.querySelectorAll('#productList tbody tr');
+      rows.forEach(row => {
+          const select = row.cells[0].querySelector('select');
+          if (select && select.selectedOptions[0].dataset.name === selectedOption.dataset.name) {
+              row.cells[2].innerText = `${selectedOption.dataset.stock} unités`; // Mettre à jour le stock
+              row.cells[1].innerText = `${selectedOption.dataset.price} €`; // Mettre à jour le prix
+              calculateRowTotal(row); // Recalculer le total de la ligne après modification
+          }
+      });
+    }
+    function updateSingleProductStockAndPrice(productName, newStock, newPrice) {
+      google.script.run.withSuccessHandler((result) => {
+          alert(result); // Confirmation de mise à jour
+      }).withFailureHandler((error) => {
+          alert("Erreur lors de la mise à jour : " + error.message);
+      }).updateProductStockAndPrice(productName, newStock, newPrice);
+    }
+    ////////////////RECEPTION//////////////////////
+ // Fonction pour charger la liste des fournisseurs
+        function loadSuppliers() {
+            google.script.run.withSuccessHandler(function(suppliers) {
+                const dropdown = document.getElementById('supplierDropdown');
+                suppliers.forEach(supplier => {
+                    dropdown.innerHTML += `<option value="${supplier.name}">${supplier.name}</option>`;
+                });
+            }).receptionGetSuppliers();
+        }
+        function updateProductDropdown() {
+            const supplier = document.getElementById('supplierDropdown').value;
+            // Appelez la fonction pour récupérer les produits associés au fournisseur
+            google.script.run.withSuccessHandler(function(products) {
+                const productDropdowns = document.querySelectorAll('.productDropdown');
+                productDropdowns.forEach(dropdown => {
+                    dropdown.innerHTML = '<option value="">-- Sélectionnez un produit --</option>'; // Reset pour chaque dropdown
+                    products.forEach(product => {
+                        dropdown.innerHTML += `<option value="${product.name}">${product.name}</option>`;
+                    });
+                });
+                // Ajouter la première ligne seulement si aucune ligne n'est encore présente
+            const receptionTableBody = document.querySelector('#receptionTable tbody');
+            if (receptionTableBody.children.length === 0) {
+                addNewLine();
+            }
+            }).receptionGetProductsBySupplier(supplier);
+        }
+       function updatePriceAndStock(selectElement) {
+    const row = selectElement.closest('tr');
+    const selectedProduct = selectElement.value;
+    google.script.run.withSuccessHandler(function(product) {
+        if (product) {
+            row.querySelector('.currentPrice').textContent = product.price;
+            row.querySelector('.currentStock').textContent = product.stock;
+            updateTotalAmount(row.querySelector('.receivedQuantity')); // Met à jour le montant total avec la quantité saisie
+        } else {
+            row.querySelector('.currentPrice').textContent = '';
+            row.querySelector('.currentStock').textContent = '';
+            row.querySelector('.totalAmount').textContent = ''; // Réinitialiser le montant total
+        }
+    }).withFailureHandler(function(error) {
+        alert("Erreur lors de la récupération des détails du produit : " + error.message);
+    }).receptionGetProductDetails(selectedProduct);
+}
+        function addNewLine() {
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>
+                    <select class="productDropdown" onchange="updatePriceAndStock(this)">
+                        <option value="">-- Sélectionnez un produit --</option>
+                    </select>
+                </td>
+                <td class="currentPrice"></td>
+                <td><input type="number" class="priceUpdate" placeholder="Nouveau Prix" oninput="updateTotalAmount(this.parentElement.parentElement.querySelector('.receivedQuantity'))"></td>
+                <td class="currentStock"></td>
+                <td><input type="number" class="stockUpdate" placeholder="Nouveau Stock"></td>
+                <td><input type="number" class="receivedQuantity" placeholder="Quantité" oninput="updateTotalAmount(this)"></td>
+                <td class="totalAmount"></td>
+                <td>
+                    <span class="deleteRow" onclick="deleteReceptionRow(this)" style="color: red; cursor: pointer; font-size: 20px;">&times;</span>
+                </td>
+            `;
+            document.querySelector('#receptionTable tbody').appendChild(newRow);
+            const supplier = document.getElementById('supplierDropdown').value;
+            if (supplier) {
+                google.script.run.withSuccessHandler(function(products) {
+                    const productDropdown = newRow.querySelector('.productDropdown');
+                    products.forEach(product => {
+                        productDropdown.innerHTML += `<option value="${product.name}">${product.name}</option>`;
+                    });
+                }).receptionGetProductsBySupplier(supplier);
+            }
+        }
+        function deleteReceptionRow(element) {
+    const row = element.closest('tr');
+    row.parentNode.removeChild(row); // Supprime la ligne
+}
+function updateTotalAmount(quantityInput) {
+    const row = quantityInput.closest('tr');
+    const productSelect = row.querySelector('.productDropdown');
+    const selectedProduct = productSelect.options[productSelect.selectedIndex].text;
+    // Vérifiez si le produit contient "piece" pour définir l'autorisation des décimales
+    const allowsDecimal = !selectedProduct.toLowerCase().includes('piece');
+    // Récupérez la valeur de la quantité, en utilisant parseFloat si les décimales sont autorisées, sinon parseInt
+    const quantity = allowsDecimal ? parseFloat(quantityInput.value) || 0 : parseInt(quantityInput.value) || 0;
+    const priceUpdateInput = parseFloat(row.querySelector('.priceUpdate').value) || 0;
+    const currentPrice = parseFloat(row.querySelector('.currentPrice').textContent) || 0;
+    const price = priceUpdateInput || currentPrice;
+    const total = price * quantity;
+    row.querySelector('.totalAmount').textContent = total.toFixed(2) + ' €';
+    updateGrandTotal();
+}
+        function updateGrandTotal() {
+            const rows = document.querySelectorAll('#receptionTable tbody tr');
+            let grandTotal = 0;
+            rows.forEach(row => {
+                const total = row.querySelector('.totalAmount').textContent;
+                grandTotal += parseFloat(total) || 0;
+            });
+            document.getElementById('totalAmount').textContent = 'Total Réception : ' + grandTotal.toFixed(2) + ' €';
+        }
+function validateReception() {
+    const rows = document.querySelectorAll('#receptionTable tbody tr');
+    const receptions = [];
+    rows.forEach(row => {
+        const productSelect = row.querySelector('.productDropdown');
+        const productName = productSelect.value;
+        if (productName) {
+            const allowsDecimal = !productName.toLowerCase().includes('piece');
+            const priceUpdateInput = row.querySelector('.priceUpdate').value;
+            const stockUpdateInput = row.querySelector('.stockUpdate').value;
+            const receivedQuantityInput = row.querySelector('.receivedQuantity').value;
+            // Utilisation de parseFloat pour gérer les décimales
+            let stockUpdate = allowsDecimal ? parseFloat(stockUpdateInput) || 0 : parseInt(stockUpdateInput, 10);
+            let receivedQuantity = allowsDecimal ? parseFloat(receivedQuantityInput) || 0 : parseInt(receivedQuantityInput, 10);
+            // Formatage des quantités en chaîne avec décimales si nécessaire
+            stockUpdate = allowsDecimal ? stockUpdate.toFixed(2) : stockUpdate.toString();
+            receivedQuantity = allowsDecimal ? receivedQuantity.toFixed(2) : receivedQuantity.toString();
+            const formattedPriceUpdate = priceUpdateInput ? parseFloat(priceUpdateInput).toFixed(2) : null;
+            receptions.push({
+                productName,
+                priceUpdate: formattedPriceUpdate,
+                stockUpdate: stockUpdate,
+                receivedQuantity: receivedQuantity
+            });
+        }
+    });
+    google.script.run.receptionValidateReception(receptions);
+    alert('Réception enregistrée !');
+    loadHome();
+}
+let selectedSupplier = "";  // Variable pour stocker le fournisseur sélectionné
+
+// Fonction appelée à chaque changement dans la liste déroulante des fournisseurs
+function handleSupplierChange() {
+    const supplierDropdown = document.getElementById('supplierDropdown');
+    const errorMessage = document.getElementById('error-message-reception');
+    const createProductButton = document.getElementById('createProductButton');
+
+    selectedSupplier = supplierDropdown.value;  // Stocker le fournisseur sélectionné
+
+    if (selectedSupplier === "") {
+        // Aucune sélection de fournisseur, afficher le message d'erreur
+        errorMessage.style.display = 'block';
+        createProductButton.disabled = true;  // Désactiver le bouton de création de produit
+    } else {
+        // Fournisseur sélectionné, masquer le message d'erreur et activer le bouton
+        errorMessage.style.display = 'none';
+        createProductButton.disabled = false;  // Activer le bouton de création de produit
+    }
+}
+
+// Fonction pour ouvrir le popup de création de produit
+function createNewProduct() {
+    if (selectedSupplier === "") {
+        alert("Sélectionnez d'abord un fournisseur");
+        return;
+    }
+    
+    // Ouvrir la popup pour créer un nouveau produit
+    openCreateProductPopup();
+}
+
+// Fonction pour ouvrir la popup de création de produit
+function openCreateProductPopup() {
+    const supplierSelect = document.getElementById("supplierDropdown");
+    
+
+    const popupHtml = `
+      <div class="popup-overlay">
+        <div class="popup-content">
+          <h2>Créer un nouveau produit</h2>
+          <form id="createProductForm">
+            <label>Nom du produit</label>
+            <input type="text" id="productName" required><br><br>
+            
+            <label>Code-barres</label>
+            <input type="text" id="productBarcode"><br><br>
+
+            <label>Unité de mesure</label>
+            <select id="productUnit" required>
+              <option value="">Sélectionnez une unité</option>
+              <option value="Kilo">Kilo</option>
+              <option value="Piece">Piece</option>
+              <option value="Litre">Litre</option>
+            </select><br><br>
+
+            <label>Prix</label>
+            <input type="number" id="productPrice" step="0.01" required><br><br>
+
+            <label>Quantité reçue</label>
+            <input type="number" id="productQuantity" step="0.01" required><br><br>
+
+            <button type="button" onclick="saveNewProduct()">Valider</button>
+            <button type="button" onclick="closePopup()">Annuler</button>
+          </form>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', popupHtml);
+}
+
+// Fonction pour fermer la popup
+function closePopup() {
+    const overlay = document.querySelector('.popup-overlay');
+    if (overlay) overlay.remove();
+}
+
+// Fonction pour enregistrer un nouveau produit
+function saveNewProduct() {
+    const productData = {
+        name: document.getElementById('productName').value,
+        barcode: document.getElementById('productBarcode').value,
+        unit: document.getElementById('productUnit').value,
+        price: parseFloat(document.getElementById('productPrice').value),
+        quantity: parseFloat(document.getElementById('productQuantity').value),
+        supplier: selectedSupplier  // Ajouter le fournisseur sélectionné
+    };
+
+    // Vérifier que tous les champs obligatoires sont remplis
+    if (!productData.name || !productData.unit || !productData.price || !productData.quantity) {
+        alert("Veuillez remplir tous les champs obligatoires.");
+        return;
+    }
+
+    // Appel à Google Apps Script pour enregistrer le produit avec le fournisseur
+    google.script.run.withSuccessHandler(response => {
+        alert(response);
+        closePopup();
+        loadHome();
+    }).receptionCreateProduct(productData);  // Passer toutes les données, y compris le fournisseur
+}
+
+    // Charger les produits et les adhérents lors du chargement de la page
+    $(document).ready(function() {
+        
+    });
+  </script>
+</body>
+</html>
+

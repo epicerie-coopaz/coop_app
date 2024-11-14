@@ -1,5 +1,5 @@
 function doGet() {
-  return HtmlService.createHtmlOutputFromFile('SalesInterface')
+  return HtmlService.createTemplateFromFile('SalesInterface')
     .setWidth(1920)
     .setHeight(1080);
 }

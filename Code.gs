@@ -134,6 +134,10 @@ function sendEmailToAdherent(email, invoiceHtml) {
     };
     MailApp.sendEmail(email, subject, '', options); // Notez le paramètre vide pour le corps du message texte
 }
+
+
+
+
 // Récupérer la liste des fournisseurs
 function receptionGetSuppliers() {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('fournisseur');
@@ -165,31 +169,51 @@ function receptionGetProductDetails(productName) {
     }
     return null; // Produit non trouvé
 }
+// Fonction pour valider la réception
 function receptionValidateReception(receptions) {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('produits');
     const data = sheet.getDataRange().getValues();
+    
     receptions.forEach(reception => {
         const { productName, priceUpdate, stockUpdate, receivedQuantity } = reception;
-        const productRow = data.find(row => row[0] === productName);
+        
+        const productRow = data.find(row => row[0] === productName); // Trouver la ligne du produit
         if (productRow) {
             const productIndex = data.indexOf(productRow);
-            let newStock = productRow[8];
-            let newPrice = priceUpdate ? parseFloat(priceUpdate.replace(',', '.')) : productRow[7];  // Conversion avec gestion de la virgule
-            // Vérification de la quantité reçue
-            const quantity = parseFloat(receivedQuantity.replace(',', '.'));  // Remplacer les virgules par des points pour le nombre décimal
-            if (isNaN(quantity) || quantity <= 0) {
-                throw new Error('La quantité reçue doit être un nombre valide.');
+            
+            // Récupération du stock actuel
+            let newStock = productRow[8]; // Colonne 9 pour le stock actuel
+            
+            // Mise à jour du prix si nécessaire
+            let newPrice = priceUpdate ? parseFloat(priceUpdate.replace(',', '.')) : productRow[7];  // Colonne 8 pour le prix
+            if (isNaN(newPrice)) {
+                newPrice = productRow[7]; // Récupérer le prix actuel si le prix mis à jour n'est pas valide
             }
-            // Mise à jour du prix (si spécifié)
+            
+            // Validation de la quantité reçue
+            let quantity = 0;
+            if (receivedQuantity) {
+                quantity = parseFloat(receivedQuantity.replace(',', '.'));
+                if (isNaN(quantity) || quantity <= 0) {
+                    throw new Error('La quantité reçue doit être un nombre valide et supérieur à 0.');
+                }
+            }
+
+            // Mise à jour du prix si un prix est fourni
             if (priceUpdate !== null && !isNaN(newPrice)) {
                 sheet.getRange(productIndex + 1, 8).setValue(newPrice); // Colonne H pour le prix
             }
+            
             // Mise à jour du stock
-            if (stockUpdate !== null) {
-                newStock = parseFloat(stockUpdate.replace(',', '.')) + quantity;
-            } else {
+            if (stockUpdate !== null && stockUpdate !== '') {
+                // Si un nouveau stock est fourni, on l'utilise directement
+                newStock = parseFloat(stockUpdate.replace(',', '.'));
+            } else if (receivedQuantity) {
+                // Sinon, on ajoute la quantité reçue au stock actuel
                 newStock += quantity;
             }
+            
+            // Vérification du stock mis à jour
             if (!isNaN(newStock)) {
                 sheet.getRange(productIndex + 1, 9).setValue(newStock); // Colonne I pour le stock
             } else {
@@ -197,8 +221,10 @@ function receptionValidateReception(receptions) {
             }
         }
     });
-    return 'Réception validée avec succès !';
+    
+    return 'Réception validée avec succès !'; // Message de confirmation
 }
+
 
 function receptionCreateProduct(productData) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('produits');
@@ -214,4 +240,53 @@ function receptionCreateProduct(productData) {
   ]);
   return `Le produit ${productData.name} a été ajouté avec succès.`;
 }
+function getSuppliers() {
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('fournisseur');
+    const data = sheet.getDataRange().getValues();
+    const suppliers = [];
+
+
+    // Parcours des lignes et extraction des données
+    for (let i = 1; i < data.length; i++) {
+        const supplier = {
+            name: data[i][0], // Nom
+            phone: data[i][8], // Téléphone
+            email: data[i][7], // Email
+            address: data[i][1] , // Adresse
+            codePostal: data[i][2], // Adresse
+            ville: data[i][3], // Adresse
+            referent: data[i][5] // Référent
+        };
+        suppliers.push(supplier);
+    }
+
+
+    // Trier les fournisseurs par nom (ordre alphabétique)
+    suppliers.sort((a, b) => a.name.localeCompare(b.name));
+
+
+    return suppliers;
+}
+
+
+
+
+function createSupplier(supplierData) {
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('fournisseur');
+    sheet.appendRow([supplierData.name, supplierData.address,supplierData.codePostal,supplierData.ville, '',supplierData.referent, '', supplierData.email, supplierData.phone]);
+    return "Fournisseur ajouté avec succès !";
+}
+
+
+function getReferents() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("data");
+  const referents = sheet.getRange("A2:A").getValues();  // Récupère les valeurs de la colonne A à partir de la ligne 2
+  return referents.filter(row => row[0] != "");  // Filtre les valeurs vides
+}
+
+
+
+
+
+
 

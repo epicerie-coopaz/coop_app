@@ -372,12 +372,17 @@
             <input type="number" id="cotisationAmount" value="0" min="5" step="1" oninput="calculateTotal()">
         </div>
           <h2>Méthode de Paiement</h2>
-          <select id="paymentMethodDropdown">
+          <select id="paymentMethodDropdown" onchange="calculateTotal()">
               <option value="" disabled selected>Sélectionnez un mode de paiement</option>
               <option value="CB">CB</option>
               <option value="Chèque">Chèque</option>
           </select>
+
+
+
+
           <div id="total">Total Général: 0 €</div>
+          <div id="cbFee" style="display: none;">Frais CB: 0 €</div>
           <button id="validateButton" onclick="validate()">Valider</button>
         </div>
       </div>
@@ -385,7 +390,7 @@
         getProducts();
         getAdherents();
         getCotisations(); // Ajoute cette ligne pour charger les cotisations
-        
+       
           }
     function loadReception() {
       const content = document.getElementById('content');
@@ -411,8 +416,8 @@
             </thead>
             <tbody>
             <div id="error-message-reception" style="color: red; display: none;">
-    Sélectionnez d'abord un fournisseur.
-</div>
+                Sélectionnez d'abord un fournisseur.
+            </div>
             </tbody>
         </table>
         <div id="totalAmount">Total Réception : 0 €</div>
@@ -424,6 +429,44 @@
       `;    
 loadSuppliers();  
             }
+    function loadFournisseur() {
+      const content = document.getElementById('content');
+      content.innerHTML = `
+      <div class="fournisseur">
+          <h1>Réception des Produits</h1>
+           <button id="addProductButton" onclick="openCreateSupplierPopup()">Ajouter un Fournisseur</button>
+
+
+        <table id="supplierTable">
+        <thead>
+            <tr>
+                <th>Nom du Fournisseur</th>
+                <th>Téléphone</th>
+                <th>Email</th>
+                <th>Adresse</th>
+                <th>Code Postal</th>
+                <th>Ville</th>
+                <th>Référent</th>
+            </tr>
+        </thead>
+        <tbody id="supplierTableBody">
+            <!-- Les fournisseurs seront ajoutés ici via JavaScript -->
+        </tbody>
+    </table>
+
+
+
+
+
+
+       
+    </div>
+      `;    
+getfournisseur();  
+            }
+
+
+
 
 
 
@@ -440,7 +483,7 @@ loadSuppliers();
     loader.style.alignItems = 'center';
     loader.style.justifyContent = 'center';
     loader.style.zIndex = '1000';
-    loader.innerHTML = '<h2>Traitement de la facture en cours...</h2><div class="spinner"></div>';
+    loader.innerHTML = '<h2>Traitement des données en cours...</h2><div class="spinner"></div>';
     document.body.appendChild(loader);
 }
 function hideLoader() {
@@ -547,6 +590,36 @@ function updateEmail() {
         $(select).select2({
             placeholder: 'Recherchez un produit',
             allowClear: true,
+             matcher: function(params, data) {
+// Si l'élément est une correspondance exacte, retourner l'élément
+            if ($.trim(params.term) === '') {
+                return data;
+            }
+
+
+            // Convertir le terme de recherche en tableau de mots
+            var searchWords = params.term.toLowerCase().split(/\s+/);
+
+
+            // Récupérer le texte de l'option (fournisseur)
+            var dataText = data.text.toLowerCase();
+
+
+            // Vérifier si tous les mots de la recherche sont présents dans le texte de l'option
+            var match = searchWords.every(function(word) {
+                return dataText.includes(word);
+            });
+
+
+            // Si tous les mots sont trouvés, renvoyer l'élément pour qu'il soit affiché
+            if (match) {
+                return data;
+            }
+
+
+            // Si aucun mot ne correspond, retourner null (ne pas afficher l'élément)
+            return null;    },
+           
             templateResult: function(option) {
                 if ($(option.element).hasClass('out-of-stock')) {
                     return $('<span style="color:red;">' + option.text + ' (Stock négatif)</span>');
@@ -599,8 +672,14 @@ function updateEmail() {
         }
         calculateRowTotal(row);
     };
-        
+       
         cell4.appendChild(quantityInput);
+
+
+
+
+
+
 
 
         // Discount input
@@ -661,7 +740,6 @@ function updateEmail() {
     }
 
 
-
     function calculateTotal() {
     const rows = document.querySelectorAll('#productList tbody tr');
     let total = 0;
@@ -673,9 +751,31 @@ function updateEmail() {
     const cotisationAmount = parseFloat(document.getElementById('cotisationAmount').value) || 0;
     total += cotisationAmount; // Ajouter le montant de cotisation au total
     document.getElementById('total').innerText = `Total Général: ${total.toFixed(2)} €`;
+     // Ajoute le coût CB si nécessaire
+  const paymentMethod = document.getElementById('paymentMethodDropdown').value;
+  let cbFee = 0;
+  if (paymentMethod === "CB") {
+    cbFee = total * 0.0055; // 0.55% de frais
+    document.getElementById('cbFee').style.display = 'block';
+    document.getElementById('cbFee').textContent = `Coût supplémentaire CB: ${cbFee.toFixed(2)} €`;
+  } else {
+    document.getElementById('cbFee').style.display = 'none';
+  }
+
+
+
+
+  // Total avec frais CB si appliqué
+  const grandTotal = total + cbFee;
+  document.getElementById('total').textContent = `Total Général: ${grandTotal.toFixed(2)} €`;
 }
+
+
+
+
 function validate() {
     showLoader();
+   
     const adherent = document.getElementById('adherentsDropdown').value;
     const paymentMethod = document.getElementById('paymentMethodDropdown').value;
     const total = parseFloat(document.getElementById('total').innerText.replace('Total Général: ', '').replace(' €', ''));
@@ -683,7 +783,7 @@ function validate() {
     const cotisationAmount = parseFloat(document.getElementById('cotisationAmount').value) || 0; // Récupérer le montant de cotisation
     const purchases = [];
     const rows = document.querySelectorAll('#productList tbody tr');
-    
+   
     // Renommer la variable pour éviter le conflit
     const invoiceRows = document.querySelectorAll('#productList tbody tr');
     for (const row of invoiceRows) {
@@ -695,10 +795,17 @@ function validate() {
         // Vérifier que le produit est sélectionné avant de vérifier la quantité
         if (select.value && quantity === 0) {
             alert("Veuillez entrer une quantité supérieure à 0 pour tous les produits sélectionnés.");
+            hideLoader(); // Cacher le loader si l'alerte est déclenchée
             return; // Sortir de la fonction si une quantité est 0
         }
     }
-    
+   
+    if (!adherent || !paymentMethod || total <= 0) {
+        alert('Veuillez remplir tous les champs requis.');
+        hideLoader(); // Cacher le loader si des champs sont manquants
+        return; // Sortir de la fonction si un champ est manquant
+    }
+   
     let orderDetails = ''; // Initialiser la variable pour stocker les détails
     rows.forEach(row => {
         const select = row.cells[0].querySelector('select');
@@ -711,7 +818,7 @@ function validate() {
         const lineTotalBeforeDiscount = price * quantity;
         const discountAmount = (lineTotalBeforeDiscount * discount) / 100; // Calcul de la remise en pourcentage
         const totalLine = (lineTotalBeforeDiscount - discountAmount).toFixed(2); // Appliquer la remise et calculer le total de la ligne
-        
+       
         if (productName && quantity > 0) {
             purchases.push({
                 productName: productName,
@@ -720,7 +827,7 @@ function validate() {
                 discount: discount, // Ajouter la remise dans les achats
                 modifiedStock: -quantity // Enregistrer une valeur négative pour diminuer le stock
             });
-            
+           
             // Construire le détail de la commande avec ou sans remise
             if (discount > 0) {
                 orderDetails += `${productName} - ${quantity} x ${price.toFixed(2)} €  = ${lineTotalBeforeDiscount.toFixed(2)} € (Remise: ${discount.toFixed(2)}%) = ${totalLine} €\n`;
@@ -730,47 +837,46 @@ function validate() {
         }
     });
 
-    
-    if (adherent && paymentMethod && total > 0) {
-            google.script.run.withSuccessHandler(() => {
-            console.log('Vente enregistrée et cotisation mise à jour');
-            const currentMonthYear = new Date().toLocaleString('fr-FR', { month: 'long', year: 'numeric' });
-            const cotisationStatus = cotisations[adherent]?.[currentMonthYear];
-            if (cotisationStatus !== "ok") {
-                // Met à jour la cotisation seulement si elle n'est pas à jour
-                google.script.run.updateCotisation(adherent, currentMonthYear, cotisationAmount);
-            }
-            
-            // Construction de l'email
-            const invoiceEmail = `
-                <div style="font-family: Arial, sans-serif; line-height: 1.6;">
-                    <p>Bonjour,</p>
-                    <p>Vous trouverez ci-dessous votre dernière facture Coop'az.</p>
-                    <h2 style="color: #4CAF50;">Facture</h2>
-                    <p><strong>Adhérent :</strong> ${adherent}</p>
-                    <p><strong>Date :</strong> ${new Date().toLocaleString('fr-FR')}</p>
-                    <h3>Détails de la commande :</h3>
-                    <pre>${orderDetails}</pre> <!-- Utilisez un <pre> pour conserver la mise en forme -->
-                    ${cotisationAmount > 0 ? `<p><strong>Montant de la cotisation :</strong> ${cotisationAmount.toFixed(2)} €</p>` : ''}
-                    <h3 style="color: #4CAF50;">Total : ${total.toFixed(2)} €</h3>
-                    <p><strong>Méthode de Paiement :</strong> ${paymentMethod}</p>
-                    <p>Merci pour votre commande</p>
-                    <img src="https://scontent-bru2-1.xx.fbcdn.net/v/t39.30808-6/304383743_535490041712950_2937999491346330678_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=_Sds-7SSXQgQ7kNvgFkPOjQ&_nc_zt=23&_nc_ht=scontent-bru2-1.xx&_nc_gid=ATe01421g4Z-YWApmKNnhFT&oh=00_AYDTFDN4ZkLjhth7pF_kojfSjcSOMq1ATwJ5G1TDsaHO2Q&oe=6728187B" alt="Logo" style="width: 100px; height: auto;">
-                </div>
-            `;
-            const email = adherents.find(a => a.name === adherent).email; // Récupère l'email de l'adhérent
-            // Envoie l'email
-            google.script.run.sendEmailToAdherent(email, invoiceEmail);
-            hideLoader();
-            alert('Vente enregistrée !');
-            resetForm();
-            getProducts();
-            loadHome();
-        }).saveSale(adherent, paymentMethod, total, dateTime, purchases);
-    } else {
-        alert('Veuillez remplir tous les champs requis.');
-    }
+
+    google.script.run.withSuccessHandler(() => {
+        console.log('Vente enregistrée et cotisation mise à jour');
+        const currentMonthYear = new Date().toLocaleString('fr-FR', { month: 'long', year: 'numeric' });
+        const cotisationStatus = cotisations[adherent]?.[currentMonthYear];
+        if (cotisationStatus !== "ok") {
+            // Met à jour la cotisation seulement si elle n'est pas à jour
+            google.script.run.updateCotisation(adherent, currentMonthYear, cotisationAmount);
+        }
+       
+        // Construction de l'email
+        const invoiceEmail = `
+            <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+                <p>Bonjour,</p>
+                <p>Vous trouverez ci-dessous votre dernière facture Coop'az.</p>
+                <h2 style="color: #4CAF50;">Facture</h2>
+                <p><strong>Adhérent :</strong> ${adherent}</p>
+                <p><strong>Date :</strong> ${new Date().toLocaleString('fr-FR')}</p>
+                <h3>Détails de la commande :</h3>
+                <pre>${orderDetails}</pre> <!-- Utilisez un <pre> pour conserver la mise en forme -->
+                ${cotisationAmount > 0 ? `<p><strong>Montant de la cotisation :</strong> ${cotisationAmount.toFixed(2)} €</p>` : ''}
+                <h3 style="color: #4CAF50;">Total : ${total.toFixed(2)} €</h3>
+                <p><strong>Méthode de Paiement :</strong> ${paymentMethod}</p>
+                <p>Merci pour votre commande</p>
+                <img src="https://scontent-bru2-1.xx.fbcdn.net/v/t39.30808-6/304383743_535490041712950_2937999491346330678_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=_Sds-7SSXQgQ7kNvgFkPOjQ&_nc_zt=23&_nc_ht=scontent-bru2-1.xx&_nc_gid=ATe01421g4Z-YWApmKNnhFT&oh=00_AYDTFDN4ZkLjhth7pF_kojfSjcSOMq1ATwJ5G1TDsaHO2Q&oe=6728187B" alt="Logo" style="width: 100px; height: auto;">
+            </div>
+        `;
+        const email = adherents.find(a => a.name === adherent).email; // Récupère l'email de l'adhérent
+        // Envoie l'email
+        google.script.run.sendEmailToAdherent(email, invoiceEmail);
+        hideLoader();
+        alert('Vente enregistrée !');
+        resetForm();
+        getProducts();
+        loadHome();
+    }).saveSale(adherent, paymentMethod, total, dateTime, purchases);
 }
+
+
+
 
     function resetForm() {
         document.getElementById('adherentsDropdown').value = '';
@@ -871,34 +977,227 @@ function validate() {
           alert("Erreur lors de la mise à jour : " + error.message);
       }).updateProductStockAndPrice(productName, newStock, newPrice);
     }
+
+
+
+
+
+
+
+
     ////////////////RECEPTION//////////////////////
  // Fonction pour charger la liste des fournisseurs
         function loadSuppliers() {
             google.script.run.withSuccessHandler(function(suppliers) {
                 const dropdown = document.getElementById('supplierDropdown');
+
+
+                   // Trier la liste des fournisseurs par ordre alphabétique
+        suppliers.sort((a, b) => a.name.localeCompare(b.name));
                 suppliers.forEach(supplier => {
                     dropdown.innerHTML += `<option value="${supplier.name}">${supplier.name}</option>`;
                 });
             }).receptionGetSuppliers();
         }
-        function updateProductDropdown() {
+ 
+
+function addNewLine() {
+    const newRow = document.createElement('tr');
+    newRow.innerHTML = `
+        <td>
+            <select class="productDropdown" onchange="updatePriceAndStock(this)" disabled>
+                <option value="">-- Sélectionnez un produit --</option>
+            </select>
+        </td>
+        <td class="currentPrice"></td>
+        <td><input type="number" class="priceUpdate" placeholder="Nouveau Prix" oninput="updateTotalAmount(this.parentElement.parentElement.querySelector('.receivedQuantity'))"></td>
+        <td class="currentStock"></td>
+        <td><input type="number" class="stockUpdate" placeholder="Nouveau Stock"></td>
+        <td><input type="number" class="receivedQuantity" placeholder="Quantité" oninput="updateTotalAmount(this)"></td>
+        <td class="totalAmount"></td>
+        <td>
+            <span class="deleteRow" onclick="deleteReceptionRow(this)" style="color: red; cursor: pointer; font-size: 20px;">&times;</span>
+        </td>
+    `;
+    document.querySelector('#receptionTable tbody').appendChild(newRow);
+
+    // Initialiser Select2 sur le nouvel élément .productDropdown
+    $(newRow).find('.productDropdown').select2({
+        placeholder: "-- Sélectionnez un produit --",
+        allowClear: true,
+        minimumResultsForSearch: 0, // Affiche la barre de recherche sans restriction
+        width: '100%', // Adapter à la largeur du conteneur
+        matcher: function(params, data) {
+            if ($.trim(params.term) === '') {
+                return data;
+            }
+            var searchWords = params.term.toLowerCase().split(/\s+/);
+            var dataText = data.text.toLowerCase();
+            var match = searchWords.every(function(word) {
+                return dataText.includes(word);
+            });
+            return match ? data : null;
+        }
+    });
+
+    // Récupérer le fournisseur sélectionné et remplir les produits
+    const supplier = document.getElementById('supplierDropdown').value;
+    if (supplier) {
+        google.script.run.withSuccessHandler(function(products) {
+            const productDropdown = newRow.querySelector('.productDropdown');
+            
+            // Trier les produits par ordre alphabétique
+            products.sort((a, b) => a.name.localeCompare(b.name));
+
+            // Ajouter les produits dans le dropdown
+            products.forEach(product => {
+                productDropdown.innerHTML += `<option value="${product.name}">${product.name}</option>`;
+            });
+
+            // Réactiver Select2 et ouvrir la liste après avoir ajouté les produits
+            $(newRow).find('.productDropdown').prop('disabled', false).select2('open');
+
+            // Appliquer le focus sur le champ de recherche après l'ouverture du Select2
+            setTimeout(function() {
+                const searchField = $(newRow).find('.select2-search__field');
+                if (searchField.length > 0 && searchField.is(":visible")) {
+                    searchField.focus(); // Appliquer le focus directement à la zone de recherche
+                }
+            }, 100); // Attendre un peu pour s'assurer que l'élément est visible
+        }).receptionGetProductsBySupplier(supplier);
+    }
+}
+
+function deleteReceptionRow(element) {
+    const row = element.closest('tr');
+    row.parentNode.removeChild(row); // Supprime la ligne
+}
+
+
+function updateProductDropdown() {
             const supplier = document.getElementById('supplierDropdown').value;
-            // Appelez la fonction pour récupérer les produits associés au fournisseur
+
+
+            // Appeler la fonction pour récupérer les produits associés au fournisseur
             google.script.run.withSuccessHandler(function(products) {
                 const productDropdowns = document.querySelectorAll('.productDropdown');
+
+
+                // Vérification de l'existence des éléments .productDropdown
+                if (productDropdowns.length === 0) {
+                    console.error("Aucun élément .productDropdown trouvé. Assurez-vous que les éléments existent avant d'appeler Select2.");
+                    return;
+                }
+
+
+
+
+
+
+        // Trier les produits par ordre alphabétique
+        products.sort((a, b) => a.name.localeCompare(b.name));
+
+
+
+
+                // Mise à jour de chaque dropdown produit
                 productDropdowns.forEach(dropdown => {
-                    dropdown.innerHTML = '<option value="">-- Sélectionnez un produit --</option>'; // Reset pour chaque dropdown
+                    // Réinitialiser le contenu du dropdown
+                    dropdown.innerHTML = '<option value="">-- Sélectionnez un produit --</option>';
+
+
+                    // Ajouter chaque produit dans la liste déroulante
                     products.forEach(product => {
                         dropdown.innerHTML += `<option value="${product.name}">${product.name}</option>`;
                     });
-                });
-                // Ajouter la première ligne seulement si aucune ligne n'est encore présente
-            const receptionTableBody = document.querySelector('#receptionTable tbody');
-            if (receptionTableBody.children.length === 0) {
-                addNewLine();
+
+
+                    // Détruire Select2 pour éviter la double initialisation s'il est déjà appliqué
+                    if ($(dropdown).hasClass("select2-hidden-accessible")) {
+                        $(dropdown).select2('destroy');
+                    }
+
+
+                    // Initialiser Select2 sur chaque dropdown de produit
+                    $(dropdown).select2({
+                        placeholder: "-- Sélectionnez un produit --",
+                                minimumResultsForSearch: 0, // Affiche la barre de recherche sans restriction
+
+                        allowClear: true,
+                        width: '100%' ,// Adapter à la largeur du conteneur
+                         matcher: function(params, data) {
+// Si l'élément est une correspondance exacte, retourner l'élément
+            if ($.trim(params.term) === '') {
+                return data;
             }
-            }).receptionGetProductsBySupplier(supplier);
+
+
+            // Convertir le terme de recherche en tableau de mots
+            var searchWords = params.term.toLowerCase().split(/\s+/);
+
+
+            // Récupérer le texte de l'option (fournisseur)
+            var dataText = data.text.toLowerCase();
+
+
+            // Vérifier si tous les mots de la recherche sont présents dans le texte de l'option
+            var match = searchWords.every(function(word) {
+                return dataText.includes(word);
+            });
+
+
+            // Si tous les mots sont trouvés, renvoyer l'élément pour qu'il soit affiché
+            if (match) {
+                return data;
+            }
+
+
+            // Si aucun mot ne correspond, retourner null (ne pas afficher l'élément)
+            return null;    },
+                    });
+                });
+
+
+                // Ajouter la première ligne si aucune ligne n'est encore présente
+                const receptionTableBody = document.querySelector('#receptionTable tbody');
+                if (receptionTableBody.children.length === 0) {
+                    addNewLine();
+                }
+            })
+            .withFailureHandler(function(error) {
+                console.error("Erreur lors de la récupération des produits : ", error);
+                alert("Erreur lors de la récupération des produits. Veuillez réessayer.");
+            })
+            .receptionGetProductsBySupplier(supplier);
         }
+
+
+        // Fonction pour surveiller l'apparition des éléments .productDropdown
+        function waitForProductDropdowns() {
+            const observer = new MutationObserver((mutations, obs) => {
+                const productDropdowns = document.querySelectorAll('.productDropdown');
+                if (productDropdowns.length > 0) {
+                    // Appeler updateProductDropdown et arrêter l'observateur
+                    updateProductDropdown();
+                    obs.disconnect();
+                }
+            });
+
+
+            // Observer les changements dans le corps de la page
+            observer.observe(document.body, { childList: true, subtree: true });
+        }
+
+
+        // Appeler la fonction d'attente au chargement de la page
+        document.addEventListener("DOMContentLoaded", waitForProductDropdowns);
+
+
+        // Exemple d'appel de la fonction pour ajouter une ligne lors de la sélection d'un fournisseur
+        document.getElementById('supplierDropdown').addEventListener('change', function() {
+            addNewLine(); // Ajouter une première ligne avec .productDropdown lors de la sélection du fournisseur
+        });
+       
        function updatePriceAndStock(selectElement) {
     const row = selectElement.closest('tr');
     const selectedProduct = selectElement.value;
@@ -916,39 +1215,7 @@ function validate() {
         alert("Erreur lors de la récupération des détails du produit : " + error.message);
     }).receptionGetProductDetails(selectedProduct);
 }
-        function addNewLine() {
-            const newRow = document.createElement('tr');
-            newRow.innerHTML = `
-                <td>
-                    <select class="productDropdown" onchange="updatePriceAndStock(this)">
-                        <option value="">-- Sélectionnez un produit --</option>
-                    </select>
-                </td>
-                <td class="currentPrice"></td>
-                <td><input type="number" class="priceUpdate" placeholder="Nouveau Prix" oninput="updateTotalAmount(this.parentElement.parentElement.querySelector('.receivedQuantity'))"></td>
-                <td class="currentStock"></td>
-                <td><input type="number" class="stockUpdate" placeholder="Nouveau Stock"></td>
-                <td><input type="number" class="receivedQuantity" placeholder="Quantité" oninput="updateTotalAmount(this)"></td>
-                <td class="totalAmount"></td>
-                <td>
-                    <span class="deleteRow" onclick="deleteReceptionRow(this)" style="color: red; cursor: pointer; font-size: 20px;">&times;</span>
-                </td>
-            `;
-            document.querySelector('#receptionTable tbody').appendChild(newRow);
-            const supplier = document.getElementById('supplierDropdown').value;
-            if (supplier) {
-                google.script.run.withSuccessHandler(function(products) {
-                    const productDropdown = newRow.querySelector('.productDropdown');
-                    products.forEach(product => {
-                        productDropdown.innerHTML += `<option value="${product.name}">${product.name}</option>`;
-                    });
-                }).receptionGetProductsBySupplier(supplier);
-            }
-        }
-        function deleteReceptionRow(element) {
-    const row = element.closest('tr');
-    row.parentNode.removeChild(row); // Supprime la ligne
-}
+       
 function updateTotalAmount(quantityInput) {
     const row = quantityInput.closest('tr');
     const productSelect = row.querySelector('.productDropdown');
@@ -976,34 +1243,71 @@ function updateTotalAmount(quantityInput) {
 function validateReception() {
     const rows = document.querySelectorAll('#receptionTable tbody tr');
     const receptions = [];
+
+
     rows.forEach(row => {
         const productSelect = row.querySelector('.productDropdown');
         const productName = productSelect.value;
+
+
         if (productName) {
             const allowsDecimal = !productName.toLowerCase().includes('piece');
             const priceUpdateInput = row.querySelector('.priceUpdate').value;
             const stockUpdateInput = row.querySelector('.stockUpdate').value;
             const receivedQuantityInput = row.querySelector('.receivedQuantity').value;
-            // Utilisation de parseFloat pour gérer les décimales
-            let stockUpdate = allowsDecimal ? parseFloat(stockUpdateInput) || 0 : parseInt(stockUpdateInput, 10);
-            let receivedQuantity = allowsDecimal ? parseFloat(receivedQuantityInput) || 0 : parseInt(receivedQuantityInput, 10);
-            // Formatage des quantités en chaîne avec décimales si nécessaire
-            stockUpdate = allowsDecimal ? stockUpdate.toFixed(2) : stockUpdate.toString();
-            receivedQuantity = allowsDecimal ? receivedQuantity.toFixed(2) : receivedQuantity.toString();
-            const formattedPriceUpdate = priceUpdateInput ? parseFloat(priceUpdateInput).toFixed(2) : null;
+
+
+            const currentStock = parseFloat(row.querySelector('.currentStock').textContent) || 0;
+
+
+            let stockUpdate = currentStock;  // Par défaut, on garde le stock actuel
+
+
+            // Si un nouveau stock est renseigné, il remplace le stock actuel
+            if (stockUpdateInput) {
+                stockUpdate = parseFloat(stockUpdateInput);
+            }
+
+
+            // Si une quantité réceptionnée est renseignée, on l'ajoute au stock
+            if (receivedQuantityInput) {
+                let receivedQuantity = allowsDecimal ? parseFloat(receivedQuantityInput) || 0 : parseInt(receivedQuantityInput, 10);
+                stockUpdate += receivedQuantity;
+            }
+
+
+            const currentPrice = parseFloat(row.querySelector('.currentPrice').textContent) || 0;
+            const priceUpdate = priceUpdateInput ? parseFloat(priceUpdateInput).toFixed(2) : currentPrice.toFixed(2);
+
+
+            // On envoie les données de cette ligne
             receptions.push({
                 productName,
-                priceUpdate: formattedPriceUpdate,
-                stockUpdate: stockUpdate,
-                receivedQuantity: receivedQuantity
+                priceUpdate: priceUpdate,
+                stockUpdate: stockUpdate.toFixed(2),
+                receivedQuantity: receivedQuantityInput ? receivedQuantityInput.toFixed(2) : "0.00"
             });
         }
     });
+
+
+    // Appel au script Google Apps pour enregistrer la réception
     google.script.run.receptionValidateReception(receptions);
     alert('Réception enregistrée !');
     loadHome();
 }
+
+
+
+
+
+
+
+
 let selectedSupplier = "";  // Variable pour stocker le fournisseur sélectionné
+
+
+
 
 // Fonction appelée à chaque changement dans la liste déroulante des fournisseurs
 function handleSupplierChange() {
@@ -1011,7 +1315,13 @@ function handleSupplierChange() {
     const errorMessage = document.getElementById('error-message-reception');
     const createProductButton = document.getElementById('createProductButton');
 
+
+
+
     selectedSupplier = supplierDropdown.value;  // Stocker le fournisseur sélectionné
+
+
+
 
     if (selectedSupplier === "") {
         // Aucune sélection de fournisseur, afficher le message d'erreur
@@ -1024,21 +1334,30 @@ function handleSupplierChange() {
     }
 }
 
+
+
+
 // Fonction pour ouvrir le popup de création de produit
 function createNewProduct() {
     if (selectedSupplier === "") {
         alert("Sélectionnez d'abord un fournisseur");
         return;
     }
-    
+   
     // Ouvrir la popup pour créer un nouveau produit
     openCreateProductPopup();
 }
 
+
+
+
 // Fonction pour ouvrir la popup de création de produit
 function openCreateProductPopup() {
     const supplierSelect = document.getElementById("supplierDropdown");
-    
+   
+
+
+
 
     const popupHtml = `
       <div class="popup-overlay">
@@ -1047,9 +1366,12 @@ function openCreateProductPopup() {
           <form id="createProductForm">
             <label>Nom du produit</label>
             <input type="text" id="productName" required><br><br>
-            
+           
             <label>Code-barres</label>
             <input type="text" id="productBarcode"><br><br>
+
+
+
 
             <label>Unité de mesure</label>
             <select id="productUnit" required>
@@ -1059,11 +1381,20 @@ function openCreateProductPopup() {
               <option value="Litre">Litre</option>
             </select><br><br>
 
+
+
+
             <label>Prix</label>
             <input type="number" id="productPrice" step="0.01" required><br><br>
 
+
+
+
             <label>Quantité reçue</label>
             <input type="number" id="productQuantity" step="0.01" required><br><br>
+
+
+
 
             <button type="button" onclick="saveNewProduct()">Valider</button>
             <button type="button" onclick="closePopup()">Annuler</button>
@@ -1074,11 +1405,17 @@ function openCreateProductPopup() {
     document.body.insertAdjacentHTML('beforeend', popupHtml);
 }
 
+
+
+
 // Fonction pour fermer la popup
 function closePopup() {
     const overlay = document.querySelector('.popup-overlay');
     if (overlay) overlay.remove();
 }
+
+
+
 
 // Fonction pour enregistrer un nouveau produit
 function saveNewProduct() {
@@ -1091,11 +1428,17 @@ function saveNewProduct() {
         supplier: selectedSupplier  // Ajouter le fournisseur sélectionné
     };
 
+
+
+
     // Vérifier que tous les champs obligatoires sont remplis
     if (!productData.name || !productData.unit || !productData.price || !productData.quantity) {
         alert("Veuillez remplir tous les champs obligatoires.");
         return;
     }
+
+
+
 
     // Appel à Google Apps Script pour enregistrer le produit avec le fournisseur
     google.script.run.withSuccessHandler(response => {
@@ -1105,11 +1448,199 @@ function saveNewProduct() {
     }).receptionCreateProduct(productData);  // Passer toutes les données, y compris le fournisseur
 }
 
+
+///////FOURNISEEUR/////////////////
+
+
+
+
+
+
+ function getfournisseur() {// Affiche le loader pendant le chargement
+    showLoader(true);  // Appel à votre fonction showLoader pour afficher le loader
+
+
+    // Appel à Google Apps Script pour récupérer les fournisseurs
+    google.script.run.withSuccessHandler(function(suppliers) {
+        // Une fois les données récupérées, affiche les fournisseurs
+        displaySuppliers(suppliers);
+    }).getSuppliers();  // Appel de la fonction `getSuppliers`
+}
+
+
+// Charge les fournisseurs lorsque la page est prête
+document.addEventListener("DOMContentLoaded", function() {
+    loadSuppliers();  // Charge les fournisseurs au chargement de la page
+});
+
+
+ // Fonction pour afficher les fournisseurs dans le tableau
+        function displaySuppliers(suppliers) {
+            const supplierTableBody = document.getElementById('supplierTableBody');
+            supplierTableBody.innerHTML = ''; // Réinitialiser le tableau avant de remplir
+
+
+            suppliers.forEach(supplier => {
+                const row = document.createElement('tr');
+
+
+                const supplierNameCell = document.createElement('td');
+                supplierNameCell.textContent = supplier.name;
+                row.appendChild(supplierNameCell);
+
+
+                const emailCell = document.createElement('td');
+                emailCell.textContent = supplier.email;
+                row.appendChild(emailCell);
+
+
+                const phoneCell = document.createElement('td');
+                phoneCell.textContent = supplier.phone;
+                row.appendChild(phoneCell);
+
+
+                const addressCell = document.createElement('td');
+                addressCell.textContent = supplier.address;
+                row.appendChild(addressCell);
+                const codePostalCell = document.createElement('td');
+                codePostalCell.textContent = supplier.codePostal;
+                row.appendChild(codePostalCell);
+                const villeCell = document.createElement('td');
+                villeCell.textContent = supplier.ville;
+                row.appendChild(villeCell);
+
+
+                const referentCell = document.createElement('td');
+                referentCell.textContent = supplier.referent;
+                row.appendChild(referentCell);
+
+
+                supplierTableBody.appendChild(row);
+            });
+             // Masque le loader après avoir affiché les fournisseurs
+    hideLoader();
+        }
+
+
+        // Fonction pour charger les référents dans le menu déroulant
+function loadReferents() {
+    google.script.run.withSuccessHandler(function(referents) {
+        const referentSelect = document.getElementById('supplierReferent');
+        referents.forEach(function(referent) {
+            const option = document.createElement('option');
+            option.value = referent[0];  // Utiliser la valeur du référent
+            option.textContent = referent[0];  // Afficher le nom du référent
+            referentSelect.appendChild(option);
+        });
+    }).getReferents();
+}
+
+
+
+
+  // Fonction pour ouvrir la popup de création de fournisseur
+function openCreateSupplierPopup() {
+    const popupHtml = `
+      <div class="popup-overlay">
+        <div class="popup-content">
+          <h2>Créer un nouveau fournisseur</h2>
+          <form id="createSupplierForm">
+            <label>Nom du fournisseur</label>
+            <input type="text" id="supplierName" required><br><br>
+           
+            <label>Téléphone</label>
+            <input type="text" id="supplierPhone" required><br><br>
+           
+            <label>Email</label>
+            <input type="email" id="supplierEmail" required><br><br>
+           
+            <label>Adresse</label>
+            <input type="text" id="supplierAddress" required><br><br>
+           
+            <label>Référent</label>
+            <select id="supplierReferent" required>
+                <option value="">Sélectionnez un référent</option>
+                <!-- Les options des référents seront ajoutées ici -->
+            </select><br><br>
+
+
+            <button type="button" onclick="saveNewSupplier()">Valider</button>
+            <button type="button" onclick="closePopup()">Annuler</button>
+          </form>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', popupHtml);
+    loadReferents();  // Charger les référents après ouverture de la popup
+}
+
+
+        // Fonction pour fermer la popup
+        function closePopup() {
+            const overlay = document.querySelector('.popup-overlay');
+            if (overlay) overlay.remove();
+        }
+
+
+        // Fonction pour enregistrer un nouveau fournisseur
+        function saveNewSupplier() {
+            const supplierData = {
+                name: document.getElementById('supplierName').value,
+                email: document.getElementById('supplierEmail').value,
+                phone: document.getElementById('supplierPhone').value,
+                address: document.getElementById('supplierAddress').value,
+                codePostal: document.getElementById('suppliercodePostal').value,
+                ville: document.getElementById('supplierville').value,
+                referent: document.getElementById('supplierReferent').value
+            };
+
+
+            // Vérifier que tous les champs obligatoires sont remplis
+            if (!supplierData.name || !supplierData.email) {
+                alert("Veuillez remplir tous les champs obligatoires.");
+                return;
+            }
+             // Afficher le loader pendant l'enregistrement
+              showLoader(true);
+            // Appel à Google Apps Script pour enregistrer le fournisseur
+            google.script.run.withSuccessHandler(response => {
+                alert(response);
+                closePopup();
+                getfournisseur(); // Recharger la liste des fournisseurs après ajout
+                hideLoader();  // Masquer le loader après l'enregistrement
+
+
+            }).createSupplier(supplierData);  // Passer toutes les données du fournisseur
+        }
+
+
+
+
+
+
+
+
     // Charger les produits et les adhérents lors du chargement de la page
     $(document).ready(function() {
-        
-    });
+   
+});
   </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

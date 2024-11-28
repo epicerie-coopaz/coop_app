@@ -16,11 +16,12 @@
       --text-color: #2c3e50;
       --light-color: #D3D3D3;
       --dark-color: #2c2c2c;
+      --md-sys-color-primary: #444f0b;
+      --md-sys-color-secondary-container: #ccd2af;
+      --md-sys-color-surface: #f5f7f1;
     }
     
     * {
-        margin: 0;
-        padding: 0;
         box-sizing: border-box;
     }
     
@@ -32,8 +33,15 @@
         background-color: var(--background-color);
         font-size: large;
         height: inherit;
+        margin: 0;
     }
     
+    h2 {
+        font-size: x-large;
+        color: var(--md-sys-color-primary);
+    }
+    
+    /*
     .flex-row {
         flex-flow: row wrap;
     }
@@ -54,6 +62,7 @@
       justify-content: flex-start;
     }
     
+    /*
     .menu-button {
         border: white;
         border:2px;
@@ -84,6 +93,7 @@
     .menu-button:hover {
         background-color: var(--dark-primary-color);
     }
+    */
     
     /* ----------------------------------- WIP -----------------------------------Contenu Principal */
     #content {
@@ -92,6 +102,7 @@
         display: flex;
         flex-direction: column;
         flex-grow: 110;
+        margin: 30px;
         justify-content: stretch;
     }
     
@@ -107,11 +118,14 @@
     }
     
     header {
-        background-color: #2980B9;
+        background-color: var(--dark-primary-color);
         color: white;
         //padding: 15px;
         text-align: center;
         font-size: large;
+        margin:0;
+        padding:10px;
+        border-radius:10px;
         order: 2;
         flex-grow: 1;
     }
@@ -123,7 +137,6 @@
         color: white;
         text-align: center;
         font-size: small;
-        padding: 10px;
         width: 100%;
     }
     
@@ -132,10 +145,6 @@
         flex-grow : 1;
         display: flex;
         flex-direction: column;
-        //margin-left: 250px;
-        //width: calc(100% - 250px);
-        padding: 20px;
-        //overflow-y: auto;
         flex-grow: 10;
     }
     
@@ -289,81 +298,57 @@
         /* Espacement en bas */
     }
     
-    #right-menu {
-        width: 100%;
-        /* Ajustez la largeur selon vos besoins */
-        background-color: #e0e0e0;
-        padding: 10px;
-        /* Ajoutez un peu de padding */
-        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-        border-radius: 8px;
-        /* Coins arrondis */
-        margin-left: 20px;
-        /* Ajoutez un peu d'espace à gauche */
-        margin-top: 50px;
-        /* Ajoutez un peu d'espace à gauche */
+    #card-light {
+      background-color: var(--md-sys-color-secondary-container);
+      padding: 30px;
+      border-radius: 24px;
+      width: 49%;
+      display: flex;
+      flex-flow: column;
+      gap:10px
     }
     
-    #right-menu h2 {
-        font-size: 20px;
-        /* Taille de police pour les titres */
-        color: #333;
-        /* Couleur du texte */
+    
+    #card-light H2 {
+        order: 1;
+        margin-top: unset;
     }
     
-    #right-menu select {
-        width: 100%;
-        /* Pour que le select prenne toute la largeur */
+    #card-light select {
         padding: 10px;
-        /* Padding pour un meilleur aspect */
         border: 1px solid #ccc;
-        /* Bordure autour du select */
         border-radius: 5px;
-        /* Coins arrondis */
-        margin-bottom: 10px;
-        /* Espace entre les éléments */
+        order: 2;
+    }
+    
+    #finalisation{
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+    }
+    
+    #adherentsDropdownContainer{
+      order: 4
+    }
+    
+    .DropdownBlock {
+      justify-content: flex-end;
+      display: flex;
+      flex-direction: column;
+      order: 2;
+      //flex-basis: 80%;
+    }
+    
+    #cbFee, #adherentEmail, #cotisationContainer{
+      font-size: medium;
+      color: var(--md-sys-color-primary);
+      order:5;
     }
     
     #validateButton {
-        padding: 40px 55px;
-        margin-top: 10px;
-        color: white;
-        text-decoration: none;
-        font-size: 18px;
-        background-color: #4CAF50;
-        border-bottom: 1px solid #2C3E50;
-        text-align: center;
-        transition: background-color 0.3s;
-    }
-    
-    #validateButton:hover {
-        background-color: #45a049;
-        /* Couleur du bouton au survol */
-    }
-    
-    #adherentEmail {
-        margin-top: 10px;
-        /* Espacement au-dessus */
-        font-weight: bold;
-        /* Texte en gras */
-        color: #555;
-        /* Couleur du texte */
-    }
-    
-    #total {
-        font-weight: bold;
-        text-align: right;
-        font-size: 18px;
-        /* Augmenter la taille de la police */
-        margin-top: 20px;
-        /* Ajouter un espace au-dessus */
-    }
-    
-    #validateButton {
-        float: right;
-        /* Aligner le bouton à droite */
-        margin-top: 20px;
-        /* Ajouter un espace au-dessus */
+        order: 10;
+        display: flex;
+        justify-content: flex-end;
     }
     
     .popup {

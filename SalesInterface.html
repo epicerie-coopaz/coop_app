@@ -9,6 +9,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    
     <script type="importmap">
       {"imports": {"@material/web/": "https://esm.run/@material/web/"}}
     </script>
@@ -16,6 +17,7 @@
       import '@material/web/all.js';
       import {styles as typescaleStyles} from '@material/web/typography/md-typescale-styles.js';
       document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
+      
     </script>
 </head>
 
@@ -28,11 +30,39 @@
     <div id="menu">
         <div id="logo"></div>
         <md-tabs style="flex-grow: 100;">
-          <md-primary-tab href="#" onclick="loadContent('home')">Accueil</md-primary-tab>
-          <md-primary-tab href="#" onclick="loadContent('vente')">Vente</md-primary-tab>
-          <md-primary-tab href="#" onclick="loadContent('reception')">Réception</md-primary-tab>
-          <md-primary-tab href="#" onclick="loadContent('suppliers')">Fournisseurs</md-primary-tab>
-          <md-primary-tab href="#" onclick="loadContent('inventaire')">Inventaire</md-primary-tab>
+          <md-primary-tab href="#" onclick="loadContent('home')"  inline-icon>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-house-fill" viewBox="0 0 16 16">
+              <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L8 2.207l6.646 6.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293z"/>
+              <path d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293z"/>
+            </svg>
+            Accueil
+            </md-primary-tab>
+          <md-primary-tab href="#" onclick="loadContent('vente')"  inline-icon>
+            <md-icon slot="icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart-fill" viewBox="0 0 16 16">
+                <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+              </svg>
+            </md-icon>
+            Vente
+          </md-primary-tab>
+          <md-primary-tab href="#" onclick="loadContent('reception')" inline-icon>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-seam-fill" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M15.528 2.973a.75.75 0 0 1 .472.696v8.662a.75.75 0 0 1-.472.696l-7.25 2.9a.75.75 0 0 1-.557 0l-7.25-2.9A.75.75 0 0 1 0 12.331V3.669a.75.75 0 0 1 .471-.696L7.443.184l.01-.003.268-.108a.75.75 0 0 1 .558 0l.269.108.01.003zM10.404 2 4.25 4.461 1.846 3.5 1 3.839v.4l6.5 2.6v7.922l.5.2.5-.2V6.84l6.5-2.6v-.4l-.846-.339L8 5.961 5.596 5l6.154-2.461z"/>
+            </svg>
+            Réception
+          </md-primary-tab>
+          <md-primary-tab href="#" onclick="loadContent('suppliers')" inline-icon>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
+              <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+            </svg>
+            Fournisseurs
+          </md-primary-tab>
+          <md-primary-tab href="#" onclick="loadContent('inventaire')" inline-icon>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calculator-fill" viewBox="0 0 16 16">
+              <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2zm2 .5v2a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 0-.5-.5h-7a.5.5 0 0 0-.5.5m0 4v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5M4.5 9a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zM4 12.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5M7.5 6a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zM7 9.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5m.5 2.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zM10 6.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5m.5 2.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5z"/>
+            </svg>
+            Inventaire
+          </md-primary-tab>
         </md-tabs>
         
         <!--
@@ -56,12 +86,25 @@
       <div id="workplace" class="flex-column">
         <div id="home" class="content-section active">
             <h2>Bienvenue sur la page d'accueil</h2>
+
             <p>Le contenu de la page d'accueil ici...</p>
 
+            <md-outlined-button>Back</md-outlined-button>
+            <md-filled-button>Complete</md-filled-button>
+            <md-filled-tonal-button>
+              Send
+              <svg slot="icon" viewBox="0 0 48 48"><path d="M6 40V8l38 16Zm3-4.65L36.2 24 9 12.5v8.4L21.1 24 9 27Zm0 0V12.5 27Z"/></svg>
+            </md-filled-tonal-button>
+
+            <md-text-button trailing-icon>
+              Open
+              <svg slot="icon" viewBox="0 0 48 48"><path d="M9 42q-1.2 0-2.1-.9Q6 40.2 6 39V9q0-1.2.9-2.1Q7.8 6 9 6h13.95v3H9v30h30V25.05h3V39q0 1.2-.9 2.1-.9.9-2.1.9Zm10.1-10.95L17 28.9 36.9 9H25.95V6H42v16.05h-3v-10.9Z"/></svg>
+            </md-text-button>
+
+            
         </div>
 
         <div id="vente" class="content-section">
-            <h2>Gestion des ventes</h2>
             <table id="productList">
                 <thead>
                     <tr>
@@ -78,25 +121,45 @@
                 </tbody>
             </table>
             <div id="addProductContainer">
-                <button id="addProductButton" onclick="addRow()">Ajouter un produit</button>
+                <md-filled-tonal-button onclick="addRow()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                      <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+                    </svg>
+                    Ajouter un produit
+                </md-filled-tonal-button>
             </div>
-            <div id="right-menu">
-                <h2>Adhérents</h2>
-                <select id="adherentsDropdown" onchange="updateEmail()"></select>
-                <div id="adherentEmail"></div>
-                <div id="cotisationContainer" style="display: none;">
-                    <label for="cotisationAmount">Montant de cotisation :</label>
-                    <input type="number" id="cotisationAmount" value="0" min="5" step="1" oninput="calculateTotal()">
-                </div>
-                <h2>Méthode de Paiement</h2>
-                <select id="paymentMethodDropdown" onchange="calculateTotal()">
-                    <option value="" disabled selected>Sélectionnez un mode de paiement</option>
-                    <option value="CB">CB</option>
-                    <option value="Chèque">Chèque</option>
-                </select>
-                <div id="total">Total Général: 0 €</div>
-                <div id="cbFee" style="display: none;">Frais CB: 0 €</div>
-                <button id="validateButton" onclick="validate()">Valider</button>
+
+            <div id="finalisation">
+              <div id="card-light">
+                  <h2>Adhérent</h2>
+                  <div id="adherentsDropdownContainer">
+                    <select id="adherentsDropdown" onchange="updateEmail()"></select>
+                  </div>
+                  <div id="adherentEmail"></div>
+                  <div id="cotisationContainer" style="display: none;">
+                      <label for="cotisationAmount">Montant de cotisation :</label>
+                      <input type="number" id="cotisationAmount" value="0" min="5" step="1" oninput="calculateTotal()">
+                  </div>
+              </div>
+
+              <div id="card-light">
+                  <h2>Méthode de Paiement</h2>
+                  <div class="DropdownBlock">
+                    <select id="paymentMethodDropdown" onchange="calculateTotal()">
+                        <option value="" disabled selected>Sélectionnez un mode de paiement</option>
+                        <option value="CB">CB</option>
+                        <option value="Chèque">Chèque</option>
+                    </select>
+                  </div>
+                  <div id="cbFee" class="overview-line" style="display: none;">Frais CB: 0 €</div>
+                  
+              </div>
+            </div>
+            <H2 id="total">Total Général: 0 €</H2>
+            <div id="validateButton">
+              <md-filled-button onclick="validate()">
+                Valider
+              </md-filled-button>
             </div>
         </div>
 
@@ -195,13 +258,12 @@
         </div>
       </div>
 
-      <!-- Footer -->
-      <footer>
-          <p>&copy; 2024 Système de gestion des ventes Coop'az</p>
-      </footer>
-
     </div>
     
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 Système de gestion des ventes Coop'az</p>
+    </footer>
     
 </body>
 
@@ -272,9 +334,6 @@
         }
     }
 
-
-
-/*
     function getProducts() {
         showLoader();
         google.script.run.withSuccessHandler(function (data) {
@@ -284,10 +343,7 @@
             hideLoader();
         }).getProducts();
     }
-*/
 
-
-/*
     function getAdherents() {
         google.script.run.withSuccessHandler(function (data) {
             adherents = data;
@@ -315,13 +371,13 @@
 
         }).getAdherentsWithCotisation();
     }
-*/
 
-
-
-
-
+    ///////////////////////////
+    ///////////////////////////
     ///////vente///////////////
+    ///////////////////////////
+    ///////////////////////////
+
     function getCotisations() {
         google.script.run.withSuccessHandler(function (data) {
             cotisations = data; // 'data' doit contenir un objet avec les informations de cotisation
@@ -766,7 +822,6 @@
     ////////////////RECEPTION//////////////////////
     // Fonction pour charger la liste des fournisseurs
 
-/*
     function loadSuppliers() {
         showLoader(); // Affiche le loader
         google.script.run.withSuccessHandler(function (suppliers) {
@@ -806,8 +861,6 @@
                 });
         }).receptionGetSuppliers();
     }
-
-*/
 
     // Fonction pour ajouter une nouvelle ligne de réception
     function addNewLine() {
@@ -1180,12 +1233,8 @@
 
 
     ///////FOURNISEEUR/////////////////
-/*
     function getfournisseur() {// Affiche le loader pendant le chargement
         showLoader(true);  // Appel à votre fonction showLoader pour afficher le loader
-
-
-
 
         // Appel à Google Apps Script pour récupérer les fournisseurs
         google.script.run.withSuccessHandler(function (suppliers) {
@@ -1194,51 +1243,29 @@
         }).getSuppliers();  // Appel de la fonction `getSuppliers`
     }
 
-
-
-
     // Charge les fournisseurs lorsque la page est prête
     document.addEventListener("DOMContentLoaded", function () {
         loadSuppliers();  // Charge les fournisseurs au chargement de la page
     });
 
-
-
-
     // Fonction pour afficher les fournisseurs dans le tableau
     function displaySuppliers(suppliers) {
         const supplierTableBody = document.getElementById('supplierTableBody');
         supplierTableBody.innerHTML = ''; // Réinitialiser le tableau avant de remplir
-
-
-
-
         suppliers.forEach(supplier => {
             const row = document.createElement('tr');
-
-
-
 
             const supplierNameCell = document.createElement('td');
             supplierNameCell.textContent = supplier.name;
             row.appendChild(supplierNameCell);
 
-
-
-
             const emailCell = document.createElement('td');
             emailCell.textContent = supplier.email;
             row.appendChild(emailCell);
 
-
-
-
             const phoneCell = document.createElement('td');
             phoneCell.textContent = supplier.phone;
             row.appendChild(phoneCell);
-
-
-
 
             const addressCell = document.createElement('td');
             addressCell.textContent = supplier.address;
@@ -1250,24 +1277,15 @@
             villeCell.textContent = supplier.ville;
             row.appendChild(villeCell);
 
-
-
-
             const referentCell = document.createElement('td');
             referentCell.textContent = supplier.referent;
             row.appendChild(referentCell);
-
-
-
 
             supplierTableBody.appendChild(row);
         });
         // Masque le loader après avoir affiché les fournisseurs
         hideLoader();
     }
-
-
-
 
     // Fonction pour charger les référents dans le menu déroulant
     function loadReferents() {
@@ -1281,7 +1299,6 @@
             });
         }).getReferents();
     }
-
 
     // Fonction pour ouvrir la popup de création de fournisseur
     function openCreateSupplierPopup() {
@@ -1319,7 +1336,6 @@
         loadReferents();  // Charger les référents après ouverture de la popup
     }
 
-
     // Fonction pour fermer la popup
     function closePopup() {
         const overlay = document.querySelector('.popup-overlay');
@@ -1356,7 +1372,6 @@
         }).createSupplier(supplierData);  // Passer toutes les données du fournisseur
     }
 
-*/
 
     ///////////////INVENTAIRE//////////////////
     let products = [];  // Liste des produits
@@ -1439,7 +1454,6 @@
         }
     }
 
-/*
     // Charger les produits depuis Google Sheets et préparer l'affichage
     function getProductsFromSheet() {
         showLoader(); // Afficher le loader pendant le chargement
@@ -1459,7 +1473,6 @@
             hideLoader(); // Cacher le loader une fois terminé
         }).getProducts();
     }
-*/
 
     // Fonction pour enregistrer l'inventaire
     function saveInventory() {
@@ -1508,7 +1521,6 @@
             alert('Aucun produit sélectionné pour l\'enregistrement.');
         }
     }
-
 
     function calculateTotalForToday(formattedDate) {
         // Appeler la fonction côté serveur pour récupérer les données filtrées et calculer le total

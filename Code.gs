@@ -1,17 +1,32 @@
 function doGet() {
   return HtmlService.createTemplateFromFile('SalesInterface')
-    .setWidth(1920)
-    .setHeight(1080);
+    .evaluate();
+};
+/*
+function doGet() {
+  var html = HtmlService.createHtmlOutputFromFile('SalesInterface')
+                         // Important pour l'affichage responsive
+  return html;
 }
+*/
+function include(filename) {
+  return HtmlService.createHtmlOutputFromFile(filename)
+  .getContent();
+};
+
 function getProducts() {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('produits');
   const data = sheet.getDataRange().getValues();
   const products = data.map((row, index) => {
     if (index === 0) return null; // Ignorer l'en-tête
+      // Vérifier si la date est présente dans une colonne (par exemple, la colonne L, soit index 11)
+    const formattedDate = row[11] instanceof Date ? Utilities.formatDate(row[11], Session.getScriptTimeZone(), 'yyyy-MM-dd') : null;
+
     return {
       name: row[0],     // Nom du produit
       price: row[7],    // Prix unitaire (colonne H)
-      stock: row[8]     // Stock actuel (colonne I)
+      stock: row[8],     // Stock actuel (colonne I)
+      stockDate : formattedDate  // Date de l'adhérent, formatée si elle existe
     };
   }).filter(Boolean); // Supprimer les entrées null
   return products;
@@ -170,60 +185,38 @@ function receptionGetProductDetails(productName) {
     return null; // Produit non trouvé
 }
 // Fonction pour valider la réception
+
+
 function receptionValidateReception(receptions) {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('produits');
-    const data = sheet.getDataRange().getValues();
-    
     receptions.forEach(reception => {
+        const currentDate = new Date(); // Récupérer la date actuelle
         const { productName, priceUpdate, stockUpdate, receivedQuantity } = reception;
-        
-        const productRow = data.find(row => row[0] === productName); // Trouver la ligne du produit
-        if (productRow) {
-            const productIndex = data.indexOf(productRow);
-            
-            // Récupération du stock actuel
-            let newStock = productRow[8]; // Colonne 9 pour le stock actuel
-            
-            // Mise à jour du prix si nécessaire
-            let newPrice = priceUpdate ? parseFloat(priceUpdate.replace(',', '.')) : productRow[7];  // Colonne 8 pour le prix
-            if (isNaN(newPrice)) {
-                newPrice = productRow[7]; // Récupérer le prix actuel si le prix mis à jour n'est pas valide
-            }
-            
-            // Validation de la quantité reçue
-            let quantity = 0;
-            if (receivedQuantity) {
-                quantity = parseFloat(receivedQuantity.replace(',', '.'));
-                if (isNaN(quantity) || quantity <= 0) {
-                    throw new Error('La quantité reçue doit être un nombre valide et supérieur à 0.');
+        const data = sheet.getDataRange().getValues();
+        for (let i = 1; i < data.length; i++) {
+            if (data[i][0] === productName) { // Trouver le produit
+                // Mettre à jour le prix
+                if (priceUpdate !== null) {
+                    sheet.getRange(i + 1, 8).setValue(priceUpdate);
                 }
-            }
+                // Mettre à jour le stock
+                const currentStock = data[i][8];
+                const newStock = (stockUpdate !== null ? parseFloat(stockUpdate) : currentStock) + parseFloat(receivedQuantity);
+                sheet.getRange(i + 1, 9).setValue(newStock);
+                
+                
+                  // Enregistrer la date si la quantité reçue est renseignée
+                if (receivedQuantity && receivedQuantity !== '') {
+                    sheet.getRange(i + 1, 7).setValue(currentDate); // Enregistrer la date dans la colonne 10 (par exemple)
+                }
 
-            // Mise à jour du prix si un prix est fourni
-            if (priceUpdate !== null && !isNaN(newPrice)) {
-                sheet.getRange(productIndex + 1, 8).setValue(newPrice); // Colonne H pour le prix
-            }
-            
-            // Mise à jour du stock
-            if (stockUpdate !== null && stockUpdate !== '') {
-                // Si un nouveau stock est fourni, on l'utilise directement
-                newStock = parseFloat(stockUpdate.replace(',', '.'));
-            } else if (receivedQuantity) {
-                // Sinon, on ajoute la quantité reçue au stock actuel
-                newStock += quantity;
-            }
-            
-            // Vérification du stock mis à jour
-            if (!isNaN(newStock)) {
-                sheet.getRange(productIndex + 1, 9).setValue(newStock); // Colonne I pour le stock
-            } else {
-                throw new Error('Le stock mis à jour doit être un nombre valide.');
+                break;
             }
         }
     });
-    
-    return 'Réception validée avec succès !'; // Message de confirmation
 }
+
+
 
 
 function receptionCreateProduct(productData) {
@@ -284,9 +277,243 @@ function getReferents() {
   return referents.filter(row => row[0] != "");  // Filtre les valeurs vides
 }
 
+function backupSales() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const productsSheet = ss.getSheetByName('produits');
+  const weeklySalesSheet = ss.getSheetByName('venteHebdo');
+  
+  // Récupérer les données de l'onglet 'produits' (nom des produits en B et quantités vendues en J)
+  const productData = productsSheet.getRange('A2:J').getValues(); // Colonne B (produits) et J (quantité vendue)
+  
+  // Récupérer la liste des produits de l'onglet 'venteHebdo' (colonne A)
+  const salesList = weeklySalesSheet.getRange('A2:A').getValues().flat(); // Liste des produits dans 'venteHebdo'
+  
+  // Trouver la première colonne vide dans 'venteHebdo'
+  const lastColumn = weeklySalesSheet.getLastColumn();
+  const nextEmptyColumn = lastColumn + 1;
+  
+  // Ajouter la date et l'heure actuelles en haut de la nouvelle colonne
+  const currentDateTime = new Date();
+  weeklySalesSheet.getRange(1, nextEmptyColumn).setValue('Ventes du ' + currentDateTime.toLocaleString());
+
+  // Créer un objet de correspondance produit/quantité vendue
+  const salesMap = {};
+  productData.forEach(row => {
+    const productName = row[0]; // Nom du produit (colonne B)
+    const quantitySold = row[9]; // Quantité vendue (colonne J)
+    
+    // Si la quantité vendue est supérieure à 0, l'ajouter à l'objet salesMap
+    if (quantitySold > 0) {
+      salesMap[productName] = quantitySold;
+    }
+  });
+
+  // Ajouter les quantités vendues pour chaque produit de 'venteHebdo' dans la nouvelle colonne
+  const salesData = [];
+  salesList.forEach(productName => {
+    const quantitySold = salesMap[productName] || 0; // Si le produit n'a pas de ventes, mettre 0
+    salesData.push([quantitySold]); // Ajouter la quantité vendue dans le tableau
+  });
+
+  // Insérer les données dans la nouvelle colonne de 'venteHebdo'
+  weeklySalesSheet.getRange(2, nextEmptyColumn, salesData.length, 1).setValues(salesData);
+  
+  // Réinitialiser la colonne J de l'onglet 'produits' (quantité vendue)
+  productsSheet.getRange('J2:J').clearContent(); // Réinitialiser toutes les quantités vendues
+
+  // Calculer le montant total des ventes
+  let totalSalesAmount = 0;
+  salesList.forEach(productName => {
+    const productPrice = weeklySalesSheet.getRange('B' + (salesList.indexOf(productName) + 2)).getValue(); // Récupérer le prix du produit
+    const quantitySold = salesMap[productName] || 0;
+    totalSalesAmount += productPrice * quantitySold; // Calculer le montant total pour ce produit
+  });
+
+  // Envoi de l'email avec le montant total des ventes
+  const recipient = 'epiceriecoopaz@gmail.com';
+  const subject = 'Rapport de ventes de la semaine';
+  const body = `Les ventes de la semaine ont été enregistrées. Montant total des ventes : €${totalSalesAmount.toFixed(2)}.`;
+  MailApp.sendEmail(recipient, subject, body);
+  
+  // Optionnel : Ajouter une notification que la sauvegarde a été effectuée
+  Logger.log('Sauvegarde effectuée avec succès à : ' + currentDateTime.toLocaleString());
+}
+
+function createWeeklyTrigger() {
+  // Crée un déclencheur qui exécute la fonction 'backupSales' tous les dimanches à midi
+  ScriptApp.newTrigger('backupSales')
+    .timeBased()
+    .onWeekDay(ScriptApp.WeekDay.SUNDAY) // Chaque dimanche
+    .atHour(12) // À midi
+    .create();
+}
+
+
+/////INVENTAIRE/////////
+
+// Fonction pour mettre à jour l'inventaire dans la feuille Google Sheets
+function updateInventory(updatedProducts) {
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Produits');
+    const dateFormat = 'dd/MM/yyyy';
+    const today = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), dateFormat);
+
+    const data = sheet.getDataRange().getValues(); // Récupération des données de la feuille
+
+    Logger.log('Produits mis à jour : %s', JSON.stringify(updatedProducts));
+
+    for (let i = 1; i < data.length; i++) { // Parcourir les lignes (ignorer l'entête)
+        const productName = data[i][0]; // Nom du produit (colonne A)
+        const currentStock = data[i][8]; // Stock actuel (colonne I)
+        const inventoryDate = data[i][11]; // Date d'inventaire (colonne L)
+
+        // Vérifier si le produit est dans la liste des produits mis à jour
+        const updatedProduct = updatedProducts.find(p => p.name === productName);
+
+        // Convertir les dates pour une comparaison sans heure
+        const formattedInventoryDate = inventoryDate ? Utilities.formatDate(new Date(inventoryDate), Session.getScriptTimeZone(), dateFormat) : null;
+
+        if (updatedProduct) {
+            // **Cas 1** : Produit renseigné
+            Logger.log('Mise à jour du produit : %s avec un nouveau stock de %d', productName, updatedProduct.stock);
+
+            sheet.getRange(i + 1, 9).setValue(updatedProduct.stock); // Mise à jour du stock (colonne I)
+            sheet.getRange(i + 1, 12).setValue(today); // Mise à jour de la date (colonne L)
+
+        } else if (formattedInventoryDate === today) {
+            // **Cas 2** : Date d'inventaire correspond à la date du jour
+            Logger.log('Produit %s déjà mis à jour aujourd\'hui, aucune modification.', productName);
+            // Ne rien modifier pour ce produit
+
+        } else {
+            // **Cas 3** : Produit non renseigné et date différente ou inexistante
+            Logger.log('Produit non renseigné ou date différente, remise du stock à 0 : %s', productName);
+
+            sheet.getRange(i + 1, 9).setValue(0); // Remettre le stock à 0 (colonne I)
+        }
+    }
+    Logger.log('Mise à jour de l\'inventaire terminée.');
+    saveInventoryToSheet(updatedProducts)
+}
+
+function saveInventoryToSheet(updatedProducts) {
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Inventaire");
+
+    // Format de la date pour l'ajouter dans le nom des colonnes
+    const today = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'dd/MM/yyyy');
+    const headerPrice = "Prix " + today; // En-tête pour les prix
+    const headerStock = "Stock " + today; // En-tête pour les stocks
+
+    // Trouver la colonne où se trouvent les prix et les stocks pour la date d'aujourd'hui
+    const existingPriceColumn = findColumnByHeader(sheet, headerPrice);
+    const existingStockColumn = findColumnByHeader(sheet, headerStock);
+
+    // Si les colonnes n'existent pas, ajouter les en-têtes et trouver les nouvelles colonnes
+    let priceColumn = existingPriceColumn;
+    let stockColumn = existingStockColumn;
+
+    if (!priceColumn) {
+        priceColumn = sheet.getLastColumn() + 1;
+        sheet.getRange(1, priceColumn).setValue(headerPrice);
+    }
+
+    if (!stockColumn) {
+        stockColumn = priceColumn + 1; // Stock dans la colonne suivante
+        sheet.getRange(1, stockColumn).setValue(headerStock);
+    }
+
+    // Mettre à jour les prix et les stocks dans les colonnes appropriées
+    updatedProducts.forEach((product) => {
+        const productRow = findProductRow(sheet, product.name);
+        if (productRow) {
+            Logger.log('Ligne trouvée pour le produit : %s à la ligne %d', product.name, productRow);
+
+            // Mettre à jour le prix et le stock dans les colonnes
+            sheet.getRange(productRow, priceColumn).setValue(product.price); // Mise à jour du prix
+            sheet.getRange(productRow, stockColumn).setValue(product.stock); // Mise à jour du stock
+        } else {
+            Logger.log('Produit non trouvé : %s', product.name);
+        }
+    });
+
+    Logger.log('Inventaire sauvegardé avec succès.');
+}
+
+// Fonction pour trouver la colonne correspondant à un en-tête spécifique
+function findColumnByHeader(sheet, header) {
+    const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0]; // Récupère les entêtes
+    for (let i = 0; i < headers.length; i++) {
+        if (headers[i] === header) {
+            return i + 1; // Retourne l'index de la colonne correspondante
+        }
+    }
+    return null; // Si l'en-tête n'est pas trouvé, retourner null
+}
+
+// Fonction pour trouver la ligne d'un produit par son nom
+function findProductRow(sheet, productName) {
+    const productNames = sheet.getRange("A:A").getValues(); // Liste des noms de produits dans la colonne A
+    for (let i = 0; i < productNames.length; i++) {
+        if (productNames[i][0] === productName) {
+            return i + 1; // Retourner la ligne du produit (ajouter 1 pour la correspondance avec l'index)
+        }
+    }
+    return null; // Si le produit n'est pas trouvé
+}
 
 
 
+// Fonction pour trouver la ligne du produit dans l'onglet "Inventaire"
+function findProductRow(sheet, productName) {
+    const productNames = sheet.getRange("A:A").getValues(); // Liste des noms de produits dans la colonne A
+    for (let i = 0; i < productNames.length; i++) {
+        if (productNames[i][0] === productName) {
+            return i + 1; // Retourner la ligne du produit (ajouter 1 pour la correspondance avec l'index)
+        }
+    }
+    return null; // Si le produit n'est pas trouvé
+}
 
+function getTotalForDate(formattedDate) {
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Produits'); // Onglet Produits
+    const data = sheet.getDataRange().getValues(); // Récupérer toutes les données
 
+    let total = 0;
 
+    // Vérifier chaque ligne de l'onglet Produits
+    data.forEach((row, index) => {
+        if (index > 0) { // Ignorer l'en-tête
+            const inventoryDate = row[11]; // Date d'inventaire dans la colonne L (index 11)
+            
+            // Convertir la date d'inventaire et vérifier si elle correspond à la date d'aujourd'hui
+            const formattedInventoryDate = inventoryDate ? Utilities.formatDate(new Date(inventoryDate), Session.getScriptTimeZone(), 'dd/MM/yyyy') : null;
+            
+            if (formattedInventoryDate === formattedDate) {
+                // Si la date d'inventaire correspond à la date du jour, ajouter le produit au total
+                const price = parseFloat(row[7]); // Prix unitaire dans la colonne H (index 7)
+                const stock = parseFloat(row[8]); // Stock actuel dans la colonne I (index 8)
+
+                // Vérifier que le prix et le stock sont des nombres valides
+                if (!isNaN(price) && !isNaN(stock)) {
+                    total += price * stock; // Calculer le total pour ce produit
+                }
+            }
+        }
+    });
+
+    return total.toFixed(2); // Retourner le total formaté à 2 décimales
+}
+
+function sendInventoryEmail(formattedDate, total) {
+    const recipient = "fabien.hicauber@gmail.com"; // Remplacez par l'adresse email cible
+    const subject = `Résumé de l'inventaire - ${formattedDate}`;
+    const body = `Bonjour,
+
+Voici le résumé de l'inventaire du ${formattedDate} :
+
+Montant total des stocks : ${total}€
+
+Cordialement,
+Votre système de gestion`;
+
+    MailApp.sendEmail(recipient, subject, body);
+}

@@ -84,6 +84,7 @@
 
       <!-- Sections de contenu -->
       <div id="workplace" class="flex-column">
+
         <div id="home" class="content-section active">
             <h2>Bienvenue sur la page d'accueil</h2>
 
@@ -101,11 +102,32 @@
               <svg slot="icon" viewBox="0 0 48 48"><path d="M9 42q-1.2 0-2.1-.9Q6 40.2 6 39V9q0-1.2.9-2.1Q7.8 6 9 6h13.95v3H9v30h30V25.05h3V39q0 1.2-.9 2.1-.9.9-2.1.9Zm10.1-10.95L17 28.9 36.9 9H25.95V6H42v16.05h-3v-10.9Z"/></svg>
             </md-text-button>
 
+<md-list>
+  <md-list-item type="button">
+    <div slot="headline">Apple</div>
+    <div slot="supporting-text">In stock</div>
+    <div >Tata</div>
+    <div slot="trailing-supporting-text">+100</div>
+  </md-list-item>
+  <md-list-item type="button">
+    <div slot="headline">Banana</div>
+    <div slot="supporting-text">In stock</div>
+        <div>Tata</div>
+    <div slot="trailing-supporting-text">56</div>
+  </md-list-item>
+  <md-list-item type="button">
+    <div slot="headline">Cucumber</div>
+    <div slot="supporting-text">Low stock</div>
+        <div >Tata</div>
+    <div slot="trailing-supporting-text">5</div>
+  </md-list-item>
+</md-list>
             
         </div>
 
         <div id="vente" class="content-section">
-            <table id="productList">
+            <div id="tableContainer">
+              <table id="productList">
                 <thead>
                     <tr>
                         <th>Produit</th>
@@ -119,7 +141,8 @@
                 <tbody>
                     <!-- Les lignes de produits seront ajoutées ici -->
                 </tbody>
-            </table>
+              </table>
+            </div>
             <div id="addProductContainer">
                 <md-filled-tonal-button onclick="addRow()">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">

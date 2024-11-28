@@ -12,13 +12,25 @@
       --primary-color: #acc81d;
       --dark-primary-color: #778a14;
       --secondary-color : #f69c04;
-      --background-color: #F8F8FF;
+      --background-color: #FFF;
       --text-color: #2c3e50;
       --light-color: #D3D3D3;
       --dark-color: #2c2c2c;
       --md-sys-color-primary: #444f0b;
       --md-sys-color-secondary-container: #ccd2af;
       --md-sys-color-surface: #f5f7f1;
+      --md-list-container-color: #f4fbfa;
+      --md-list-item-label-text-color: #161d1d;
+      --md-list-item-supporting-text-color: #3f4948;
+      --md-list-item-trailing-supporting-text-color: #3f4948;
+      --md-list-item-label-text-font: system-ui;
+      --md-list-item-supporting-text-font: system-ui;
+      --md-list-item-trailing-supporting-text-font: system-ui;
+    }
+    [slot="trailing-supporting-text"] {
+      width: 30px;
+      text-align: end;
+    }
     }
     
     * {
@@ -182,30 +194,27 @@
     
     /* Produits*/
     
+    #tableContainer{
+      margin-top:20px;
+      margin-bottom:20px;
+    }
+    
     #productList {
         flex-grow: 1;
         border-collapse: collapse;
-        margin-left: 10px;
+        transition: all 0.5s;/* Transition pour les modifications de la table */
     }
     
     #productList tbody tr {
-        transition: background-color 0.3s;
-        /* Transition pour le changement de couleur */
+        transition: background-color 0.3s; /* Transition pour le changement de couleur */
     }
     
     #productList tbody tr:hover {
-        background-color: #f0f8ff;
-        /* Change de couleur au survol */
-    }
-    
-    #productList {
-        transition: all 0.5s;
-        /* Transition pour les modifications de la table */
+        background-color: #f0f8ff; /* Change de couleur au survol */
     }
     
     table {
         width: 100%;
-        margin-bottom: 20px;
         border-collapse: collapse;
     }
     
@@ -227,12 +236,12 @@
     
     th:nth-child(1),
     td:nth-child(1) {
-        width: 40%;
+        width: 30%;
     }
     
     th:nth-child(2),
     td:nth-child(2) {
-        width: 20%;
+        width: 15%;
     }
     
     th:nth-child(3),
@@ -242,12 +251,29 @@
     
     th:nth-child(4),
     td:nth-child(4) {
-        width: 15%;
+        width: 10%;
     }
     
     th:nth-child(5),
     td:nth-child(5) {
         width: 10%;
+    }
+    
+    th:nth-child(5),
+    td:nth-child(5) {
+        width: 10%;
+    }
+    
+    td input {
+      width: 90%;
+    }
+    
+    .select2-container {
+      width: 100% !important;
+    }
+    
+    td .select2-selection--single {
+      width: 33vw;
     }
     
     #addProductButton {
@@ -325,6 +351,7 @@
       display: flex;
       flex-direction: row;
       justify-content: space-between;
+      gap:10px; 
     }
     
     #adherentsDropdownContainer{

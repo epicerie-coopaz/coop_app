@@ -89,6 +89,12 @@
             <h2>Bienvenue sur la page d'accueil</h2>
 
             <p>Le contenu de la page d'accueil ici...</p>
+            <p style="background-color: var(--X-dark-primary-color)">--X-dark-primary-color</p>
+            <p style="background: var(--dark-primary-color)">--dark-primary-color</p>
+            <p style="background: var(--primary-color)">--primary-color</p>
+            <p style="background: var(--light-primary-color)">--light-primary-color</p>
+            <p style="background: var(--X-light-primary-color)">--X-light-primary-color</p>
+            <p style="background: var(--XX-light-primary-color)">--XX-light-primary-color</p>
 
             <md-outlined-button>Back</md-outlined-button>
             <md-filled-button>Complete</md-filled-button>
@@ -180,7 +186,7 @@
             </div>
             <H2 id="total">Total Général: 0 €</H2>
             <div id="validateButton">
-              <md-filled-button onclick="validate()">
+              <md-filled-button label="Valider" onclick="validate()">
                 Valider
               </md-filled-button>
             </div>
@@ -793,8 +799,8 @@
             <input type="number" id="newPrice" value="${currentPrice}" min="0" step="0.01"></p>
             </br>
             <div class="popup-buttons">
-                <button id="saveStockButton" class="btn-save">Enregistrer</button>
-                <button id="cancelButton" class="btn-cancel">Annuler</button>
+                <button id="saveStockButton" class="btn-save">Enregistrer<button>
+                <button id="cancelButton" class="btn-cancel">Annuler<button>
             </div>
         </div>
     `;

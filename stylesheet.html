@@ -9,24 +9,33 @@
     }
     
     :root {
-      --primary-color: #acc81d;
-      --dark-primary-color: #778a14;
-      --secondary-color : #f69c04;
+      --primary-color: #819716;
+      --dark-primary-color: oklch(from var(--primary-color) calc(l - .2) c calc(h - 5));
+      --X-dark-primary-color: oklch(from var(--primary-color) calc(l - .350) calc(c + 0) calc(h - 5));
+      --XX-dark-primary-color: oklch(from var(--primary-color) calc(l - .350) calc(c + 0) calc(h - 5));
+      --light-primary-color: oklch(from var(--primary-color) calc(l + 0.28) calc(c - 0.05) calc(h - 0));
+      --X-light-primary-color: oklch(from var(--primary-color) calc(l + 0.3) calc(c - 0.1) calc(h - 1));
+      --XX-light-primary-color: oklch(from var(--primary-color) calc(l + 0.33) calc(c - 0.13) h);
+      --secondary-color: #f69c04;
       --background-color: #FFF;
-      --text-color: #2c3e50;
-      --light-color: #D3D3D3;
-      --dark-color: #2c2c2c;
-      --md-sys-color-primary: #444f0b;
-      --md-sys-color-secondary-container: #ccd2af;
-      --md-sys-color-surface: #f5f7f1;
-      --md-list-container-color: #f4fbfa;
-      --md-list-item-label-text-color: #161d1d;
-      --md-list-item-supporting-text-color: #3f4948;
+      --text-color: var(--XX-dark-primary-color);
+      --light-color: var(--XX-light-primary-color);
+      --dark-color: var(--X-dark-primary-color);
+    
+      --md-sys-color-primary: var(--X-dark-primary-color);
+      --md-sys-color-primary-container: var(--dark-primary-color);
+      --md-sys-color-secondary-container: var(--X-light-primary-color);
+      --md-sys-color-surface: var(--XX-light-primary-color);
+      --md-list-container-color: var(--XX-light-primary-color);
+      --md-list-item-label-text-color: var(--XX-dark-primary-color);
+      --md-list-item-supporting-text-color: var(--X-dark-primary-color);
       --md-list-item-trailing-supporting-text-color: #3f4948;
       --md-list-item-label-text-font: system-ui;
       --md-list-item-supporting-text-font: system-ui;
       --md-list-item-trailing-supporting-text-font: system-ui;
+    
     }
+    
     [slot="trailing-supporting-text"] {
       width: 30px;
       text-align: end;
@@ -210,7 +219,7 @@
     }
     
     #productList tbody tr:hover {
-        background-color: #f0f8ff; /* Change de couleur au survol */
+        background-color: var(--XX-light-primary-color); /* Change de couleur au survol */
     }
     
     table {
@@ -261,6 +270,11 @@
     
     th:nth-child(5),
     td:nth-child(5) {
+        width: 10%;
+    }
+    
+    th:nth-child(6),
+    td:nth-child(6) {
         width: 10%;
     }
     
@@ -378,6 +392,18 @@
         justify-content: flex-end;
     }
     
+    #validateButton md-filled-button {
+      font-size: x-large;
+      padding-top: 20px;
+      padding-bottom: 20px;
+      padding-right: 30px;
+      padding-left: 30px;
+    }
+    
+    .fab.primary .label {
+      color: #fff;
+    }
+    
     .popup {
         opacity: 0;
         /* Commencez invisible */
@@ -447,17 +473,21 @@
     }
     
     .popup-content {
-        background: #34495E;
+        background: var(--dark-primary-color);
         position: fixed;
         left: 50%;
         top: 50%;
         transform: translate(-50%, -50%);
         transition: background-color 0.3s;
-        color: #fff;
+        color: var(--XX-light-primary-color);
         border-bottom: 1px solid #2C3E50;
         padding: 20px;
         max-width: 400px;
         width: 100%;
+    }
+    
+    .popup-content H2 {
+          color: #fff;
     }
     
     .updated-today {

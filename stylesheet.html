@@ -40,7 +40,7 @@
       width: 30px;
       text-align: end;
     }
-    }
+    
     
     * {
         box-sizing: border-box;
@@ -52,13 +52,18 @@
         flex-wrap:  nowrap;
         flex-direction: column;
         background-color: var(--background-color);
-        font-size: large;
+        //font-size: large;
         height: inherit;
         margin: 0;
     }
     
-    h2 {
+    h1 {
         font-size: x-large;
+        color: var(--md-sys-color-primary);
+    }
+    
+    h2 {
+        font-size: large;
         color: var(--md-sys-color-primary);
     }
     
@@ -71,7 +76,7 @@
         flex-flow: column;
     }
     
-    /* ----------------------------------- WIP -----------------------------------Menu Latéral */
+    /* Menu */
     #menu {
       background-color: white;
       order: 1;
@@ -115,6 +120,7 @@
         background-color: var(--dark-primary-color);
     }
     */
+    
     
     /* ----------------------------------- WIP -----------------------------------Contenu Principal */
     #content {
@@ -174,7 +180,7 @@
     //tablets 
     @media screen and (min-width: 577px) and (max-width: 768px) {
         body {
-          font-size: medium;
+          //font-size: medium;
           background-color: blue !important;
         }
     
@@ -192,7 +198,7 @@
     //phones 
     @media screen and (max-width: 576px) {
       body {
-        font-size: small;
+        //font-size: small;
         background-color: grey !important;
         }
       #menu {
@@ -290,13 +296,14 @@
       width: 33vw;
     }
     
+    /*
     #addProductButton {
         display: block;
         margin-top: 10px;
         padding: 15px;
         color: white;
         text-decoration: none;
-        font-size: 18px;
+        //font-size: large;
         background-color: #34495E;
         border-bottom: 1px solid #2C3E50;
         text-align: center;
@@ -307,6 +314,8 @@
         background-color: #1ABC9C;
     }
     
+    */
+    
     #addProductContainer {
         text-align: center;
         /* Centrer le bouton */
@@ -314,12 +323,13 @@
         /* Espacement en bas */
     }
     
+    /*
     #addProductButtonreception {
         padding: 15px;
         margin-top: 10px;
         color: white;
         text-decoration: none;
-        font-size: 18px;
+        //font-size: large;
         background-color: #34495E;
         border-bottom: 1px solid #2C3E50;
         text-align: center;
@@ -328,14 +338,11 @@
     
     #addProductButtonreception:hover {
         background-color: #318ce7;
-        /* Couleur au survol */
     }
-    
+    */
     #addProductContainer {
         text-align: center;
-        /* Centrer le bouton */
         margin-bottom: 20px;
-        /* Espacement en bas */
     }
     
     #card-light {
@@ -381,7 +388,7 @@
     }
     
     #cbFee, #adherentEmail, #cotisationContainer{
-      font-size: medium;
+      //font-size: medium;
       color: var(--md-sys-color-primary);
       order:5;
     }
@@ -393,7 +400,7 @@
     }
     
     #validateButton md-filled-button {
-      font-size: x-large;
+      font-size: large;
       padding-top: 20px;
       padding-bottom: 20px;
       padding-right: 30px;
@@ -470,6 +477,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        z-index: 1;
     }
     
     .popup-content {
@@ -484,10 +492,21 @@
         padding: 20px;
         max-width: 400px;
         width: 100%;
+        display: flex;
+        flex-direction: column;
     }
     
     .popup-content H2 {
           color: #fff;
+    }
+    
+    .popup-buttons {
+      display: flex;
+      justify-content: space-evenly;
+      margin-left: 0px;
+      margin-right: 0px;
+      margin-top: 18px;
+      margin-bottom: 18px;
     }
     
     .updated-today {

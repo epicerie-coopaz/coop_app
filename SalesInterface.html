@@ -2,7 +2,6 @@
 <html style="height: 100%;"> 
 
 <head>
-    <?!= include('stylesheet'); ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
@@ -10,15 +9,14 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     
-    <script type="importmap">
-      {"imports": {"@material/web/": "https://esm.run/@material/web/"}}
-    </script>
+    <script type="importmap">{"imports": {"@material/web/": "https://esm.run/@material/web/"}}</script>
     <script type="module">
       import '@material/web/all.js';
       import {styles as typescaleStyles} from '@material/web/typography/md-typescale-styles.js';
       document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
-      
     </script>
+
+    <?!= include('stylesheet'); ?>
 </head>
 
 <!-----------------------------------------------------------------------
@@ -64,15 +62,6 @@
             Inventaire
           </md-primary-tab>
         </md-tabs>
-        
-        <!--
-        <a href="#" class="menu-button" onclick="loadContent('home')"><p>Accueil</p></a>
-        <a href="#" class="menu-button" onclick="loadContent('vente')">Vente</a>
-        <a href="#" class="menu-button" onclick="loadContent('reception')">Réception</a>
-        <a href="#" class="menu-button" onclick="loadContent('suppliers')">Fournisseurs</a>
-        <a href="#" class="menu-button" onclick="loadContent('inventaire')">Inventaire</a>
-        -->
-
     </div>
 
     <!-- Contenu Principal -->
@@ -85,52 +74,13 @@
       <!-- Sections de contenu -->
       <div id="workplace" class="flex-column">
 
+        <!-- Accueil -->
         <div id="home" class="content-section active">
             <h2>Bienvenue sur la page d'accueil</h2>
-
-            <p>Le contenu de la page d'accueil ici...</p>
-            <p style="background-color: var(--X-dark-primary-color)">--X-dark-primary-color</p>
-            <p style="background: var(--dark-primary-color)">--dark-primary-color</p>
-            <p style="background: var(--primary-color)">--primary-color</p>
-            <p style="background: var(--light-primary-color)">--light-primary-color</p>
-            <p style="background: var(--X-light-primary-color)">--X-light-primary-color</p>
-            <p style="background: var(--XX-light-primary-color)">--XX-light-primary-color</p>
-
-            <md-outlined-button>Back</md-outlined-button>
-            <md-filled-button>Complete</md-filled-button>
-            <md-filled-tonal-button>
-              Send
-              <svg slot="icon" viewBox="0 0 48 48"><path d="M6 40V8l38 16Zm3-4.65L36.2 24 9 12.5v8.4L21.1 24 9 27Zm0 0V12.5 27Z"/></svg>
-            </md-filled-tonal-button>
-
-            <md-text-button trailing-icon>
-              Open
-              <svg slot="icon" viewBox="0 0 48 48"><path d="M9 42q-1.2 0-2.1-.9Q6 40.2 6 39V9q0-1.2.9-2.1Q7.8 6 9 6h13.95v3H9v30h30V25.05h3V39q0 1.2-.9 2.1-.9.9-2.1.9Zm10.1-10.95L17 28.9 36.9 9H25.95V6H42v16.05h-3v-10.9Z"/></svg>
-            </md-text-button>
-
-<md-list>
-  <md-list-item type="button">
-    <div slot="headline">Apple</div>
-    <div slot="supporting-text">In stock</div>
-    <div >Tata</div>
-    <div slot="trailing-supporting-text">+100</div>
-  </md-list-item>
-  <md-list-item type="button">
-    <div slot="headline">Banana</div>
-    <div slot="supporting-text">In stock</div>
-        <div>Tata</div>
-    <div slot="trailing-supporting-text">56</div>
-  </md-list-item>
-  <md-list-item type="button">
-    <div slot="headline">Cucumber</div>
-    <div slot="supporting-text">Low stock</div>
-        <div >Tata</div>
-    <div slot="trailing-supporting-text">5</div>
-  </md-list-item>
-</md-list>
-            
+            <p>Le contenu de la page d'accueil ici...</p>            
         </div>
 
+        <!-- Vente -->
         <div id="vente" class="content-section">
             <div id="tableContainer">
               <table id="productList">
@@ -149,42 +99,49 @@
                 </tbody>
               </table>
             </div>
-            <div id="addProductContainer">
+
+            <div id="addRow">
                 <md-filled-tonal-button onclick="addRow()">
-                    Ajouter un produit
+                    Ajouter une ligne
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
                       <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
                     </svg>
                 </md-filled-tonal-button>
             </div>
-
-            <div id="finalisation">
-              <div id="card-light">
-                  <h2>Adhérent</h2>
-                  <div id="adherentsDropdownContainer">
+            
+            <div id="finalContainer" class="rowWrapper">
+              <div id="adherentsContainer" class="card-light">
+                <div id="adherentSelect" class="rowWrapper">
+                  <h2>Adhérent : </h2>
+                  <div id="adherentsDropdownContainer" class="DropdownBlock">
                     <select id="adherentsDropdown" onchange="updateEmail()"></select>
                   </div>
-                  <div id="adherentEmail"></div>
-                  <div id="cotisationContainer" style="display: none;">
-                      <label for="cotisationAmount">Montant de cotisation :</label>
-                      <input type="number" id="cotisationAmount" value="0" min="5" step="1" oninput="calculateTotal()">
+                </div>
+                  <div id="adherentDetails" class="rowWrapper">
+                    <div id="adherentEmail"></div>
+                    <div id="cotisationContainer" class="rowWrapper" style="display: none;">
+                        <label for="cotisationAmount">Montant de la cotisation : </label>
+                        <input type="number" id="cotisationAmount" value="0" min="5" step="1" oninput="calculateTotal()">
+                    </div>
                   </div>
               </div>
 
-              <div id="card-light">
-                  <h2>Méthode de Paiement</h2>
-                  <div class="DropdownBlock">
-                    <select id="paymentMethodDropdown" onchange="calculateTotal()">
-                        <option value="" disabled selected>Sélectionnez un mode de paiement</option>
-                        <option value="CB">CB</option>
-                        <option value="Chèque">Chèque</option>
-                    </select>
+              <div id="paymentContainer" class="card-light">
+                  <div id="paymentSelect" class="rowWrapper">
+                    <h2>Paiement : </h2>
+                    <div class="DropdownBlock">
+                      <select id="paymentMethodDropdown" onchange="calculateTotal()">
+                          <option value="" disabled selected>Sélectionnez un mode de paiement</option>
+                          <option value="CB">CB</option>
+                          <option value="Chèque">Chèque</option>
+                      </select>
+                    </div>
                   </div>
-                  <div id="cbFee" class="overview-line" style="display: none;">Frais CB: 0 €</div>
-                  
+                  <div id="cbFee" class="overview-line" style="display: none;">Frais de CB : 0 €</div>
               </div>
             </div>
-            <H2 id="total">Total Général: 0 €</H2>
+
+            <H2 id="total">Total Général : 0 €</H2>
             <div id="validateButton">
               <md-filled-button label="Valider" onclick="validate()">
                 Valider
@@ -192,13 +149,25 @@
             </div>
         </div>
 
+        <!-- Reception -->
         <div id="reception" class="content-section">
-            <h2>Réception des Produits</h2>
-            <select id="supplierDropdown" onchange="updateProductDropdown(),handleSupplierChange()">
-                <option value="">-- Choisissez un fournisseur --</option>
-                <!-- Les fournisseurs seront chargés ici -->
-            </select>
-            <table id="receptionTable">
+            <div id="supplierContainer" class="card-light">
+              <div id="supplierSelect" class="rowWrapper">
+                <h2>Producteur : </h2>
+                <div id="supplierDropdownContainer">
+                  <select id="supplierDropdown" onchange="updateProductDropdown(),handleSupplierChange()">
+                    <option value="">-- Choisissez un fournisseur --</option>
+                    <!-- Les fournisseurs seront chargés ici -->
+                  </select>
+                </div>
+              </div>
+              <div id="addRow">
+                <md-filled-tonal-button id="addProductButtonreception" onclick="createNewProduct()">Créer un nouveau produit</md-filled-tonal-button>
+              </div>
+            </div>
+
+            <div id="tableContainer">
+              <table id="receptionTable">
                 <thead>
                     <tr>
                         <th>Produit</th>
@@ -216,22 +185,30 @@
                         Sélectionnez d'abord un fournisseur.
                     </div>
                 </tbody>
-            </table>
-            <div id="totalAmount">Total Réception : 0 €</div>
-            <md-filled-tonal-button id="addProductButtonreception" onclick="createNewProduct()">Créer un nouveau produit</md-filled-tonal-button>
-            <md-filled-tonal-button id="addProductButton" onclick="addNewLine()">Ajouter une nouvelle ligne</md-filled-tonal-button>
-            <md-filled-button id="validateButton" onclick="validateReception()">Valider la réception</md-filled-button>
+              </table>
+            </div>
+            <div id="addRow">
+              <md-filled-tonal-button id="addProductButton" onclick="addNewLine()">Ajouter une nouvelle ligne</md-filled-tonal-button>
+            </div>
+            
+            <H2 id="totalAmount">Total Réception : 0 €</H2>
+            <div id="validateButton">
+              <md-filled-button id="validateButton" onclick="validateReception()">Valider la réception</md-filled-button>
+            </div>
         </div>
 
+        <!-- Fournisseurs -->
         <div id="suppliers" class="content-section">
-            <h2>Liste des Fournisseurs</h2>
-            <md-filled-tonal-button id="addProductButton" onclick="openCreateSupplierPopup()">Ajouter un Fournisseur</md-filled-tonal-button>
-            <table id="supplierTable">
+            <div id="addRow">
+              <md-filled-tonal-button id="addProductButton" onclick="openCreateSupplierPopup()">Ajouter un fournisseur</md-filled-tonal-button>
+            </div>
+            <div id="tableContainer">
+              <table id="supplierTable">
                 <thead>
                     <tr>
                         <th>Nom du Fournisseur</th>
-                        <th>Téléphone</th>
                         <th>Email</th>
+                        <th>Téléphone</th>
                         <th>Adresse</th>
                         <th>Code Postal</th>
                         <th>Ville</th>
@@ -241,13 +218,14 @@
                 <tbody id="supplierTableBody">
                     <!-- Les fournisseurs seront ajoutés ici via JavaScript -->
                 </tbody>
-            </table>
+              </table>
+            </div>
         </div>
 
+        <!-- Inventaire -->
         <div id="inventaire" class="content-section">
-            <h2>inventaire</h2>
-
-            <table id="productTable">
+            <div id="tableContainer">
+              <table id="productTable">
                 <thead>
                     <tr>
                         <th>Produit</th>
@@ -261,6 +239,7 @@
                     <!-- Les lignes seront ajoutées dynamiquement -->
                 </tbody>
             </table>
+            </div>
 
             <!-- Template pour une ligne -->
             <template id="rowTemplate">
@@ -277,9 +256,12 @@
                 </tr>
             </template>
 
-
-            <md-filled-tonal-button onclick="addRowInventaire()">Ajouter une ligne</md-filled-tonal-button>
-            <md-filled-button onclick="saveInventory()">Enregistrer les modifications</md-filled-button>
+            <div id="addRow">
+              <md-filled-tonal-button onclick="addRowInventaire()">Ajouter une ligne</md-filled-tonal-button>
+            </div>
+            <div id="validateButton">
+              <md-filled-button onclick="saveInventory()">Enregistrer les modifications</md-filled-button>
+            </div>
         </div>
       </div>
 
@@ -421,12 +403,12 @@
             const currentMonthYear = new Date().toLocaleString('fr-FR', { month: 'long', year: 'numeric' });
             const cotisationStatus = cotisations[selectedAdherentName]?.[currentMonthYear];
             if (cotisationStatus === "ok") {
-                emailDiv.style.color = "black";
+                emailDiv.style.color = "var(--md-sys-color-primary)";
                 document.getElementById('cotisationContainer').style.display = "none"; // Cacher le champ
             } else {
                 emailDiv.style.color = "red"; // Changer le texte en rouge
-                emailDiv.innerText += ` | Statut de cotisation: non à jour`;
-                document.getElementById('cotisationContainer').style.display = "block"; // Afficher le champ
+                emailDiv.innerText += `\nN'a pas encore cotisé ce mois`;
+                document.getElementById('cotisationContainer').style.display = "flex"; // Afficher le champ
             }
         } else {
             document.getElementById('adherentEmail').innerText = '';
@@ -636,14 +618,14 @@
         if (paymentMethod === "CB") {
             cbFee = total * 0.0055; // 0.55% de frais
             document.getElementById('cbFee').style.display = 'block';
-            document.getElementById('cbFee').textContent = `Coût supplémentaire CB: ${cbFee.toFixed(2)} €`;
+            document.getElementById('cbFee').textContent = `Frais CB : ${cbFee.toFixed(2)} €`;
         } else {
             document.getElementById('cbFee').style.display = 'none';
         }
 
         // Total avec frais CB si appliqué
         const grandTotal = total + cbFee;
-        document.getElementById('total').textContent = `Total Général: ${grandTotal.toFixed(2)} €`;
+        document.getElementById('total').textContent = `Total général : ${grandTotal.toFixed(2)} €`;
     }
 
     function validate() {
@@ -1569,6 +1551,6 @@
 
     });
 </script>
-</body>
+
 
 </html>

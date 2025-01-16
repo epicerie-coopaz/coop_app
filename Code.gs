@@ -28,16 +28,18 @@ function getProducts() {
     const price = row[7] ? parseFloat(row[7].toString().replace(',', '.')) : 0;
 
     return {
-      name: row[0],     // Nom du produit
-      shortName : row[1], // Nom court (colonne 2)
-      price: price,    // Prix unitaire
-      stock: row[8],     // Stock actuel
-      barcode : row[2], // Code barre (colonne 3)
-      stockDate : formattedDate  // Date de l'adhérent, formatée si elle existe
+      name: row[0],       // Nom du produit
+      shortName: row[1],  // Nom court (colonne 2)
+      supplier: row[3],  // Fournisseur
+      price: price,       // Prix unitaire
+      stock: row[8],      // Stock actuel
+      barcode: row[2],    // Code barre (colonne 3)
+      stockDate: formattedDate  // Date de la dernière réception, formatée si elle existe
     };
   }).filter(Boolean); // Supprimer les entrées null
   return products;
 }
+
 //récupérer la liste des adhérents dans l'onglet adherents
 function getAdherents() {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('adherents'); // Change le nom de l'onglet si nécessaire
@@ -51,7 +53,8 @@ function getAdherents() {
   });
   return adherents;
 }
-//réceupère l'état de la cotisation de l'adhérent dans l'onglet cotisations
+
+//récupère l'état de la cotisation de l'adhérent dans l'onglet cotisations
 function getCotisations() {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("cotisations");
     const data = sheet.getDataRange().getValues();
@@ -165,27 +168,24 @@ function saveSale(adherent, paymentMethod, total, dateTime, purchases) {
   const salesSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('ventes');
   salesSheet.appendRow([dateTime, adherent, formattedTotal, paymentMethod]);
 }
-
-// Mise à jour du nom, du code barre, du stock et du prix d'un produit
-function updateProductStockAndPrice(oldProductName, newProductName, newBarcode, newStock, newPrice) {
+function updateProductDetails(productName, newStock, newPrice, newShortName, newBarcode) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('produits');
   const data = sheet.getDataRange().getValues();
 
   newStock = parseFloat(newStock); // S'assurer que le stock est un nombre décimal
   newPrice = parseFloat(newPrice); // S'assurer que le prix est un nombre décimal
 
-  // Parcours de toutes les lignes pour trouver le produit correspondant
   for (let i = 1; i < data.length; i++) {
-    if (data[i][0] === oldProductName) { // Vérifier le nom du produit dans la colonne 2
-      // Mise à jour du nom, du code barre, du stock et du prix
-      sheet.getRange(i + 1, 2).setValue(newProductName);  // Colonne 2 pour le nom du produit
-      sheet.getRange(i + 1, 3).setValue(newBarcode);     // Colonne 3 pour le code barre
-      sheet.getRange(i + 1, 9).setValue(newStock);       // Colonne 9 pour le stock
-      sheet.getRange(i + 1, 8).setValue(newPrice);       // Colonne 8 pour le prix
-      return `Produit ${oldProductName} mis à jour avec succès.`;
+    if (data[i][0] === productName) { // Nom du produit dans la colonne 0
+      sheet.getRange(i + 1, 9).setValue(newStock);    // Colonne 9 : Stock
+      sheet.getRange(i + 1, 8).setValue(newPrice);    // Colonne 8 : Prix
+      sheet.getRange(i + 1, 2).setValue(newShortName); // Colonne 2 : Nom court
+      sheet.getRange(i + 1, 3).setValue(newBarcode);   // Colonne 3 : Code-barre
+      return `Produit "${productName}" mis à jour avec succès.`;
     }
   }
-  return `Produit ${oldProductName} non trouvé.`;
+
+  return `Produit "${productName}" non trouvé.`;
 }
 
 //Envoi de la facture par mail
@@ -504,6 +504,8 @@ function receptionAventureBio() {
       }
 
       nouveauxProduits.push(["", nomProduit, codeBarre, "AVENTURE BIO", unite,  "", "",  nouveauPrix, quantiteReception]);
+      // Générer l'étiquette pour le nouveau produit
+      generateEtiquette(nomProduit, codeBarre, nouveauPrix, quantiteReception);
     }
   }
 
@@ -769,7 +771,6 @@ function createWeeklyLossTrigger() {
     .atHour(12) // À midi;
 }
 
-
 ////////////////////////
 /////INVENTAIRE/////////
 ////////////////////////
@@ -817,7 +818,6 @@ function updateInventory(updatedProducts) {
     Logger.log('Mise à jour de l\'inventaire terminée.');
     saveInventoryToSheet(updatedProducts)
 }
-
 //Sauvegarde l'inventaire
 function saveInventoryToSheet(updatedProducts) {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Inventaire");
@@ -897,6 +897,8 @@ function findProductRow(sheet, productName) {
     return null; // Si le produit n'est pas trouvé
 }
 
+
+
 // Fonction pour trouver la ligne du produit dans l'onglet "Inventaire"
 function findProductRow(sheet, productName) {
     const productNames = sheet.getRange("A:A").getValues(); // Liste des noms de produits dans la colonne A
@@ -907,7 +909,6 @@ function findProductRow(sheet, productName) {
     }
     return null; // Si le produit n'est pas trouvé
 }
-
 
 function getTotalForDate(formattedDate) {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Produits'); // Onglet Produits

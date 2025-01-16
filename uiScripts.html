@@ -32,6 +32,7 @@ Scripts côté client (logiciel, interactions utilisateur)
                   break;
               case 'vente':
                   headerTitle.textContent = 'Gestion des ventes';
+				getProductsFromSheet();								   
                   getProducts();
                   addRow();
                   getAdherents();
@@ -53,6 +54,16 @@ Scripts côté client (logiciel, interactions utilisateur)
               case 'inventaire':
                   headerTitle.textContent = 'Inventaire';
                   getProducts();
+					break;
+            case 'etiquettes':
+                headerTitle.textContent = 'Gestion des pertes';
+                getProducts();
+                addRowEtiquettes();
+					  
+		 
+	 
+
+								 
                   break;
           }
       }
@@ -118,7 +129,7 @@ Scripts côté client (logiciel, interactions utilisateur)
       showLoader('Chargement des produits');
       google.script.run.withSuccessHandler(function (data) {
           products = data;
-          console.log(products);
+          console.log('Produits mis à jour:', products);
           hideLoader();
       }).getProducts();
   }
@@ -161,10 +172,13 @@ Scripts côté client (logiciel, interactions utilisateur)
               allowClear: true
           });
   
+
           // Ajouter le focus au champ de recherche lorsque la liste est ouverte
           $(adherentsDropdown).on('select2:open', () => {
               document.querySelector('.select2-search__field').focus();
           });
+												  
+									
       }).getAdherents();
   }
   
@@ -372,6 +386,8 @@ Scripts côté client (logiciel, interactions utilisateur)
   
   ///////////////////////////
   //////////vente////////////
+															  
+																									
   ///////////////////////////
   
   function getCotisations() {
@@ -380,6 +396,7 @@ Scripts côté client (logiciel, interactions utilisateur)
       }).getCotisations(); // Assure-toi que cette fonction soit bien définie dans le backend
   }
   
+							   
   function updateEmail() {
       const selectedAdherentName = document.getElementById('adherentsDropdown').value;
   
@@ -418,7 +435,12 @@ Scripts côté client (logiciel, interactions utilisateur)
       }
   }
   
-  function sortProducts(products) {
+    function sortProducts(products) {
+
+       if (!products || products.length === 0) {
+        console.warn("La liste des produits est vide ou non définie.");
+        return [];
+    } 
         // Trier les produits : d'abord par stock, puis par nom
         return products.sort((a, b) => {
             if (a.stock === 0 && b.stock === 0) {
@@ -432,6 +454,7 @@ Scripts côté client (logiciel, interactions utilisateur)
         });
     }
   
+						  
   function addRow() {
       const productList = document.getElementById('productList').getElementsByTagName('tbody')[0];
       const row = productList.insertRow();
@@ -444,10 +467,12 @@ Scripts côté client (logiciel, interactions utilisateur)
       const cell6 = row.insertCell(5); // Colonne total
       const cell7 = row.insertCell(6); // Colonne supprimer
       const cell8 = row.insertCell(7); // Colonne modifier le stock
+		   
       // Animation de glissement
       setTimeout(() => {
           row.style.opacity = 1;
       }, 10);
+												  
       const select = document.createElement('select');
       select.classList.add('product-select');
       select.innerHTML = `<option value="">Sélectionner un produit</option>`;
@@ -458,13 +483,19 @@ Scripts côté client (logiciel, interactions utilisateur)
           option.dataset.price = product.price;
           option.dataset.stock = product.stock;
           option.dataset.name = product.name;
+        option.dataset.shortName = product.shortName;
+        option.dataset.barcode = product.barcode;													 
+		 
           option.textContent = product.name;
+	   
           if (product.stock <= 0) {
               option.classList.add('out-of-stock');
           }
           select.appendChild(option);
       });
+											 
       cell1.appendChild(select);
+										  
       $(select)
       .select2({
           placeholder: 'Recherchez un produit',
@@ -473,6 +504,24 @@ Scripts côté client (logiciel, interactions utilisateur)
               if ($.trim(params.term) === '') {
                   return data;
               }
+											 
+										  
+												
+										  
+							  
+							  
+								 
+								
+				  
+
+																																						 
+			 
+
+																																														
+																	
+
+																			 
+									   
               const searchWords = params.term.toLowerCase().split(/\s+/).map(word => removeAccents(word));
               const dataText = removeAccents(data.text.toLowerCase());
   
@@ -490,9 +539,11 @@ Scripts côté client (logiciel, interactions utilisateur)
         .on('select2:open', () => {
               document.querySelector('.select2-search__field').focus(); // Focus dans la zone de recherche
           });
+																											 
       // Gestion de la sélection du produit
       select.onchange = function () {
           const selectedOption = select.selectedOptions[0];
+															  
           const formattedPrice = selectedOption ? parseFloat(selectedOption.dataset.price).toFixed(2) : '0.00';
           cell2.innerText = `${formattedPrice} €`;
   
@@ -514,12 +565,26 @@ Scripts côté client (logiciel, interactions utilisateur)
               } else {
                   cell3.innerText = `${stockText} unités`;
               }
+											   
               if (selectedOption.dataset.name.toLowerCase().includes("retour")) {
                   cell3.innerText = "";
                   row.style.backgroundColor = '#fdd';
               } else {
                   row.style.backgroundColor = '';
               }
+
+            // Enregistrement du shortName et barcode
+            const shortName = selectedOption.dataset.shortName;
+            const barcode = selectedOption.dataset.barcode;
+
+
+            // Incrémentation de la quantité si produit "unite"
+									   
+						 
+  
+																							  
+								  
+																																								 
               if (selectedOption.dataset.name.toLowerCase().includes("unite")) {
                   // Incrémenter la quantité de 1
                   const quantityInput = cell4.querySelector('input');
@@ -589,6 +654,7 @@ Scripts côté client (logiciel, interactions utilisateur)
       cell5.appendChild(discountInput);
           // Total de la ligne (initialisé à 0)
           cell6.innerText = '0.00 €';
+									  
       const deleteIcon = document.createElement('span');
       deleteIcon.innerHTML = '❌';
       deleteIcon.style.cursor = 'pointer';
@@ -596,6 +662,7 @@ Scripts côté client (logiciel, interactions utilisateur)
           deleteRow(row);
       };
       cell7.appendChild(deleteIcon);
+							 
       const editIcon = document.createElement('span');
       editIcon.innerHTML = '✏️';
       editIcon.style.cursor = 'pointer';
@@ -605,6 +672,7 @@ Scripts côté client (logiciel, interactions utilisateur)
       cell8.appendChild(editIcon);
   }
   
+																  
   function deleteRow(row) {
       if (confirm("Êtes-vous sûr de vouloir supprimer cette ligne ?")) {
           const productList = document.getElementById('productList').getElementsByTagName('tbody')[0];
@@ -685,6 +753,13 @@ Scripts côté client (logiciel, interactions utilisateur)
       invoice.grandTotal = grandTotal;
   }
   
+																				 
+																																										
+			
+											  
+																																													 
+																																										  
+		   
   function validate() {
       showLoader('Validation de la facture');
      
@@ -729,6 +804,41 @@ Scripts côté client (logiciel, interactions utilisateur)
             hideLoader(); // Cacher le loader si des champs sont manquants
             return; // Sortir de la fonction si un champ est manquant
         }
+																												
+																																													 
+	   
+										  
+							
+										 
+								   
+														   
+																		
+																								   
+			   
+		   
+									
+							   
+																																																											
+					
+																																																												 
+			 
+		 
+	   
+
+
+
+
+												
+																	 
+																										
+																		   
+										
+																			
+																							 
+		 
+
+								  
+							  
       google.script.run.withSuccessHandler(() => {
           console.log('Vente enregistrée et cotisation mise à jour');
           const currentMonthYear = new Date().toLocaleString('fr-FR', { month: 'long', year: 'numeric' });
@@ -742,7 +852,11 @@ Scripts côté client (logiciel, interactions utilisateur)
           const invoiceData = {
             adherent: adherent,
             email: adherents.find(a => a.name === adherent).email, // Récupère l'email de l'adhérent
+			 
+				  
+	 
             date: new Date().toLocaleString('fr-FR'),
+												
             //orderDetails: orderDetails,
             cotisationAmount: `${cotisationAmount.toFixed(2)}`,
             creditAmount: `${creditAmount.toFixed(2)}`,
@@ -753,6 +867,16 @@ Scripts côté client (logiciel, interactions utilisateur)
             purchases: purchases // Liste des produits achetés
             };
   
+																   
+															  
+									  
+					
+															 
+									  
+																			
+														 
+															   
+																	 
           // Envoie l'email
           google.script.run.sendInvoiceToAdherent(invoiceData);
           hideLoader(); // Cacher le loader après la validation
@@ -767,6 +891,16 @@ Scripts côté client (logiciel, interactions utilisateur)
   }
   
   
+										  
+																										  
+																														 
+																										  
+																								
+																									  
+																				
+
+								  
+															   
   function resetForm() {
       // Réinitialiser les champs de saisie
       document.getElementById('adherentsDropdown').value = '';  // Réinitialiser le dropdown des adhérents
@@ -791,101 +925,139 @@ Scripts côté client (logiciel, interactions utilisateur)
       calculateTotal(); // Recalculer le total général
   }
   
-  function updateProductPrice(selectedOption, newPrice) {
-      // Mettre à jour le prix dans l'option sélectionnée
-      selectedOption.dataset.price = newPrice;
-      selectedOption.value = newPrice;
-      // Mettre à jour l'affichage du prix dans la cellule de prix
-      const row = selectedOption.closest('tr');
-      row.cells[1].innerText = `${newPrice} €`;
-      // Recalculer le total de la ligne et le total général
-      calculateRowTotal(row);
-  }
+								
+  function updateProductPrice(selectedOption, newPrice, priceType) {
+    // Mettre à jour le prix dans l'option sélectionnée
+    selectedOption.dataset.price = newPrice;
+    selectedOption.value = newPrice;
+
+    // Mettre à jour l'affichage du prix dans la cellule de prix
+    const row = selectedOption.closest('tr');
+    let finalPrice = newPrice;
+
+    // Calcul du prix en fonction du type (TTC, HT à 5.5%, HT à 20%)
+    if (priceType === 'HT5.5') {
+        finalPrice = newPrice * 1.055; // Calculer le prix TTC pour 5.5%
+    } else if (priceType === 'HT20') {
+        finalPrice = newPrice * 1.20;  // Calculer le prix TTC pour 20%
+    }
+    
+    // Mettre à jour le texte du prix avec le prix calculé
+    row.cells[1].innerText = `${finalPrice.toFixed(2)} €`;
+
+    // Recalculer le total de la ligne et le total général
+    calculateRowTotal(row);
+}
   
-  function openStockPopup(selectedOption) {
-      if (!selectedOption) {
-          alert("Veuillez sélectionner un produit avant de modifier le stock.");
-          return;
-      }
+ function openStockPopup(selectedOption) {
+    if (!selectedOption) {
+        alert("Veuillez sélectionner un produit avant de modifier le stock.");
+        return;
+    }
+
+																							
+																				
+																			 
   
-      console.log("selectedOption:", selectedOption);  // Vérifier ce qui est sélectionné
-      console.log("shortName:", selectedOption.dataset.shortName);  // Nom court
-      console.log("barcode:", selectedOption.dataset.barcode);  // Code barre
+    const productName = selectedOption.dataset.name;
+    const shortName = selectedOption.dataset.shortName;
+    const barcode = selectedOption.dataset.barcode;
+    const currentStock = selectedOption.dataset.stock;
+    const currentPrice = selectedOption.dataset.price;
+    const priceType = selectedOption.dataset.priceType || 'TTC'; // Récupérer le type de prix actuel
+
+    // Création de la structure HTML de la popup
+    const popup = document.createElement('div');
+    popup.classList.add('popup-overlay'); // Utilisation de votre classe CSS existante
+
+    // Mise à jour du contenu de la popup
+    popup.innerHTML = `
+        <div class="popup-content">
+            <h2>Mettre à jour le produit</h2>
+            <p><strong>${productName}</strong></p>
+            <p><strong>Nom court :</strong>
+                <input type="text" id="shortNameInput" value="${shortName}">
+            </p>
+            <p><strong>Code barre :</strong>
+                <input type="text" id="barcodeInput" value="${barcode}">
+            </p>
+            <p><label for="newStock">Nouveau Stock :</label>
+            <input type="number" id="newStock" value="${currentStock}" min="0"></p>
+            <p><label for="newPrice">Nouveau Prix :</label>
+            <input type="number" id="newPrice" value="${currentPrice}" min="0" step="0.01"></p>
+            <p><label for="priceType">Type de Prix :</label>
+                <select id="priceType">
+                    <option value="TTC" ${priceType === 'TTC' ? 'selected' : ''}>TTC</option>
+                    <option value="HT5.5" ${priceType === 'HT5.5' ? 'selected' : ''}>HT à 5.5%</option>
+                    <option value="HT20" ${priceType === 'HT20' ? 'selected' : ''}>HT à 20%</option>
+                </select>
+            </p>
+            <div class="popup-buttons">
+                <md-filled-tonal-button id="saveStockButton" class="btn-save">Enregistrer</md-filled-tonal-button>
+                <div></div>
+                <md-filled-tonal-button id="cancelButton" class="btn-cancel">Annuler</md-filled-tonal-button>
+            </div>
+        </div>
+    `;
   
-      const productName = selectedOption.dataset.name;
-      const shortProductName = selectedOption.dataset.shortName;  // Nom court (colonne 2)
-      const currentStock = selectedOption.dataset.stock;
-      const currentPrice = selectedOption.dataset.price;
-      const currentBarcode = selectedOption.dataset.barcode;
-  
-      // Création de la structure HTML de la popup
-      const popup = document.createElement('div');
-      popup.classList.add('popup-overlay'); // Utilisation de votre classe CSS existante
-  
-      popup.innerHTML = `
-      <div class="popup-content">
-          <h2>Mettre à jour le produit</h2>
-          <p><strong>${productName}</strong></p>
-          <p><label for="newName">Nouveau Nom :</label>
-          <input type="text" id="newName" value="${shortProductName}"></p>
-          <p><label for="newBarcode">Nouveau Code Barre :</label>
-          <input type="text" id="newBarcode" value="${currentBarcode}"></p>
-          <p><label for="newStock">Nouveau Stock :</label>
-          <input type="number" id="newStock" value="${currentStock}" min="0"></p>
-          <p><label for="newPrice">Nouveau Prix :</label>
-          <input type="number" id="newPrice" value="${currentPrice}" min="0" step="0.01"></p>
-          <div class="popup-buttons">
-              <md-filled-tonal-button id="saveStockButton" class="btn-save">Enregistrer</md-filled-tonal-button>
-              <div></div>
-              <md-filled-tonal-button id="cancelButton" class="btn-cancel">Annuler</md-filled-tonal-button>
-          </div>
-      </div>
-      `;
-  
-      // Ajouter la popup au DOM
-      document.body.appendChild(popup);
-  
-      // Enregistrer les nouvelles valeurs de stock, prix, nom et code barre
-      document.getElementById('saveStockButton').onclick = function () {
-          const newName = document.getElementById('newName').value;
-          const newBarcode = document.getElementById('newBarcode').value;
-          // Nettoyage des valeurs et conversion en nombre
-          const newStockValue = document.getElementById('newStock').value.trim();
-          const newPriceValue = document.getElementById('newPrice').value.trim();
-  
-          // Vérification et conversion du stock et prix en nombres
-          const newStock = parseInt(newStockValue, 10);
-          const newPrice = parseFloat(newPriceValue);
-  
-          // Vérification des valeurs
-          if (isNaN(newStock) || isNaN(newPrice)) {
-              alert("Le stock ou le prix ne sont pas valides. Veuillez entrer des valeurs numériques.");
-              return;
-          }
-  
-          // Mise à jour des données dans l'option sélectionnée
-          selectedOption.dataset.name = newName;
-          selectedOption.dataset.barcode = newBarcode;
-          selectedOption.dataset.stock = newStock;
-          selectedOption.dataset.price = newPrice;
-  
-          // Mise à jour de l'affichage dans la ligne du tableau
-          updateStockInRow(selectedOption);
-          updateProductPrice(selectedOption, parseFloat(newPrice));
-  
-          // Fermer la popup
-          document.body.removeChild(popup);
-  
-          // Mise à jour dans Google Sheets
-          updateSingleProductStockAndPrice(productName, newName, newBarcode, newStock, newPrice);
+    // Ajouter la popup au DOM
+    document.body.appendChild(popup);
+
+    // Enregistrer les nouvelles valeurs de stock, prix, shortName, barcode et type de prix
+    document.getElementById('saveStockButton').onclick = function () {
+        const newStock = parseInt(document.getElementById('newStock').value, 10);
+        const newPrice = parseFloat(document.getElementById('newPrice').value);
+														  
+        const newShortName = document.getElementById('shortNameInput').value;
+        const newBarcode = document.getElementById('barcodeInput').value;
+        const newPriceType = document.getElementById('priceType').value;
+        
+        // Calcul des prix TTC et HT en fonction du type de prix
+													   
+        let finalPrice = newPrice;
+        
+        if (newPriceType === 'TTC') {
+            // Si le prix est TTC, calculer le HT pour 5.5% ou 20%
+            const priceHT5_5 = newPrice / 1.055;
+            const priceHT20 = newPrice / 1.20;
+            selectedOption.dataset.priceHT5_5 = priceHT5_5.toFixed(2);
+            selectedOption.dataset.priceHT20 = priceHT20.toFixed(2);
+        } else if (newPriceType === 'HT5.5') {
+            // Si le prix est HT à 5.5%, calculer le TTC
+            finalPrice = newPrice * 1.055;
+        } else if (newPriceType === 'HT20') {
+            // Si le prix est HT à 20%, calculer le TTC
+            finalPrice = newPrice * 1.20;
+        }
+        
+        // Mise à jour des données dans l'option sélectionnée
+												
+													  
+        selectedOption.dataset.stock = newStock;
+        selectedOption.dataset.price = finalPrice;
+        selectedOption.dataset.shortName = newShortName;
+        selectedOption.dataset.barcode = newBarcode;
+        selectedOption.dataset.priceType = newPriceType;
+
+        // Mise à jour de l'affichage dans la ligne du tableau
+        updateStockInRow(selectedOption);
+        updateProductPrice(selectedOption, finalPrice, newPriceType);
+
+        // Fermer la popup
+        document.body.removeChild(popup);
+
+        // Mise à jour dans Google Sheets
+        updateSingleProductStockAndPrice(productName, newStock, finalPrice, newShortName, newBarcode, newPriceType);
     };
-  
+
     // Annuler et fermer la popup
     document.getElementById('cancelButton').onclick = function () {
         document.body.removeChild(popup);
     };
-  }
+}
   
+		   
+	 
   function updateStockInRow(selectedOption) {
       const rows = document.querySelectorAll('#productList tbody tr');
       rows.forEach(row => {
@@ -898,18 +1070,23 @@ Scripts côté client (logiciel, interactions utilisateur)
       });
   }
   
-  function updateSingleProductStockAndPrice(productName, newStock, newPrice) {
-      google.script.run.withSuccessHandler((result) => {
-          alert(result); // Confirmation de mise à jour
-      }).withFailureHandler((error) => {
-          alert("Erreur lors de la mise à jour : " + error.message);
-      }).updateProductStockAndPrice(productName, newStock, newPrice);
-  }
+    function updateSingleProductStockAndPrice(productName, newStock, newPrice, newShortName, newBarcode) {
+        google.script.run.withSuccessHandler((result) => {
+            alert(result); // Confirmation de mise à jour
+        }).withFailureHandler((error) => {
+            alert("Erreur lors de la mise à jour : " + error.message);
+        }).updateProductDetails(productName, newStock, newPrice, newShortName, newBarcode);
+    }
   
   ///////////////////////////////////////////////
   ////////////////RECEPTION//////////////////////
   ///////////////////////////////////////////////
   
+												   
+												 
+				   
+		 
+
   // Fonction pour charger la liste des fournisseurs
   
   function loadSuppliers() {
@@ -941,63 +1118,76 @@ Scripts côté client (logiciel, interactions utilisateur)
                   width: '100%',
                   minimumResultsForSearch: 0,
               });
+																						  
       }).receptionGetSuppliers();
   }
   
+									  
+																																																								   
   // Fonction pour ajouter une nouvelle ligne de réception
-  function addNewLine() {
-      const newRow = document.createElement('tr');
-      newRow.innerHTML = `
-          <td>
-              <select class="productDropdown" onchange="updatePriceAndStock(this)" disabled>
-                  <option value="">-- Sélectionnez un produit --</option>
-              </select>
-          </td>
-          <td class="currentPrice"></td>
-          <td class="currentStock"></td>
-          <td><input type="number" class="receivedQuantity" placeholder="Quantité" oninput="updateTotalAmount(this)"></td>
-          <td class="totalAmount"></td>
-          <td>
-                  <button onclick="openModifyPopup(this)">Modifier</button> <!-- Bouton pour ouvrir la pop-up -->
-              </td>
-              <td>
-                  <span class="deleteRow" onclick="deleteReceptionRow(this)" style="color: red; cursor: pointer; font-size: 20px;">&times;</span>
-              </td>
-      `;
-      document.querySelector('#receptionTable tbody').appendChild(newRow);
-      
-      const supplier = document.getElementById('supplierDropdown').value;
-      if (supplier) {
-          showLoader('Chargement des produits'); // Affiche le loader pendant le chargement des produits
-          google.script.run.withSuccessHandler(function(products) {
-              hideLoader(); // Masque le loader après chargement
-              if (!products || products.length === 0) {
-                  alert("Aucun produit trouvé pour ce fournisseur !");
-                  return;
-              }
-              const productDropdown = newRow.querySelector('.productDropdown');
-              // Ajouter les produits dans le dropdown du produit
-              products.sort((a, b) => a.name.localeCompare(b.name));
-              const fragment = document.createDocumentFragment();
-              products.forEach(product => {
-                  const option = document.createElement('option');
-                  option.value = product.name;
-                  option.textContent = product.name;
-                  fragment.appendChild(option);
-              });
-              productDropdown.appendChild(fragment);
-              
-              // Initialiser Select2 une seule fois sur ce dropdown spécifique
-              $(productDropdown).prop('disabled', false).select2({
-                  placeholder: "-- Sélectionnez un produit --",
-                  allowClear: true,
-                  minimumResultsForSearch: 1,
-                  width: '100%',
-              });
-          }).receptionGetProductsBySupplier(supplier);
-      }
-  }
+function addNewLine() {
+    const newRow = document.createElement('tr');
+    newRow.innerHTML = `
+        <td>
+            <select class="productDropdown" onchange="updatePriceAndStock(this)" disabled>
+                <option value="">-- Sélectionnez un produit --</option>
+            </select>
+        </td>
+        <td class="currentPrice"></td>
+        <td><input type="number" class="priceUpdate" placeholder="Nouveau Prix" oninput="updateTotalAmount(this.parentElement.parentElement.querySelector('.receivedQuantity'))"></td>
+         <td>
+        <select class="priceType" onchange="updateTotalAmount(this)">
+            <option value="TTC">TTC</option>
+            <option value="HT5.5">HT à 5.5%</option>
+            <option value="HT20">HT à 20%</option>
+        </select>
+    </td>
+        <td class="currentStock"></td>
+        <td><input type="number" class="stockUpdate" placeholder="Nouveau Stock"></td>
+        <td><input type="number" class="receivedQuantity" placeholder="Quantité" oninput="updateTotalAmount(this)"></td>
+        <td class="totalAmount"></td>
+        <td>
+																												 
+				   
+				  
+            <span class="deleteRow" onclick="deleteReceptionRow(this)" style="color: red; cursor: pointer; font-size: 20px;">&times;</span>
+        </td>
+    `;
+    document.querySelector('#receptionTable tbody').appendChild(newRow);
+    
+    const supplier = document.getElementById('supplierDropdown').value;
+    if (supplier) {
+        showLoader('Chargement des produits'); // Affiche le loader pendant le chargement des produits
+        google.script.run.withSuccessHandler(function(products) {
+            hideLoader(); // Masque le loader après chargement
+            if (!products || products.length === 0) {
+                alert("Aucun produit trouvé pour ce fournisseur !");
+                return;
+            }
+            const productDropdown = newRow.querySelector('.productDropdown');
+            // Ajouter les produits dans le dropdown du produit
+            products.sort((a, b) => a.name.localeCompare(b.name));
+            const fragment = document.createDocumentFragment();
+            products.forEach(product => {
+                const option = document.createElement('option');
+                option.value = product.name;
+                option.textContent = product.name;
+                fragment.appendChild(option);
+            });
+            productDropdown.appendChild(fragment);
+            
+            // Initialiser Select2 une seule fois sur ce dropdown spécifique
+            $(productDropdown).prop('disabled', false).select2({
+                placeholder: "-- Sélectionnez un produit --",
+                allowClear: true,
+                minimumResultsForSearch: 1,
+                width: '100%',
+            });
+        }).receptionGetProductsBySupplier(supplier);
+    }
+}
   
+  /*
   function openModifyPopup(button) {
       const row = button.closest('tr');
       const price = row.querySelector('.currentPrice').textContent || '';
@@ -1038,7 +1228,7 @@ Scripts côté client (logiciel, interactions utilisateur)
         popup.remove();
     }
   }
-  
+  */
   function deleteReceptionRow(element) {
       const row = element.closest('tr');
       row.parentNode.removeChild(row); // Supprime la ligne
@@ -1080,11 +1270,31 @@ Scripts côté client (logiciel, interactions utilisateur)
                       if ($.trim(params.term) === '') {
                             return data;
                         }
+								
+				  
+
+																																						 
+			 
+
+																																														
+																	
+
+																			 
+									   
+		 
+ 
+												 
+																										
+		   
+				   
+	
                         const searchWords = params.term.toLowerCase().split(/\s+/).map(word => removeAccents(word));
                         const dataText = removeAccents(data.text.toLowerCase());
+															   
                         const match = searchWords.every(word => dataText.includes(word));
                         return match ? data : null;
                     },
+												 
               }).on('select2:open', () => {
                   document.querySelector('.select2-search__field').focus(); // Focus dans la zone de recherche
               });
@@ -1119,6 +1329,7 @@ Scripts côté client (logiciel, interactions utilisateur)
   
   // Appeler la fonction d'attente au chargement de la page
   document.addEventListener("DOMContentLoaded", waitForProductDropdowns);
+																
       
   function updatePriceAndStock(selectElement) {
       const row = selectElement.closest('tr');
@@ -1139,37 +1350,39 @@ Scripts côté client (logiciel, interactions utilisateur)
       }).receptionGetProductDetails(selectedProduct);
   }
   
-  function updateTotalAmount(element) {
-      const row = element.closest('tr');
-      const receivedQuantity = row.querySelector('.receivedQuantity').value;
-      const priceUpdate = row.querySelector('.priceUpdate').value || row.querySelector('.currentPrice').textContent;
-      const stockUpdate = row.querySelector('.stockUpdate').value || row.querySelector('.currentStock').textContent;
+function updateTotalAmount(element) {
+    const row = element.closest('tr');
+    const receivedQuantity = row.querySelector('.receivedQuantity').value;
+    let priceUpdate = row.querySelector('.priceUpdate').value || row.querySelector('.currentPrice').textContent;
+    const priceType = row.querySelector('.priceType').value; // Récupérer le type de prix sélectionné
+
+    // Si le prix est en HT, on applique la TVA
+    if (priceType === 'HT5.5') {
+        priceUpdate = parseFloat(priceUpdate) * 1.055; // Appliquer la TVA de 5.5%
+    } else if (priceType === 'HT20') {
+        priceUpdate = parseFloat(priceUpdate) * 1.20; // Appliquer la TVA de 20%
+    }
+
+    // Calcul du montant total
+    const totalAmount = parseFloat(receivedQuantity) * parseFloat(priceUpdate);
+    row.querySelector('.totalAmount').textContent = totalAmount.toFixed(2) + ' €';
+    
+    // Recalculer le total général de la réception
+    updateReceptionTotal();
+}
   
-      // Vérification que la quantité reçue et le prix sont des nombres valides
-      if (isNaN(receivedQuantity) || receivedQuantity <= 0 || isNaN(priceUpdate) || priceUpdate <= 0) {
-          row.querySelector('.totalAmount').textContent = ''; // Réinitialiser le montant total
-          updateReceptionTotal(); // Mise à jour du total général
-          return;
-      }
+							  
+function updateReceptionTotal() {
+    let total = 0;
+    const rows = document.querySelectorAll('#receptionTable tbody tr');
+    rows.forEach(row => {
+        const totalAmount = row.querySelector('.totalAmount').textContent;
+        total += parseFloat(totalAmount.replace(' €', '') || 0);
+    });
+    document.getElementById("totalAmount").textContent = "Total Réception : " + total.toFixed(2) + " €";
+}
   
-      // Calcul du montant total
-      const totalAmount = parseFloat(receivedQuantity) * parseFloat(priceUpdate);
-      row.querySelector('.totalAmount').textContent = totalAmount.toFixed(2) + ' €';
-  
-      // Recalculer le total général de la réception
-      updateReceptionTotal();
-  }
-  
-  function updateReceptionTotal() {
-          let total = 0;
-          const rows = document.querySelectorAll('#receptionTable tbody tr');
-          rows.forEach(row => {
-              const totalAmount = row.querySelector('.totalAmount').textContent;
-              total += parseFloat(totalAmount.replace(' €', '') || 0);
-          });
-          document.getElementById('totalAmount').textContent = 'Total Réception : ' + total.toFixed(2) + ' €';
-      }
-  
+						  
   function validateReception() {
       showLoader('Validation de la réception');
       const rows = document.querySelectorAll('#receptionTable tbody tr');
@@ -1227,6 +1440,7 @@ Scripts côté client (logiciel, interactions utilisateur)
           alert('Réception enregistrée avec succès !');
           resetFormReception();
           hideLoader();
+				products = null; // Invalider le cache local									 
           loadContent('reception'); // Revenir à la page d'accueil
       } else {
           hideLoader(); // Masquer le loader si des erreurs sont détectées
@@ -1238,12 +1452,14 @@ Scripts côté client (logiciel, interactions utilisateur)
       return value.includes('.') && !Number.isInteger(parseFloat(value));
   }
   
+																		 
   function resetFormReception() {
       document.getElementById('supplierDropdown').value = '';
       const rows = document.querySelectorAll('#receptionTable tbody tr');
       rows.forEach(row => row.remove()); // Supprimer toutes les lignes
   }
   
+																							  
   let selectedSupplier = "";  // Variable pour stocker le fournisseur sélectionné
   
   // Fonction appelée à chaque changement dans la liste déroulante des fournisseurs
@@ -1275,6 +1491,7 @@ Scripts côté client (logiciel, interactions utilisateur)
           alert("Sélectionnez d'abord un fournisseur");
           return;
       }   
+											
       // Ouvrir la popup pour créer un nouveau produit
       openCreateProductPopup();
   }
@@ -1370,6 +1587,7 @@ Scripts côté client (logiciel, interactions utilisateur)
   ///////FOURNISSEUR/////////////////
   ///////////////////////////////////
   
+															   
   function getfournisseur() {// Affiche le loader pendant le chargement
       showLoader('Chargement de la liste des fournisseurs');  // Appel à votre fonction showLoader pour afficher le loader
   
@@ -1473,6 +1691,8 @@ Scripts côté client (logiciel, interactions utilisateur)
       loadReferents();  // Charger les référents après ouverture de la popup
   }
   
+		  
+
   // Fonction pour enregistrer un nouveau fournisseur
   function saveNewSupplier(event) {
       const supplierData = {
@@ -1485,6 +1705,7 @@ Scripts côté client (logiciel, interactions utilisateur)
           referent: document.getElementById('supplierReferent') ? document.getElementById('supplierReferent').value : ''
       };
   
+											
       // Vérifier que tous les champs obligatoires sont remplis
       if (!supplierData.name || !supplierData.referent) {
           alert("Veuillez renseigner au minuimum le nom et le référent.");
@@ -1502,13 +1723,15 @@ Scripts côté client (logiciel, interactions utilisateur)
       }).createSupplier(supplierData);  // Passer toutes les données du fournisseur
   }
   
+			
+			 
   ///////////////////////////
   ///////////////////////////
   ///////pertes///////////////
   ///////////////////////////
   ///////////////////////////
   
-  
+  /*
   function sortProducts(products) {
     // Trier les produits : d'abord par stock, puis par nom
     return products.sort((a, b) => {
@@ -1522,6 +1745,7 @@ Scripts côté client (logiciel, interactions utilisateur)
         return a.name.localeCompare(b.name); // Trier par ordre alphabétique
     });
   }
+  */
   
   function addRowPertes() {
     const lossTable = document.getElementById('lossTable').getElementsByTagName('tbody')[0];
@@ -1561,6 +1785,23 @@ Scripts côté client (logiciel, interactions utilisateur)
                 return data;
             }
   
+
+																																						 
+			 
+
+																																														
+																	
+
+																			 
+									   
+		  
+										   
+															 
+																								 
+			 
+							   
+		 
+	  
             const searchWords = params.term.toLowerCase().split(/\s+/).map(word => removeAccents(word));
             const dataText = removeAccents(data.text.toLowerCase());
   
@@ -1629,6 +1870,7 @@ Scripts côté client (logiciel, interactions utilisateur)
         }
         calculateRowTotalPertes(row);
         calculateTotalPertes();  
+  
     };
     
     cell4.appendChild(quantityInput);
@@ -1673,7 +1915,12 @@ Scripts côté client (logiciel, interactions utilisateur)
       document.getElementById('totalPertes').innerText = `Total Général: ${total.toFixed(2)} €`;
   }
   
+
+											
   function resetFormLoss() {
+  
+																   
+
       // Réinitialiser les produits sélectionnés
       const rows = document.querySelectorAll('#lossTable tbody tr');
       rows.forEach(row => row.remove());  // Supprimer toutes les lignes du tableau
@@ -1723,6 +1970,8 @@ Scripts côté client (logiciel, interactions utilisateur)
       ///////////////INVENTAIRE//////////////////
       ///////////////////////////////////////////
   
+
+													  
       let products = [];  // Liste des produits
       let isProductsLoaded = false;  // Indicateur pour vérifier si les produits sont chargés
   
@@ -1776,6 +2025,23 @@ Scripts côté client (logiciel, interactions utilisateur)
                               return data;
                           }
   
+
+																																						 
+			 
+
+																																														
+																	
+
+																			 
+									   
+		  
+  
+				  
+										   
+														   
+											  
+																			   
+																						   
                           const searchWords = params.term.toLowerCase().split(/\s+/).map(word => removeAccents(word));
                           const dataText = removeAccents(data.text.toLowerCase());
   
@@ -1808,12 +2074,16 @@ Scripts côté client (logiciel, interactions utilisateur)
       function getProductsFromSheet() {
           showLoader('Chargement des produits'); // Afficher le loader pendant le chargement
           google.script.run.withSuccessHandler(function (data) {
-              console.log('Données produits:', data); // Afficher les produits récupérés
               products = data.map(product => {
                   // Assurer que stockDate existe ou est défini
                   return {
                       name: product.name,
                       price: product.price,
+                    shortName: product.shortName,
+                    supplier: product.supplier,
+                    barcode: product.barcode,												 
+																										   
+
                       stock: product.stock,
                       stockDate: product.stockDate || 'Aucune date' // Valeur par défaut si stockDate est vide
                   };
@@ -1936,6 +2206,8 @@ Scripts côté client (logiciel, interactions utilisateur)
               });
           }
       });
+												
+				
           if (updatedProducts.length > 0) {
               // Étape 1 : Enregistrer les données dans Google Sheets
               google.script.run.withSuccessHandler(function () {
@@ -1945,6 +2217,9 @@ Scripts côté client (logiciel, interactions utilisateur)
                   resetInventoryRows();
                   loadContent('inventaire');
                               hideLoader();
+														  
+ 
+													
               }).updateInventory(updatedProducts);
           } else {
               hideLoader();
@@ -1973,7 +2248,591 @@ Scripts côté client (logiciel, interactions utilisateur)
               loadContent('inventaire');
           }).getTotalForDate(formattedDate);
       }
+													
+														  
+////////////////////////////
+////////ETIQUETTES//////////
+////////////////////////////
+
+
+function addRowEtiquettes() {
+    const labelTable = document.getElementById('labelTable').getElementsByTagName('tbody')[0];
+    const row = labelTable.insertRow();
+    row.style.opacity = 0;
+
+    const cell1 = row.insertCell(0); // Colonne produit
+    const cell2 = row.insertCell(1); // Colonne short name
+    const cell3 = row.insertCell(2); // Colonne fournisseur
+    const cell4 = row.insertCell(3); // Colonne prix
+    const cell5 = row.insertCell(4); // Colonne Code Barre
+
+    // Animation de glissement
+    setTimeout(() => {
+        row.style.opacity = 1;
+    }, 10);
+
+    // Création de la liste déroulante pour les produits
+    const select = document.createElement('select');
+    select.classList.add('product-select');
+    select.innerHTML = `<option value="">Sélectionner un produit</option>`;
+
+    // Tri et ajout des produits dans la liste déroulante
+    const sortedProducts = sortProducts(products);
+    sortedProducts.forEach(product => {
+        const option = document.createElement('option');
+        option.value = product.price; // Valeur = prix
+        option.dataset.price = product.price; // Stocker le prix
+        option.dataset.name = product.name; // Stocker le nom
+        option.textContent = product.name; // Afficher le nom
+        option.dataset.shortName = product.shortName;
+        option.dataset.supplier = product.supplier;
+        option.dataset.barcode = product.barcode;
+        select.appendChild(option);
+    });
+
+    // Ajouter la liste déroulante à la première cellule
+    cell1.appendChild(select);
+
+    
+    // Ajouter un gestionnaire d'événement pour mettre à jour le prix
+    select.onchange = function () {
+    const selectedOption = select.selectedOptions[0];
+     const formattedPrice = selectedOption ? parseFloat(selectedOption.dataset.price).toFixed(2) : '0.00';
+        cell2.innerText = selectedOption ? selectedOption.dataset.shortName : ''; // Affiche le fournisseur
+        cell3.innerText = selectedOption ? selectedOption.dataset.supplier : ''; // Affiche le fournisseur
+        cell4.innerText = `${formattedPrice} €`; // Affiche le prix formaté
+        cell5.innerText = selectedOption ? selectedOption.dataset.barcode : ''; // Affiche le code-barres
+
+          // Crée une nouvelle ligne après la sélection du produit
+        addRowEtiquettes(); // Appelle la fonction pour ajouter une nouvelle ligne
+};
+
+ $(select).select2({
+        placeholder: 'Recherchez un produit',
+        allowClear: true,
+        matcher: function (params, data) {
+            if ($.trim(params.term) === '') {
+                return data;
+            }
+
+            function removeAccents(str) {
+                return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+            }
+
+            const searchWords = params.term.toLowerCase().split(/\s+/).map(removeAccents);
+            const dataText = removeAccents(data.text.toLowerCase());
+
+            const match = searchWords.every(word => dataText.includes(word));
+            return match ? data : null;
+        },
+        templateResult: function (option) {
+            if ($(option.element).hasClass('out-of-stock')) {
+                return $('<span style="color:red;">' + option.text + ' (Stock négatif)</span>');
+            }
+            return option.text;
+        }
+    })
+     .on('select2:open', () => {
+        document.querySelector('.select2-search__field').focus(); // Focus dans la zone de recherche
+    })
+    .trigger('open'); // Ouvre la liste déroulante immédiatement après sa création
+}
+
+function openPreviewWindow(content) {
+    // Ouvrir une nouvelle fenêtre
+    const printWindow = window.open('', '_blank');
+
+    // CSS injecté directement dans le contenu de la nouvelle fenêtre
+    const cssStyles = `
+       body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+.page {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* Espacement entre les étiquettes */
+}
+
+.etiquette {
+    width: 8cm; /* Largeur de l'étiquette */
+    height: 4cm; /* Hauteur de l'étiquette */
+    border: 2px solid black; /* Bordure de 2px autour de chaque étiquette */
+    padding: 10px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Espace entre les éléments */
+    background-color: #fff; /* Fond blanc */
+    page-break-inside: avoid; /* Empêche la coupure d'étiquette entre les pages */
+}
+
+.short-name {
+    font-size: 3vw; /* Taille du nom du produit relative à la largeur de l'étiquette */
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+    text-align: left;
+    white-space: nowrap; /* Empêche la coupe du texte */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Ajoute des points de suspension si le texte est trop long */
+    flex-shrink: 1; /* Permet au nom de se réduire si nécessaire */
+}
+
+.details {
+    font-size: 2vw; /* Taille pour le fournisseur relative à la largeur de l'étiquette */
+    text-transform: uppercase;
+    margin-bottom: 5px;
+    text-align: left;
+    white-space: nowrap; /* Empêche la coupure du texte */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Ajoute des points de suspension si le texte est trop long */
+}
+
+.price-barcode {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    min-height: 30px; /* Hauteur minimale pour cette ligne */
+}
+
+.barcode {
+    font-size: 2vw; /* Taille du code barre en fonction de la largeur de l'étiquette */
+    text-align: left;
+    visibility: visible; /* Par défaut, le code barre est visible */
+    flex-shrink: 1; /* Permet au code barre de rétrécir si nécessaire */
+    word-wrap: break-word; /* Permet de casser les mots longs si nécessaire */
+    max-width: 50%; /* Limite la largeur du code barre pour qu'il ne prenne pas trop de place */
+}
+
+.price {
+    font-size: 5vw; /* Taille du prix en fonction de la largeur de l'étiquette */
+    font-weight: bold;
+    text-align: right;
+    flex-shrink: 1; /* Permet au prix de se réduire si nécessaire */
+    margin-left: 10px; /* Un petit espacement entre le code barre et le prix */
+    max-width: 50%; /* Limite la largeur du prix pour qu'il ne prenne pas trop de place */
+}
+
+.etiquette .barcode:empty {
+    visibility: hidden; /* Cache le code barre si vide */
+        display: none; /* Supprime complètement l'espace réservé pour le code barre */
+
+}
+
+.etiquette .price-barcode {
+    justify-content: space-between; /* Toujours espacer le code barre et le prix */
+}
+
+.etiquette .barcode {
+    margin-right: 0; /* Supprimer la marge si pas de code barre */
+}
+
+
+
+    `;
+
+    // Contenu HTML à injecter
+    const html = `
+        <html>
+        <head>
+            <title>Aperçu des Étiquettes</title>
+            <style>${cssStyles}</style> <!-- Ajout du CSS directement ici -->
+        </head>
+        <body>
+            ${content}
+        </body>
+        </html>
+    `;
+
+    // Écrire le contenu HTML dans la nouvelle fenêtre
+    printWindow.document.open();
+    printWindow.document.write(html);
+    printWindow.document.close();
+
+    // Ajouter dynamiquement le script pour générer les codes-barres
+    printWindow.onload = function () {
+    const scriptBarcode = printWindow.document.createElement('script');
+    scriptBarcode.src = "https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js";
+    scriptBarcode.onload = () => {
+        // Attendre un petit délai pour s'assurer que le DOM est chargé
+        setTimeout(() => {
+            const barcodes = printWindow.document.querySelectorAll('.barcode');
+            const rows = document.querySelectorAll('#labelTable tr'); // Sélectionner toutes les lignes du tableau
+
+            // Parcourir les codes-barres et appliquer le bon code-barres à chaque étiquette
+            barcodes.forEach((barcode, index) => {
+                const row = rows[index + 1]; // Ignorer la première ligne du tableau (en-tête)
+                const cells = row.getElementsByTagName('td');
+                
+                // Vérifier si la ligne et les cellules sont valides
+                if (cells.length > 4) {
+                    const barcodeValue = cells[4]?.textContent.trim() || ''; // Obtenir la valeur du code-barres
+
+                    // Nettoyer la valeur du code-barres
+                    const cleanedBarcodeValue = barcodeValue.replace(/\D/g, ''); // Supprimer tous les caractères non numériques
+                    const numericBarcodeValue = Number(cleanedBarcodeValue);
+
+                    // Vérifier si le code-barres est valide (doit avoir une longueur de 13 chiffres)
+                    if (numericBarcodeValue && cleanedBarcodeValue.length === 13) {
+                        JsBarcode(barcode, cleanedBarcodeValue, {
+                            format: 'EAN13',
+                            width: 2,
+                            height: 50,
+                            displayValue: true, // Afficher la valeur du code-barres
+                        });
+                    } else {
+                        console.error("Code-barres invalide ou trop court:", cleanedBarcodeValue);
+                    }
+                }
+            });
+
+            // Lancer l'impression après que tout soit prêt
+            printWindow.print();
+        }, 100); // Un petit délai pour s'assurer que le DOM est bien prêt
+    };
+    printWindow.document.body.appendChild(scriptBarcode);
+};
+
+
+}
+
+
+function generateEtiquettes() {
+    // Récupérer les données du tableau des produits
+    const table = document.getElementById('labelTable');
+    const rows = table.getElementsByTagName('tr');
+
+    // Création des étiquettes en HTML
+    const etiquettesHTML = createEtiquettesHTML(rows);
+
+    // Ouvrir une nouvelle fenêtre pour l'aperçu
+    openPreviewWindow(etiquettesHTML);
+}
+
+function createEtiquettesHTML(rows) {
+    let html = `<div class="page">`;
+
+    // Parcourir les lignes du tableau et générer les étiquettes
+    for (let i = 1; i < rows.length; i++) { // Commencer à 1 pour ignorer l'en-tête
+        const cells = rows[i].getElementsByTagName('td');
+        if (cells.length > 0) {
+            const shortName = cells[1].innerText || '';
+            const supplier = cells[2].innerText || '';
+            const price = cells[3].innerText || '';
+            const barcodeValue = cells[4].innerText || '';
+
+            html += `
+                <div class="etiquette">
+                    <div class="short-name">${shortName}</div>
+                    <div class="details"> ${supplier}</div>
+                                       <div class="price-barcode">
+
+                    <svg class="barcode"></svg> <!-- Code barre sous forme de SVG -->
+                    <div class="price">${price}</div>
+                </div>
+                </div>
+            `;
+        }
+    }
+
+    html += `</div>`; // Fermeture du conteneur principal
+    return html;
+}
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
   
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
+																	  
       // Initialisation
       document.addEventListener('DOMContentLoaded', function () {
           getProductsFromSheet(); // Charger les produits au démarrage
@@ -1983,3 +2842,4 @@ Scripts côté client (logiciel, interactions utilisateur)
   
       });
   </script>
+																	  

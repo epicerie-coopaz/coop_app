@@ -1,16 +1,19 @@
+////////////////////////////////////////////////////////////////////////////////////////////
+//fonctions côté serveur traitent les requêtes de l'interface et interagissent avec Sheets//
+////////////////////////////////////////////////////////////////////////////////////////////
+
 function doGet() {
-  return HtmlService.createTemplateFromFile('SalesInterface')
-    .evaluate();
-};
+  return HtmlService.createTemplateFromFile('salesInterface').evaluate()
+    .setTitle(VERSION);
+}
 
 function include(filename) {
-  return HtmlService.createHtmlOutputFromFile(filename)
-  .getContent();
-};
+  return HtmlService.createHtmlOutputFromFile(filename).getContent();
+}
 
-///////////////////
+/////////////////////
 //////Ventes/////////
-///////////////////
+/////////////////////
 
 // récupérer les produits dans l'onglet produits de la feuille google sheet
 function getProducts() {
@@ -36,6 +39,7 @@ function getProducts() {
   }).filter(Boolean); // Supprimer les entrées null
   return products;
 }
+
 //récupérer la liste des adhérents dans l'onglet adherents
 function getAdherents() {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('adherents'); // Change le nom de l'onglet si nécessaire
@@ -49,7 +53,8 @@ function getAdherents() {
   });
   return adherents;
 }
-//réceupère l'état de la cotisation de l'adhérent dans l'onglet cotisations
+
+//récupère l'état de la cotisation de l'adhérent dans l'onglet cotisations
 function getCotisations() {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("cotisations");
     const data = sheet.getDataRange().getValues();
@@ -96,63 +101,28 @@ function updateCotisation(adherentName, monthYear, cotisationAmount) {
     console.log(`Cotisation mise à jour pour ${adherentName} à ${cotisationAmount} dans la cellule [${adherentRow}, ${monthYearColumn + 1}]`);
 }
 
-
 //Sauvegarde les coordonnées d'un nouvel adhérent dans une autre feuille dans l'onglet Recap
 function saveNewAdherent(name, email, phone, address) {
     const ss = SpreadsheetApp.openById('1ziWZgsLbGDVyPLe3pGKwwBDCZGr1tglIKjWDtifMuCg'); // ID de ton Google Sheets
     const sheet = ss.getSheetByName('Recap'); // Nom de la feuille "Recap"
-
     const date = new Date(); // Date du jour
     const status = "Nouveau"; // Statut "Nouveau"
-
     // Insertion des données dans la feuille "Recap"
     sheet.appendRow([date, status, name, '', '', '', phone, '', email, '', '', '', address]);
 }
 
 //Envoi des coordonnée du nouvel adhérent à l'adresse indiquée
-
-
-/*function sendAdherentEmail(adherentData) {
-    const recipient = "fabien.hicauber@gmail.com"; // Remplacez par l'adresse email cible
-    const subject = `Nouvel adhérent créé`;
-    const body = `Bonjour,
-
-    Un nouvel adhérent a été créé. Voici les détails :
-
-    - Nom : ${adherentData.name}
-    - Email : ${adherentData.email}
-    - Téléphone : ${adherentData.phone}
-    - Adresse : ${adherentData.address}
-    - Jour de réunion : ${adherentData.meetingDates}
-
-    Cordialement,
-    Votre système de gestion des adhérents
-  `;
-
-    MailApp.sendEmail(recipient, subject, body);
-}*/
-
 function sendAdherentEmail(adherentData) {
-  const recipient = "laurie.besinet@gmail.com"; // Adresse email cible
-  const subject = `Nouvel adhérent créé`;
-
-  // Charger le fichier HTML
-  const template = HtmlService.createTemplateFromFile("emailBody");
-
-  // Passer les données au template
-  template.name = adherentData.name;
-  template.email = adherentData.email;
-  template.phone = adherentData.phone;
-  template.address = adherentData.address;
-  template.meetingDates = adherentData.meetingDates;
-
-  // Générer le contenu personnalisé
-  const body = template.evaluate().getContent();
-
-  // Envoyer l'email
+  const recipient = NEW_ADHERENT_EMAIL.recipient;
+  const subject = NEW_ADHERENT_EMAIL.subject;
+  const body = NEW_ADHERENT_EMAIL.body // Remplacer les variables dynamiques dans le corps du message
+    .replace("{{name}}", adherentData.name)
+    .replace("{{email}}", adherentData.email)
+    .replace("{{phone}}", adherentData.phone)
+    .replace("{{address}}", adherentData.address)
+    .replace("{{meetingDates}}", adherentData.meetingDates);
   MailApp.sendEmail(recipient, subject, body);
 }
-
 
 //sauvegarde une vente
 function saveSale(adherent, paymentMethod, total, dateTime, purchases) {
@@ -218,16 +188,43 @@ function updateProductDetails(productName, newStock, newPrice, newShortName, new
   return `Produit "${productName}" non trouvé.`;
 }
 
-
-
 //Envoi de la facture par mail
-function sendEmailToAdherent(email, invoiceHtml) {
-    const subject = "Votre Facture Coop'az";
-    const options = {
-        htmlBody: invoiceHtml // Utiliser htmlBody pour envoyer du contenu HTML
-    };
-    MailApp.sendEmail(email, subject, '', options); // Notez le paramètre vide pour le corps du message texte
+function sendInvoiceToAdherent(invoiceData) {
+    const email = invoiceData.email;
+    // passer les constante fixe paramétrée dans le fichier config
+    const subject = INVOICE_EMAIL.subject;
+    // Construire les détails des lignes de la commande
+    let orderDetails = '';
+    invoiceData.purchases.forEach(purchase => {
+      const lineHtml = INVOICE_EMAIL.orderDetailsTemplate
+        .replace('{{productName}}', purchase.productName)
+        .replace('{{quantity}}', purchase.quantity)
+        .replace('{{price}}', purchase.price.toFixed(2))
+        .replace('{{lineTotalBeforeDiscount}}', (purchase.price * purchase.quantity).toFixed(2))
+        .replace('{{discount}}', purchase.discount.toFixed(0))
+        .replace('{{discountAmount}}',(- (purchase.price * purchase.quantity * purchase.discount / 100)).toFixed(2))
+        .replace('{{totalLine}}', ((purchase.price * purchase.quantity) - (purchase.price * purchase.quantity * purchase.discount / 100)).toFixed(2));
+      orderDetails += lineHtml;
+    });
+    // Remplacer les variables dynamiques dans le corps du message
+    const htmlBody = INVOICE_EMAIL.htmlBody 
+      .replace("{{adherent}}", invoiceData.adherent)
+      .replace("{{paymentMethod}}", invoiceData.paymentMethod)
+      .replace("{{orderDetails}}", orderDetails)
+      .replace("{{cotisationAmount}}", invoiceData.cotisationAmount)
+      .replace("{{creditAmount}}", invoiceData.creditAmount)
+      .replace("{{total}}", invoiceData.total)
+      .replace("{{date}}", invoiceData.date)
+      .replace("{{cbfee}}", invoiceData.cbFee)
+      .replace("{{subTotal}}", invoiceData.subTotal)
+      ;
+    MailApp.sendEmail({
+        to: email,
+        subject: subject,
+        htmlBody: htmlBody
+    });
 }
+
 // Sauvegarde les ventes hebdomadaires et envoie un mail avec le montant des ventes et le classement des produits
 function backupSales() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -440,8 +437,6 @@ function receptionCreateProduct(productData) {
   return `Le produit ${productData.name} a été ajouté avec succès.`;
 }
 
-
-
 //// réception aventure bio////
 function receptionAventureBio() {
   const feuilleProduits = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("produits");
@@ -511,7 +506,6 @@ function receptionAventureBio() {
       nouveauxProduits.push(["", nomProduit, codeBarre, "AVENTURE BIO", unite,  "", "",  nouveauPrix, quantiteReception]);
       // Générer l'étiquette pour le nouveau produit
       generateEtiquette(nomProduit, codeBarre, nouveauPrix, quantiteReception);
-    
     }
   }
 
@@ -521,8 +515,6 @@ function receptionAventureBio() {
     feuilleProduits.getRange(derniereLigne, 1, nouveauxProduits.length, nouveauxProduits[0].length).setValues(nouveauxProduits);
   }
 }
-
-
 
 /////////////////////////
 ////////Fournisseurs/////
@@ -571,11 +563,10 @@ function getReferents() {
   return referents.filter(row => row[0] != "");  // Filtre les valeurs vides
 }
 
-
-
 /////////////////////
 //////PERTES/////////
 /////////////////////
+
 //Valider les pertes
 function validateLoss(pertes) {
   const produitSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('produits');
@@ -677,6 +668,7 @@ function getWeekNumber(d) {
   const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
   return Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
 }
+
 function backupLosses() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const produitsSheet = ss.getSheetByName('produits');
@@ -771,7 +763,6 @@ function backupLosses() {
   Logger.log(`Rapport des pertes envoyé avec succès pour la semaine ${weekNumber}`);
 }
 
-
 function createWeeklyLossTrigger() {
   // Crée un déclencheur qui exécute la fonction 'backupLosses' tous les dimanches à midi
   ScriptApp.newTrigger('backupLosses')
@@ -779,7 +770,6 @@ function createWeeklyLossTrigger() {
     .onWeekDay(ScriptApp.WeekDay.SUNDAY) // Chaque dimanche
     .atHour(12) // À midi;
 }
-
 
 ////////////////////////
 /////INVENTAIRE/////////
@@ -828,7 +818,7 @@ function updateInventory(updatedProducts) {
     Logger.log('Mise à jour de l\'inventaire terminée.');
     saveInventoryToSheet(updatedProducts)
 }
-//Sauvefarfe l'inventaire
+//Sauvegarde l'inventaire
 function saveInventoryToSheet(updatedProducts) {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Inventaire");
 
@@ -919,7 +909,6 @@ function findProductRow(sheet, productName) {
     }
     return null; // Si le produit n'est pas trouvé
 }
-
 
 function getTotalForDate(formattedDate) {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Produits'); // Onglet Produits

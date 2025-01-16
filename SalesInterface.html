@@ -2,6 +2,8 @@
 <html style="height: 100%;"> 
 
 <head>
+    <title>Caisse</title>
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
@@ -19,139 +21,225 @@
     <?!= include('stylesheet'); ?>
 </head>
 
-<!-----------------------------------------------------------------------
------------------------------------ BODY -------------------------------
------------------------------------------------------------------------->
-
 <body>
     <!-- Menu -->
     <div id="menu">
-        <div id="logo"></div>
-        <md-tabs style="flex-grow: 100;">
-          <md-primary-tab href="#" onclick="loadContent('home')"  inline-icon>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-house-fill" viewBox="0 0 16 16">
-              <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L8 2.207l6.646 6.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293z"/>
-              <path d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293z"/>
+          <a onclick="loadContent('home')" href="#"><div id="logo"></div></a>
+          <!-- bouton burger Menu -->
+          <md-menu-item id="usage-submenu-anchor" inline-icon>
+            <md-icon slot="start"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
             </svg>
-            Accueil
-            </md-primary-tab>
-          <md-primary-tab href="#" onclick="loadContent('vente')"  inline-icon>
-            <md-icon slot="icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart-fill" viewBox="0 0 16 16">
-                <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+            </md-icon>
+                        
+          </md-menu-item>
+          <!-- contenu du menu -->
+          <md-menu positioning="popover" id="usage-submenu" anchor="usage-submenu-anchor">            
+            <md-menu-item onclick="loadContent('suppliers')">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
+                <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
               </svg>
+              Fournisseurs
+            </md-menu-item>
+            <md-menu-item onclick="loadContent('perte')" >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="bi bi-trash-fill">
+                <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"></path>
+              </svg>
+              Pertes
+            </md-menu-item>
+            <md-menu-item onclick="requestAccess('inventaire')">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calculator-fill" viewBox="0 0 16 16">
+                  <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2zm2 .5v2a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 0-.5-.5h-7a.5.5 0 0 0-.5.5m0 4v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5M4.5 9a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zM4 12.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5M7.5 6a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zM7 9.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5m.5 2.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zM10 6.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5m.5 2.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5z"/>
+              </svg>
+              Inventaire
+            </md-menu-item>
+          </md-menu>
+
+          <md-menu-item id="menuVente" onclick="loadContent('vente')"  inline-icon>
+            <md-icon slot="start"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart-fill" viewBox="0 0 16 16">
+              <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+            </svg>
             </md-icon>
             Vente
-          </md-primary-tab>
-          <md-primary-tab href="#" onclick="loadContent('reception')" inline-icon>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-seam-fill" viewBox="0 0 16 16">
+          </md-menu-item>
+          <md-menu-item id="menuReception" onclick="loadContent('reception')" inline-icon>
+            <md-icon slot="start"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-seam-fill" viewBox="0 0 16 16">
               <path fill-rule="evenodd" d="M15.528 2.973a.75.75 0 0 1 .472.696v8.662a.75.75 0 0 1-.472.696l-7.25 2.9a.75.75 0 0 1-.557 0l-7.25-2.9A.75.75 0 0 1 0 12.331V3.669a.75.75 0 0 1 .471-.696L7.443.184l.01-.003.268-.108a.75.75 0 0 1 .558 0l.269.108.01.003zM10.404 2 4.25 4.461 1.846 3.5 1 3.839v.4l6.5 2.6v7.922l.5.2.5-.2V6.84l6.5-2.6v-.4l-.846-.339L8 5.961 5.596 5l6.154-2.461z"/>
             </svg>
+            </md-icon>
             Réception
-          </md-primary-tab>
-          <md-primary-tab href="#" onclick="loadContent('suppliers')" inline-icon>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
-              <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
-            </svg>
-            Fournisseurs
-          </md-primary-tab>
-          <md-primary-tab href="#" onclick="loadContent('inventaire')" inline-icon>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calculator-fill" viewBox="0 0 16 16">
-              <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2zm2 .5v2a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 0-.5-.5h-7a.5.5 0 0 0-.5.5m0 4v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5M4.5 9a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zM4 12.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5M7.5 6a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zM7 9.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5m.5 2.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zM10 6.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5m.5 2.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5z"/>
-            </svg>
-            Inventaire
-          </md-primary-tab>
-        </md-tabs>
+          </md-menu-item>
+
+          
     </div>
+
 
     <!-- Contenu Principal -->
     <div id="content">
       <!-- Header -->
       <header>
-          <h1 id="header-title">Page d'Accueil</h1>
+          <h1 id="header-title">Caisse Coop'az</h1>
       </header>
 
       <!-- Sections de contenu -->
       <div id="workplace" class="flex-column">
 
-        <!-- Accueil -->
+        <!----------------------------- Accueil ------------------------------->
         <div id="home" class="content-section active">
-            <h2>Bienvenue sur la page d'accueil</h2>
-            <p>Le contenu de la page d'accueil ici...</p>            
-        </div>
-
-        <!-- Vente -->
-        <div id="vente" class="content-section">
-            <div id="tableContainer">
-              <table id="productList">
-                <thead>
-                    <tr>
-                        <th>Produit</th>
-                        <th>Prix Unitaire</th>
-                        <th>Stock</th>
-                        <th>Quantité</th>
-                        <th>Remise (%)</th>
-                        <th>Total Ligne</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Les lignes de produits seront ajoutées ici -->
-                </tbody>
-              </table>
+            <p>Bienvenue sur la caisse en ligne de la Coop'az</p>
+            <div id="homeMainOptions" class="card-outlined">
+              <H3>Que souhaitez-vous faire aujourd'hui? </H3> 
+              <div class="rowWrapper">
+                <div>
+                  <md-fab class="" variant="primary" label="Vente" onclick="loadContent('vente')">
+                      <svg slot="icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart-fill" viewBox="0 0 16 16">
+                        <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+                      </svg>
+                      Vente
+                    </md-fab>
+                </div>
+                <div>
+                    <md-fab class="" variant="primary" label="Réception" onclick="loadContent('reception')" inline-icon>
+                      <svg slot="icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-seam-fill" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M15.528 2.973a.75.75 0 0 1 .472.696v8.662a.75.75 0 0 1-.472.696l-7.25 2.9a.75.75 0 0 1-.557 0l-7.25-2.9A.75.75 0 0 1 0 12.331V3.669a.75.75 0 0 1 .471-.696L7.443.184l.01-.003.268-.108a.75.75 0 0 1 .558 0l.269.108.01.003zM10.404 2 4.25 4.461 1.846 3.5 1 3.839v.4l6.5 2.6v7.922l.5.2.5-.2V6.84l6.5-2.6v-.4l-.846-.339L8 5.961 5.596 5l6.154-2.461z"/>
+                      </svg>
+                      Réception
+                    </md-fab>
+                </div>
+              </div>
+            </div>
+            <div id="homeBegin" class="card-light">
+              <h4>Aide au démarrage</h4>
+              <p>lien vers videos<p>
+              <p>document d'aide</p>
+              <p>...</p>
+            </div>
+            <div id="homeOthersOptions">
+                <h4>Autres fonctions</h4>
+                <div class="rowWrapper" style="justify-content: center;">
+                  <md-outlined-button onclick="loadContent('suppliers')">
+                    <svg slot="icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
+                      <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+                    </svg>
+                    Consulter la liste des fournisseurs
+                  </md-outlined-button>
+                  <md-outlined-button onclick="loadContent('perte')" >
+                    <svg slot="icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="bi bi-trash-fill">
+                      <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"></path>
+                    </svg>
+                    Enregistrer des pertes
+                  </md-outlined-button>
+                  <md-outlined-button onclick="requestAccess('inventaire')">
+                    <svg slot="icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calculator-fill" viewBox="0 0 16 16">
+                        <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2zm2 .5v2a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 0-.5-.5h-7a.5.5 0 0 0-.5.5m0 4v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5M4.5 9a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zM4 12.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5M7.5 6a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zM7 9.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5m.5 2.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zM10 6.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5m.5 2.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5z"/>
+                    </svg>
+                    Accéder à l'inventaire
+                  </md-outlined-button>
+                </div>
             </div>
 
-            <div id="addRow">
-                <md-filled-tonal-button onclick="addRow()">
-                    Ajouter une ligne
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
-                      <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
-                    </svg>
-                </md-filled-tonal-button>
+            
+            
+            </div>
+     
+        </div>
+
+       <!------------------------------- Vente ------------------------------->
+<div id="vente" class="content-section">
+    <div id="tableContainer">
+        <table id="productList">
+            <thead>
+                <tr>
+                    <th>Produit</th>
+                    <th>Prix Unitaire</th>
+                    <th>Stock</th>
+                    <th>Quantité</th>
+                    <th class="discount-column">Remise (%)</th> <!-- Classe pour la colonne Remise -->
+                    <th>Total Ligne</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Les lignes de produits seront ajoutées ici -->
+            </tbody>
+        </table>
+    </div>
+
+    <div id="addRow">
+        <md-filled-tonal-button onclick="addRow()">
+            Ajouter une ligne
+            <svg slot="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/></svg>
+        </md-filled-tonal-button>
+    </div>
+
+    <div id="finalContainer" class="rowWrapper">
+        <div id="adherentsContainer" class="card-grey">
+            <div id="adherentSelect" class="rowWrapper">
+                <h2>Adhérent : </h2>
+                <div id="adherentsDropdownContainer" class="DropdownBlock">
+                    <select id="adherentsDropdown" onchange="updateEmail()"></select>
+                </div>
+                <div id="addAdherent">
+                    <md-filled-tonal-button id="addAdherentButton" onclick="openCreateAdherentPopup()">
+                        Créer un adhérent
+                        <svg slot="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M9 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v1c0 .55.45 1 1 1h14c.55 0 1-.45 1-1v-1c0-2.66-5.33-4-8-4zM17 5v3h-3c-.55 0-1 .45-1 1s.45 1 1 1h3v3c0 .55.45 1 1 1s1-.45 1-1v-3h3c.55 0 1-.45 1-1s-.45-1-1-1h-3V5c0-.55-.45-1-1-1s-1 .45-1 1z"/>
+                        </svg>
+                    </md-filled-tonal-button>
+                </div>
+            </div>
+            <div id="adherentDetails" class="rowWrapper">
+                <div id="adherentEmail"></div>
+                <div id="cotisationContainer" class="rowWrapper" style="display: none;">
+                    <label for="cotisationAmount">Montant de la cotisation : </label>
+                    <input type="number" id="cotisationAmount" value="0" min="5" step="1" oninput="calculateTotal()">
+                </div>
+            </div>
+        </div>
+
+        <div id="paymentContainer" class="card-grey">
+            <div id="paymentSelect" class="rowWrapper">
+                <h2>Paiement : </h2>
+                <div class="DropdownBlock">
+                    <select id="paymentMethodDropdown" onchange="calculateTotal()">
+                        <option value="" disabled selected>Sélectionnez un mode de paiement</option>
+                        <option value="CB">CB</option>
+                        <option value="Chèque">Chèque</option>
+                    </select>
+                </div>
+                <div id="cbFeeField" class="overview-line" style="display: none;">
+                  <div>Frais de Carte Bancaire :&nbsp;<span id="cbFee">0</span>&nbsp;€</div>
+                </div>
             </div>
             
-            <div id="finalContainer" class="rowWrapper">
-              <div id="adherentsContainer" class="card-light">
-                <div id="adherentSelect" class="rowWrapper">
-                  <h2>Adhérent : </h2>
-                  <div id="adherentsDropdownContainer" class="DropdownBlock">
-                    <select id="adherentsDropdown" onchange="updateEmail()"></select>
-                  </div>
-                </div>
-                  <div id="adherentDetails" class="rowWrapper">
-                    <div id="adherentEmail"></div>
-                    <div id="cotisationContainer" class="rowWrapper" style="display: none;">
-                        <label for="cotisationAmount">Montant de la cotisation : </label>
-                        <input type="number" id="cotisationAmount" value="0" min="5" step="1" oninput="calculateTotal()">
-                    </div>
-                  </div>
-              </div>
-
-              <div id="paymentContainer" class="card-light">
-                  <div id="paymentSelect" class="rowWrapper">
-                    <h2>Paiement : </h2>
-                    <div class="DropdownBlock">
-                      <select id="paymentMethodDropdown" onchange="calculateTotal()">
-                          <option value="" disabled selected>Sélectionnez un mode de paiement</option>
-                          <option value="CB">CB</option>
-                          <option value="Chèque">Chèque</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div id="cbFee" class="overview-line" style="display: none;">Frais de CB : 0 €</div>
-              </div>
+            <!-- Case à cocher "J'ai un avoir" -->
+            <div>
+                <label>
+                    <input type="checkbox" id="hasCredit" onclick="toggleCreditField()"> J'ai un avoir
+                </label>
             </div>
-
-            <H2 id="total">Total Général : 0 €</H2>
-            <div id="validateButton">
-              <md-filled-button label="Valider" onclick="validate()">
-                Valider
-              </md-filled-button>
+            <!-- Champ pour le montant de l'avoir, masqué par défaut -->
+            <div id="creditField" style="display:none;">
+                <label for="creditAmount">Montant de l'avoir :</label>
+                <input type="number" id="creditAmount" name="creditAmount" placeholder="Montant de l'avoir" min="0" oninput="calculateTotal()">
             </div>
         </div>
+    </div>
 
-        <!-- Reception -->
+    <H2 id="total">Total Général : 0 €</H2>
+    <div id="validateButton">
+        <md-filled-button label="Valider" onclick="validate()">
+            Valider
+        </md-filled-tonal-button>
+    </div>
+</div>
+
+
+
+
+        <!------------------------------- Reception ------------------------------->
+    <div id="content">
         <div id="reception" class="content-section">
-            <div id="supplierContainer" class="card-light">
+            <div id="supplierContainer" class="card-grey">
               <div id="supplierSelect" class="rowWrapper">
                 <h2>Producteur : </h2>
                 <div id="supplierDropdownContainer">
@@ -162,21 +250,24 @@
                 </div>
               </div>
               <div id="addRow">
-                <md-filled-tonal-button id="addProductButtonreception" onclick="createNewProduct()">Créer un nouveau produit</md-filled-tonal-button>
+                <md-filled-tonal-button id="addProductButtonreception" onclick="createNewProduct()">
+                  Créer un produit
+                  <svg slot="icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-plus-fill" viewBox="0 0 16 16">
+                  <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0M9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1M8.5 7v1.5H10a.5.5 0 0 1 0 1H8.5V11a.5.5 0 0 1-1 0V9.5H6a.5.5 0 0 1 0-1h1.5V7a.5.5 0 0 1 1 0"/>
+                </svg>
+                </md-filled-tonal-button>
               </div>
             </div>
-
             <div id="tableContainer">
               <table id="receptionTable">
                 <thead>
                     <tr>
                         <th>Produit</th>
                         <th>Prix Actuel</th>
-                        <th>Mettre à jour le Prix</th>
                         <th>Stock Actuel</th>
-                        <th>Mettre à jour le Stock</th>
                         <th>Quantité Réceptionnée</th>
                         <th>Montant Total</th>
+                        <th>Modifier</th> <!-- Colonne pour ouvrir la pop-up -->
                         <th>Delete</th> <!-- Nouvelle colonne pour les actions -->
                     </tr>
                 </thead>
@@ -188,19 +279,28 @@
               </table>
             </div>
             <div id="addRow">
-              <md-filled-tonal-button id="addProductButton" onclick="addNewLine()">Ajouter une nouvelle ligne</md-filled-tonal-button>
+              <md-filled-tonal-button id="" onclick="addNewLine()">
+                    Ajouter une ligne
+                    <svg slot="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/></svg>
+                </md-filled-tonal-button>
             </div>
-            
             <H2 id="totalAmount">Total Réception : 0 €</H2>
             <div id="validateButton">
-              <md-filled-button id="validateButton" onclick="validateReception()">Valider la réception</md-filled-button>
+              <md-filled-button id="validateButton" onclick="validateReception()">Valider</md-filled-button>
             </div>
         </div>
+      </div>
+    </div>
 
-        <!-- Fournisseurs -->
+        <!------------------------------- Fournisseurs ------------------------------->
         <div id="suppliers" class="content-section">
             <div id="addRow">
-              <md-filled-tonal-button id="addProductButton" onclick="openCreateSupplierPopup()">Ajouter un fournisseur</md-filled-tonal-button>
+              <md-filled-tonal-button id="addProductButton" onclick="openCreateSupplierPopup()">
+                Créer un fournisseur
+                <svg slot="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M9 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v1c0 .55.45 1 1 1h14c.55 0 1-.45 1-1v-1c0-2.66-5.33-4-8-4zM17 5v3h-3c-.55 0-1 .45-1 1s.45 1 1 1h3v3c0 .55.45 1 1 1s1-.45 1-1v-3h3c.55 0 1-.45 1-1s-.45-1-1-1h-3V5c0-.55-.45-1-1-1s-1 .45-1 1z"/>
+                </svg>
+              </md-filled-tonal-button>
             </div>
             <div id="tableContainer">
               <table id="supplierTable">
@@ -222,7 +322,44 @@
             </div>
         </div>
 
-        <!-- Inventaire -->
+        <!------------------------------- Pertes ------------------------------->
+        <div id="perte" class="content-section">
+            <div id="tableContainer">
+              <table id="lossTable">
+                <thead>
+                    <tr>
+                        <th>Produit</th>
+                        <th>Prix Unitaire</th>
+                        <th>Stock</th>
+                        <th>Perte</th>
+                        <th>Total Ligne</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Les lignes de produits seront ajoutées ici -->
+                </tbody>
+              </table>
+            </div>
+
+            <div id="addRow">
+              <md-filled-tonal-button id="" onclick="addRowPertes()">
+                    Ajouter une ligne
+                    <svg slot="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/></svg>
+                </md-filled-tonal-button>
+            </div>
+            
+
+          <H2 id="totalPertes">Total Général : 0 €</H2>
+            <div id="validateButton">
+              <md-filled-button label="Valider" onclick="validateLosses()">
+                Valider
+              </md-filled-button>
+            </div>
+        </div>
+
+
+
+        <!------------------------------- Inventaire ------------------------------->
         <div id="inventaire" class="content-section">
             <div id="tableContainer">
               <table id="productTable">
@@ -231,7 +368,7 @@
                         <th>Produit</th>
                         <th>Prix</th>
                         <th>Stock actuel</th>
-                        <th>Mise à jour stock</th>
+                        <th>Sotck inventaire</th>
                         <th>date de l'inventaire</th>
                     </tr>
                 </thead>
@@ -257,10 +394,22 @@
             </template>
 
             <div id="addRow">
-              <md-filled-tonal-button onclick="addRowInventaire()">Ajouter une ligne</md-filled-tonal-button>
+              <md-filled-tonal-button onclick="addRowInventaire()">
+                    Ajouter une ligne
+                    <svg slot="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/></svg>
+                </md-filled-tonal-button>
+            </div>
+            <div id="saveButton">
+              <md-filled-button onclick="saveInventoryWithoutMail()">
+                Enregistrer les modifications
+                <svg slot="icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-floppy" viewBox="0 0 16 16">
+                <path d="M11 2H9v3h2z"/>
+                <path d="M1.5 0h11.586a1.5 1.5 0 0 1 1.06.44l1.415 1.414A1.5 1.5 0 0 1 16 2.914V14.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 14.5v-13A1.5 1.5 0 0 1 1.5 0M1 1.5v13a.5.5 0 0 0 .5.5H2v-4.5A1.5 1.5 0 0 1 3.5 9h9a1.5 1.5 0 0 1 1.5 1.5V15h.5a.5.5 0 0 0 .5-.5V2.914a.5.5 0 0 0-.146-.353l-1.415-1.415A.5.5 0 0 0 13.086 1H13v4.5A1.5 1.5 0 0 1 11.5 7h-7A1.5 1.5 0 0 1 3 5.5V1H1.5a.5.5 0 0 0-.5.5m3 4a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5V1H4zM3 15h10v-4.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5z"/>
+                </svg>
+              </md-filled-button>
             </div>
             <div id="validateButton">
-              <md-filled-button onclick="saveInventory()">Enregistrer les modifications</md-filled-button>
+              <md-filled-button onclick="saveInventory()">Valider l'inventaire</md-filled-button>
             </div>
         </div>
       </div>
@@ -269,1288 +418,13 @@
     
     <!-- Footer -->
     <footer>
-        <p>&copy; 2024 Système de gestion des ventes Coop'az</p>
+        <p>&copy; 2025 Système de gestion des ventes Coop'az</p>
     </footer>
     
+    
+    <?!= include('uiScripts'); ?>
+
+
 </body>
-
-
-<!-----------------------------------------------------------------------
------------------------------------ SCRIPTS -------------------------------
------------------------------------------------------------------------->
-<script>
-    function loadContent(sectionId) {
-        // Masquer toutes les sections
-        const sections = document.querySelectorAll('.content-section');
-        sections.forEach(section => section.classList.remove('active'));
-
-        // Afficher la section correspondante
-        const selectedSection = document.getElementById(sectionId);
-        selectedSection.classList.add('active');
-
-        // Modifier le titre du header en fonction de la section
-        const headerTitle = document.getElementById('header-title');
-        switch (sectionId) {
-            case 'home':
-                headerTitle.textContent = 'Page d\'Accueil';
-                break;
-            case 'vente':
-                headerTitle.textContent = 'Gestion des ventes';
-                getProducts();
-                getAdherents();
-                getCotisations();
-                break;
-            case 'reception':
-                headerTitle.textContent = 'Réception des Produits';
-                loadSuppliers();
-                break;
-            case 'suppliers':
-                headerTitle.textContent = 'Liste des Fournisseurs';
-                getfournisseur();
-                break;
-            case 'inventaire':
-                headerTitle.textContent = 'Inventaire';
-                getProducts();
-                break;
-        }
-    }
-
-
-    ///////////UI////////////
-
-    function showLoader() {
-        const loader = document.createElement('div');
-        loader.id = 'loader';
-        loader.style.position = 'fixed';
-        loader.style.top = '0';
-        loader.style.left = '0';
-        loader.style.width = '100%';
-        loader.style.height = '100%';
-        loader.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
-        loader.style.display = 'flex';
-        loader.style.alignItems = 'center';
-        loader.style.justifyContent = 'center';
-        loader.style.zIndex = '1000';
-        loader.innerHTML = '<h2>Chargement en cours...</h2><div class="spinner"></div>';
-        document.body.appendChild(loader);
-    }
-    function hideLoader() {
-        const loader = document.getElementById('loader');
-        if (loader) {
-            document.body.removeChild(loader);
-        }
-    }
-
-    function getProducts() {
-        showLoader();
-        google.script.run.withSuccessHandler(function (data) {
-            products = data;
-            console.log(products);
-            addRow();
-            hideLoader();
-        }).getProducts();
-    }
-
-    function getAdherents() {
-        google.script.run.withSuccessHandler(function (data) {
-            adherents = data;
-            const adherentsDropdown = document.getElementById('adherentsDropdown');
-            adherentsDropdown.innerHTML = '<option value="">Sélectionner un adhérent</option>';
-            adherents.forEach(adherent => {
-                const option = document.createElement('option');
-                option.value = adherent.name; // Utilise le nom comme valeur
-                option.textContent = adherent.name;
-                adherentsDropdown.appendChild(option);
-            });
-
-            // Initialiser Select2
-            $(adherentsDropdown).select2({
-                placeholder: 'Sélectionnez un adhérent',
-                allowClear: true
-            });
-
-
-            // Ajouter le focus au champ de recherche lorsque la liste est ouverte
-            $(adherentsDropdown).on('select2:open', () => {
-                document.querySelector('.select2-search__field').focus();
-            });
-
-
-        }).getAdherentsWithCotisation();
-    }
-
-    ///////////////////////////
-    ///////////////////////////
-    ///////vente///////////////
-    ///////////////////////////
-    ///////////////////////////
-
-    function getCotisations() {
-        google.script.run.withSuccessHandler(function (data) {
-            cotisations = data; // 'data' doit contenir un objet avec les informations de cotisation
-        }).getCotisations(); // Assure-toi que cette fonction soit bien définie dans le backend
-    }
-
-
-    function updateEmail() {
-        const selectedAdherentName = document.getElementById('adherentsDropdown').value;
-        const selectedAdherent = adherents.find(adherent => adherent.name === selectedAdherentName);
-        if (selectedAdherent) {
-            const emailDiv = document.getElementById('adherentEmail');
-            emailDiv.innerText = `Email: ${selectedAdherent.email}`;
-            const status = selectedAdherent.cotisation === "ok" ? "à jour" : "non à jour";
-            // Vérification de la cotisation dans l'onglet "cotisations"
-            const currentMonthYear = new Date().toLocaleString('fr-FR', { month: 'long', year: 'numeric' });
-            const cotisationStatus = cotisations[selectedAdherentName]?.[currentMonthYear];
-            if (cotisationStatus === "ok") {
-                emailDiv.style.color = "var(--md-sys-color-primary)";
-                document.getElementById('cotisationContainer').style.display = "none"; // Cacher le champ
-            } else {
-                emailDiv.style.color = "red"; // Changer le texte en rouge
-                emailDiv.innerText += `\nN'a pas encore cotisé ce mois`;
-                document.getElementById('cotisationContainer').style.display = "flex"; // Afficher le champ
-            }
-        } else {
-            document.getElementById('adherentEmail').innerText = '';
-            document.getElementById('cotisationContainer').style.display = "none"; // Cacher le champ
-        }
-    }
-    function sortProducts(products) {
-        // Trier les produits : d'abord par stock, puis par nom
-        return products.sort((a, b) => {
-            if (a.stock === 0 && b.stock === 0) {
-                return 0; // Les deux sont hors stock
-            } else if (a.stock <= 0) {
-                return 1; // 'a' est hors stock, donc on le met en bas
-            } else if (b.stock <= 0) {
-                return -1; // 'b' est hors stock, donc on le met en bas
-            }
-            return a.name.localeCompare(b.name); // Trier par ordre alphabétique
-        });
-    }
-    function addRow() {
-        const productList = document.getElementById('productList').getElementsByTagName('tbody')[0];
-        const row = productList.insertRow();
-        row.style.opacity = 0;
-        const cell1 = row.insertCell(0); // Colonne produit
-        const cell2 = row.insertCell(1); // Colonne prix
-        const cell3 = row.insertCell(2); // Colonne stock
-        const cell4 = row.insertCell(3); // Colonne quantité
-        const cell5 = row.insertCell(4); // Colonne discount
-        const cell6 = row.insertCell(5); // Colonne total
-        const cell7 = row.insertCell(6); // Colonne supprimer
-        const cell8 = row.insertCell(7); // Colonne modifier le stock
-        // Animation de glissement
-        setTimeout(() => {
-            row.style.opacity = 1; // Rendre la ligne visible avec une transition
-        }, 10); // Attendre un peu avant de démarrer la transition
-        const select = document.createElement('select');
-        select.classList.add('product-select');
-        select.innerHTML = `<option value="">Sélectionner un produit</option>`; // Ligne par défaut
-        const sortedProducts = sortProducts(products);
-        products.forEach(product => {
-            const option = document.createElement('option');
-            option.value = product.price;
-            option.dataset.price = product.price;
-            option.dataset.stock = product.stock;
-            option.dataset.name = product.name; // Ajouter le nom du produit pour la mise à jour
-            option.textContent = product.name;
-            if (product.stock <= 0) {
-                option.classList.add('out-of-stock');
-            }
-            select.appendChild(option);
-        });
-        cell1.appendChild(select);
-        $(select).select2({
-            placeholder: 'Recherchez un produit',
-            allowClear: true,
-            matcher: function (params, data) {
-                // Si l'élément est une correspondance exacte, retourner l'élément
-                if ($.trim(params.term) === '') {
-                    return data;
-                }
-                // Convertir le terme de recherche en tableau de mots
-                var searchWords = params.term.toLowerCase().split(/\s+/);
-                // Récupérer le texte de l'option (fournisseur)
-                var dataText = data.text.toLowerCase();
-                // Vérifier si tous les mots de la recherche sont présents dans le texte de l'option
-                var match = searchWords.every(function (word) {
-                    return dataText.includes(word);
-                });
-                // Si tous les mots sont trouvés, renvoyer l'élément pour qu'il soit affiché
-                if (match) {
-                    return data;
-                }
-                // Si aucun mot ne correspond, retourner null (ne pas afficher l'élément)
-                return null;
-            },
-
-            templateResult: function (option) {
-                if ($(option.element).hasClass('out-of-stock')) {
-                    return $('<span style="color:red;">' + option.text + ' (Stock négatif)</span>');
-                }
-                return option.text;
-            }
-        }).on('select2:open', () => {
-            document.querySelector('.select2-search__field').focus(); // Force le focus dans le champ de recherche
-        });
-
-
-        select.onchange = function () {
-            const selectedOption = select.selectedOptions[0];
-            cell2.innerText = `${selectedOption ? selectedOption.dataset.price : 0} €`;
-            if (selectedOption) {
-                if (selectedOption.dataset.name.toLowerCase().includes("unite")) {
-                    cell3.innerText = `${selectedOption.dataset.stock} unités`;
-                } else if (selectedOption.dataset.name.toLowerCase().includes("kilo")) {
-                    cell3.innerText = `${selectedOption.dataset.stock} Kg`;
-                } else {
-                    cell3.innerText = `${selectedOption.dataset.stock} unités`; // Par défaut "unités"
-                }
-            } else {
-                cell3.innerText = "0 unités";
-            }
-            // Vérifiez si le produit contient le mot "unite"
-            if (selectedOption && selectedOption.dataset.name.toLowerCase().includes("unite")) {
-                quantityInput.setAttribute("step", "1"); // Quantité forcée à un entier
-                quantityInput.value = 1; // Définir la quantité à 1 si le produit contient "unite"
-            } else {
-                quantityInput.setAttribute("step", "0.01"); // Permettre des quantités décimales
-                quantityInput.value = 0; // Réinitialiser à 0 si le produit ne contient pas "unite"
-            }
-            calculateRowTotal(row);
-            // Vérification pour ajouter une nouvelle ligne si un produit est sélectionné
-            if (selectedOption && selectedOption.value) {
-                addRow(); // Ajouter une nouvelle ligne
-            }
-        };
-        const quantityInput = document.createElement('input');
-        quantityInput.type = 'number';
-        quantityInput.value = 0;
-        quantityInput.step = 0.01;
-        quantityInput.min = 0; // Vous pouvez définir un minimum pour permettre les quantités de 0 et plus.
-        quantityInput.oninput = function () {
-            const selectedOption = select.selectedOptions[0];
-            // Si le produit contient "unite" et que la quantité est décimale
-            if (selectedOption && selectedOption.dataset.name.toLowerCase().includes("unite")) {
-                const value = quantityInput.value;
-                if (value.includes('.')) {
-                    alert("La quantité d'un produit contenant 'unite' doit être un entier.");
-                    quantityInput.value = Math.floor(value); // Réinitialiser à l'entier inférieur
-                }
-            }
-            calculateRowTotal(row);
-        };
-
-        cell4.appendChild(quantityInput);
-
-        // Discount input
-        const discountInput = document.createElement('input');
-        discountInput.type = 'number';
-        discountInput.value = 0;
-        discountInput.step = 5;
-        discountInput.min = 0;
-        discountInput.oninput = function () {
-            const selectedOption = select.selectedOptions[0];
-            if (selectedOption && selectedOption.dataset.name.toLowerCase().includes("unite")) {
-                const value = discountInput.value;
-                if (value.includes('.')) {
-                    alert("La remise d'un produit contenant 'unite' doit être un entier.");
-                    discountInput.value = Math.floor(value); // Round down
-                }
-            }
-            calculateRowTotal(row);
-        };
-        cell5.appendChild(discountInput);
-        // Total de la ligne (initialisé à 0)
-        cell6.innerText = '0.00 €';
-        // Ajouter l'icône de suppression
-        const deleteIcon = document.createElement('span');
-        deleteIcon.innerHTML = '❌'; // Utilisez une croix comme symbole ou une image si vous le souhaitez
-        deleteIcon.style.cursor = 'pointer';
-        deleteIcon.style.marginLeft = '10px';
-        deleteIcon.onclick = function () {
-            deleteRow(row);
-        };
-        cell7.appendChild(deleteIcon);
-        // Ajouter l'icône de modification du stock
-        const editIcon = document.createElement('span');
-        editIcon.innerHTML = '✏️'; // Utilisez une icône ou un emoji
-        editIcon.style.cursor = 'pointer';
-        editIcon.style.marginLeft = '10px';
-        editIcon.onclick = function () {
-            openStockPopup(select.selectedOptions[0]); // Ouvrir la popup avec le produit sélectionné
-        };
-        cell8.appendChild(editIcon);
-    }
-    function deleteRow(row) {
-        if (confirm("Êtes-vous sûr de vouloir supprimer cette ligne ?")) {
-            const productList = document.getElementById('productList').getElementsByTagName('tbody')[0];
-            productList.deleteRow(row.rowIndex - 1);
-            calculateTotal();
-        }
-    }
-    function calculateRowTotal(row) {
-        const select = row.cells[0].querySelector('select');
-        const quantityInput = row.cells[3].querySelector('input');
-        const discountInput = row.cells[4].querySelector('input');
-        const price = select ? parseFloat(select.value) : 0;
-        const quantity = quantityInput ? parseFloat(quantityInput.value) : 0; // Remplacer parseInt par parseFloat
-        const discount = discountInput ? parseFloat(discountInput.value) : 0; // Remplacer parseInt par parseFloat
-        row.cells[5].innerText = `${(price * quantity - (price * quantity * (discount / 100))).toFixed(2)} €`; // Mettre à jour le total de la ligne
-        calculateTotal(); // Recalculer le total général
-    }
-
-    function calculateTotal() {
-        const rows = document.querySelectorAll('#productList tbody tr');
-        let total = 0;
-        rows.forEach(row => {
-            const totalCell = row.cells[5].innerText;
-            total += parseFloat(totalCell.replace(' €', '')) || 0;
-        });
-        // Ajouter le montant de la cotisation
-        const cotisationAmount = parseFloat(document.getElementById('cotisationAmount').value) || 0;
-        total += cotisationAmount; // Ajouter le montant de cotisation au total
-        document.getElementById('total').innerText = `Total Général: ${total.toFixed(2)} €`;
-        // Ajoute le coût CB si nécessaire
-        const paymentMethod = document.getElementById('paymentMethodDropdown').value;
-        let cbFee = 0;
-        if (paymentMethod === "CB") {
-            cbFee = total * 0.0055; // 0.55% de frais
-            document.getElementById('cbFee').style.display = 'block';
-            document.getElementById('cbFee').textContent = `Frais CB : ${cbFee.toFixed(2)} €`;
-        } else {
-            document.getElementById('cbFee').style.display = 'none';
-        }
-
-        // Total avec frais CB si appliqué
-        const grandTotal = total + cbFee;
-        document.getElementById('total').textContent = `Total général : ${grandTotal.toFixed(2)} €`;
-    }
-
-    function validate() {
-        showLoader();
-
-        const adherent = document.getElementById('adherentsDropdown').value;
-        const paymentMethod = document.getElementById('paymentMethodDropdown').value;
-        const total = parseFloat(document.getElementById('total').innerText.replace('Total Général: ', '').replace(' €', ''));
-        const dateTime = new Date().toISOString();
-        const cotisationAmount = parseFloat(document.getElementById('cotisationAmount').value) || 0; // Récupérer le montant de cotisation
-        const purchases = [];
-        const rows = document.querySelectorAll('#productList tbody tr');
-
-        // Renommer la variable pour éviter le conflit
-        const invoiceRows = document.querySelectorAll('#productList tbody tr');
-        for (const row of invoiceRows) {
-            const select = row.cells[0].querySelector('select');
-            const quantityInput = row.cells[3].querySelector('input');
-            const discountInput = row.cells[4].querySelector('input'); // Champ de remise (assurez-vous que la remise est dans la 5ème colonne)
-            const quantity = parseFloat(quantityInput.value) || 0; // Utiliser parseFloat pour permettre les quantités décimales
-            const discount = parseFloat(discountInput.value) || 0; // Récupérer la remise
-            // Vérifier que le produit est sélectionné avant de vérifier la quantité
-            if (select.value && quantity === 0) {
-                alert("Veuillez entrer une quantité supérieure à 0 pour tous les produits sélectionnés.");
-                hideLoader(); // Cacher le loader si l'alerte est déclenchée
-                return; // Sortir de la fonction si une quantité est 0
-            }
-        }
-
-        if (!adherent || !paymentMethod || total <= 0) {
-            alert('Veuillez remplir tous les champs requis.');
-            hideLoader(); // Cacher le loader si des champs sont manquants
-            return; // Sortir de la fonction si un champ est manquant
-        }
-
-        let orderDetails = ''; // Initialiser la variable pour stocker les détails
-        rows.forEach(row => {
-            const select = row.cells[0].querySelector('select');
-            const quantityInput = row.cells[3].querySelector('input');
-            const discountInput = row.cells[4].querySelector('input'); // Remise pour chaque ligne
-            const productName = select.options[select.selectedIndex].dataset.name; // Récupérer le nom du produit
-            const quantity = parseFloat(quantityInput.value) || 0; // Utiliser parseFloat pour permettre les quantités décimales
-            const discount = parseFloat(discountInput.value) || 0; // Remise sur le produit
-            const price = parseFloat(select.value) || 0; // Utiliser parseFloat pour permettre les prix décimaux
-            const lineTotalBeforeDiscount = price * quantity;
-            const discountAmount = (lineTotalBeforeDiscount * discount) / 100; // Calcul de la remise en pourcentage
-            const totalLine = (lineTotalBeforeDiscount - discountAmount).toFixed(2); // Appliquer la remise et calculer le total de la ligne
-
-            if (productName && quantity > 0) {
-                purchases.push({
-                    productName: productName,
-                    quantity: quantity,
-                    price: price, // Ajouter le prix au produit
-                    discount: discount, // Ajouter la remise dans les achats
-                    modifiedStock: -quantity // Enregistrer une valeur négative pour diminuer le stock
-                });
-
-                // Construire le détail de la commande avec ou sans remise
-                if (discount > 0) {
-                    orderDetails += `${productName} - ${quantity} x ${price.toFixed(2)} €  = ${lineTotalBeforeDiscount.toFixed(2)} € (Remise: ${discount.toFixed(2)}%) = ${totalLine} €\n`;
-                } else {
-                    orderDetails += `${productName} - ${quantity} x ${price.toFixed(2)} €  = ${lineTotalBeforeDiscount.toFixed(2)} € = ${totalLine} €\n`;
-                }
-            }
-        });
-
-        google.script.run.withSuccessHandler(() => {
-            console.log('Vente enregistrée et cotisation mise à jour');
-            const currentMonthYear = new Date().toLocaleString('fr-FR', { month: 'long', year: 'numeric' });
-            const cotisationStatus = cotisations[adherent]?.[currentMonthYear];
-            if (cotisationStatus !== "ok") {
-                // Met à jour la cotisation seulement si elle n'est pas à jour
-                google.script.run.updateCotisation(adherent, currentMonthYear, cotisationAmount);
-            }
-
-            // Construction de l'email
-            const invoiceEmail = `
-            <div style="font-family: Arial, sans-serif; line-height: 1.6;">
-                <p>Bonjour,</p>
-                <p>Vous trouverez ci-dessous votre dernière vente Coop'az.</p>
-                <h2 style="color: #4CAF50;">vente</h2>
-                <p><strong>Adhérent :</strong> ${adherent}</p>
-                <p><strong>Date :</strong> ${new Date().toLocaleString('fr-FR')}</p>
-                <h3>Détails de la commande :</h3>
-                <pre>${orderDetails}</pre> <!-- Utilisez un <pre> pour conserver la mise en forme -->
-                ${cotisationAmount > 0 ? `<p><strong>Montant de la cotisation :</strong> ${cotisationAmount.toFixed(2)} €</p>` : ''}
-                <h3 style="color: #4CAF50;">Total : ${total.toFixed(2)} €</h3>
-                <p><strong>Méthode de Paiement :</strong> ${paymentMethod}</p>
-                <p>Merci pour votre commande</p>
-                <img src="https://scontent-bru2-1.xx.fbcdn.net/v/t39.30808-6/304383743_535490041712950_2937999491346330678_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=_Sds-7SSXQgQ7kNvgFkPOjQ&_nc_zt=23&_nc_ht=scontent-bru2-1.xx&_nc_gid=ATe01421g4Z-YWApmKNnhFT&oh=00_AYDTFDN4ZkLjhth7pF_kojfSjcSOMq1ATwJ5G1TDsaHO2Q&oe=6728187B" alt="Logo" style="width: 100px; height: auto;">
-            </div>
-        `;
-            const email = adherents.find(a => a.name === adherent).email; // Récupère l'email de l'adhérent
-            // Envoie l'email
-            google.script.run.sendEmailToAdherent(email, invoiceEmail);
-            hideLoader(); // Cacher le loader après la validation
-            alert('Vente enregistrée !');
-            resetForm();
-            loadContent('home'); // Revenir à la page d'accueil
-        }).withFailureHandler((error) => {
-            console.error("Erreur lors de l'enregistrement de la vente", error);
-            hideLoader(); // Cacher le loader en cas d'erreur
-            alert('Une erreur est survenue. Veuillez réessayer.');
-        }).saveSale(adherent, paymentMethod, total, dateTime, purchases);
-    }
-
-
-    function resetForm() {
-        document.getElementById('adherentsDropdown').value = '';
-        document.getElementById('paymentMethodDropdown').value = '';
-        const rows = document.querySelectorAll('#productList tbody tr');
-        rows.forEach(row => row.remove()); // Supprimer toutes les lignes
-    }
-
-    function updateProductPrice(selectedOption, newPrice) {
-        // Mettre à jour le prix dans l'option sélectionnée
-        selectedOption.dataset.price = newPrice;
-        selectedOption.value = newPrice;
-        // Mettre à jour l'affichage du prix dans la cellule de prix
-        const row = selectedOption.closest('tr');
-        row.cells[1].innerText = `${newPrice} €`;
-        // Recalculer le total de la ligne et le total général
-        calculateRowTotal(row);
-    }
-
-    function openStockPopup(selectedOption) {
-        if (!selectedOption) {
-            alert("Veuillez sélectionner un produit avant de modifier le stock.");
-            return;
-        }
-
-        const productName = selectedOption.dataset.name;
-        const currentStock = selectedOption.dataset.stock;
-        const currentPrice = selectedOption.dataset.price;
-        // Création de la structure HTML de la popup
-        const popup = document.createElement('div');
-        popup.classList.add('popup-overlay'); // Utilisation de votre classe CSS existante
-
-        popup.innerHTML = `
-        <div class="popup-content">
-            <h2>Mettre à jour le produit</h2>
-            <p><strong>${productName}</strong></p>
-            <p><label for="newStock">Nouveau Stock :</label>
-            <input type="number" id="newStock" value="${currentStock}" min="0"></p>
-            <p><label for="newPrice">Nouveau Prix :</label>
-            <input type="number" id="newPrice" value="${currentPrice}" min="0" step="0.01"></p>
-            <div class="popup-buttons">
-                <md-filled-tonal-button id="saveStockButton" class="btn-save">Enregistrer</md-filled-tonal-button>
-                <div></div>
-                <md-filled-tonal-button id="cancelButton" class="btn-cancel">Annuler</md-filled-tonal-button>
-            </div>
-        </div>
-    `;
-        // Ajouter la popup au DOM
-        document.body.appendChild(popup);
-        // Enregistrer les nouvelles valeurs de stock et de prix
-        document.getElementById('saveStockButton').onclick = function () {
-            const newStock = parseInt(document.getElementById('newStock').value, 10);
-            const newPrice = parseFloat(document.getElementById('newPrice').value);
-            // Mise à jour des données dans l'option sélectionnée
-            selectedOption.dataset.stock = newStock;
-            selectedOption.dataset.price = newPrice;
-            // Mise à jour de l'affichage dans la ligne du tableau
-            updateStockInRow(selectedOption);
-            updateProductPrice(selectedOption, parseFloat(newPrice));
-            // Fermer la popup
-            document.body.removeChild(popup);
-            // Mise à jour dans Google Sheets
-            updateSingleProductStockAndPrice(productName, newStock, newPrice);
-        };
-
-        // Annuler et fermer la popup
-        document.getElementById('cancelButton').onclick = function () {
-            document.body.removeChild(popup);
-        };
-    }
-
-    function updateStockInRow(selectedOption) {
-        const rows = document.querySelectorAll('#productList tbody tr');
-        rows.forEach(row => {
-            const select = row.cells[0].querySelector('select');
-            if (select && select.selectedOptions[0].dataset.name === selectedOption.dataset.name) {
-                row.cells[2].innerText = `${selectedOption.dataset.stock} unités`; // Mettre à jour le stock
-                row.cells[1].innerText = `${selectedOption.dataset.price} €`; // Mettre à jour le prix
-                calculateRowTotal(row); // Recalculer le total de la ligne après modification
-            }
-        });
-    }
-
-    function updateSingleProductStockAndPrice(productName, newStock, newPrice) {
-        google.script.run.withSuccessHandler((result) => {
-            alert(result); // Confirmation de mise à jour
-        }).withFailureHandler((error) => {
-            alert("Erreur lors de la mise à jour : " + error.message);
-        }).updateProductStockAndPrice(productName, newStock, newPrice);
-    }
-
-    ////////////////RECEPTION//////////////////////
-    // Fonction pour charger la liste des fournisseurs
-
-    function loadSuppliers() {
-        showLoader(); // Affiche le loader
-        google.script.run.withSuccessHandler(function (suppliers) {
-            hideLoader(); // Masque le loader après le chargement
-            if (!suppliers || suppliers.length === 0) {
-                alert("Aucun fournisseur trouvé !");
-                return;
-            }
-
-            const dropdown = document.getElementById('supplierDropdown');
-            suppliers.sort((a, b) => a.name.localeCompare(b.name)); // Tri alphabétique
-
-            const fragment = document.createDocumentFragment();
-            suppliers.forEach(supplier => {
-                const option = document.createElement('option');
-                option.value = supplier.name;
-                option.textContent = supplier.name;
-                fragment.appendChild(option);
-            });
-            dropdown.appendChild(fragment);
-
-            // Initialisation de Select2
-            $('#supplierDropdown')
-                .select2({
-                    placeholder: "-- Sélectionnez un producteur --",
-                    allowClear: true,
-                    width: '100%',
-                    minimumResultsForSearch: 0,
-                })
-                .off('change') // Supprime les anciens événements
-                .on('change', function () {
-                    const selectedSupplier = $(this).val();
-                    if (selectedSupplier) {
-                        addNewLine(selectedSupplier);
-                        $('#supplierDropdown').select2('close');
-                    }
-                });
-        }).receptionGetSuppliers();
-    }
-
-    // Fonction pour ajouter une nouvelle ligne de réception
-    function addNewLine() {
-        const newRow = document.createElement('tr');
-        newRow.innerHTML = `
-        <td>
-            <select class="productDropdown" onchange="updatePriceAndStock(this)" disabled>
-                <option value="">-- Sélectionnez un produit --</option>
-            </select>
-        </td>
-        <td class="currentPrice"></td>
-        <td><input type="number" class="priceUpdate" placeholder="Nouveau Prix" oninput="updateTotalAmount(this.parentElement.parentElement.querySelector('.receivedQuantity'))"></td>
-        <td class="currentStock"></td>
-        <td><input type="number" class="stockUpdate" placeholder="Nouveau Stock"></td>
-        <td><input type="number" class="receivedQuantity" placeholder="Quantité" oninput="updateTotalAmount(this)"></td>
-        <td class="totalAmount"></td>
-        <td>
-            <span class="deleteRow" onclick="deleteReceptionRow(this)" style="color: red; cursor: pointer; font-size: 20px;">&times;</span>
-        </td>
-    `;
-        document.querySelector('#receptionTable tbody').appendChild(newRow);
-
-        const supplier = document.getElementById('supplierDropdown').value;
-        if (supplier) {
-            showLoader(); // Affiche le loader pendant le chargement des produits
-            google.script.run.withSuccessHandler(function (products) {
-                hideLoader(); // Masque le loader après chargement
-                if (!products || products.length === 0) {
-                    alert("Aucun produit trouvé pour ce fournisseur !");
-                    return;
-                }
-                const productDropdown = newRow.querySelector('.productDropdown');
-                // Ajouter les produits dans le dropdown du produit
-                products.sort((a, b) => a.name.localeCompare(b.name));
-                const fragment = document.createDocumentFragment();
-                products.forEach(product => {
-                    const option = document.createElement('option');
-                    option.value = product.name;
-                    option.textContent = product.name;
-                    fragment.appendChild(option);
-                });
-                productDropdown.appendChild(fragment);
-
-                // Initialiser Select2 avec les mêmes options que dans AddRowInventaire
-                $(productDropdown).prop('disabled', false).select2({
-                    placeholder: "-- Sélectionnez un produit --",
-                    allowClear: true,
-                    minimumResultsForSearch: 0,
-                    width: '100%',
-                    matcher: function (params, data) {
-                        if ($.trim(params.term) === '') {
-                            return data; // Retourner tous les résultats si aucun terme n'est fourni
-                        }
-                        const terms = params.term
-                            .toLowerCase()
-                            .split(' ')
-                            .map(term => term.replace(/s$/, '')); // Supprimer "s" à la fin des mots
-                        const text = data.text.toLowerCase().replace(/s$/, ''); // Supprimer "s" du texte du produit
-                        const allMatch = terms.every(term => text.includes(term)); // Vérifier chaque mot
-                        return allMatch ? data : null;
-                    }
-                })
-                    .on('select2:open', function () {
-                        // Mettre le focus sur la zone de recherche après ouverture du Select2
-                        const searchInput = document.querySelector('.select2-search__field');
-                        if (searchInput) {
-                            searchInput.focus();
-                        }
-                    });
-            }).receptionGetProductsBySupplier(supplier);
-        }
-    }
-
-    function deleteReceptionRow(element) {
-        const row = element.closest('tr');
-        row.parentNode.removeChild(row); // Supprime la ligne
-        updateReceptionTotal(); // Mise à jour du total général après suppression
-    }
-
-    function updateProductDropdown() {
-        const supplier = document.getElementById('supplierDropdown').value;
-        // Appeler la fonction pour récupérer les produits associés au fournisseur
-        google.script.run.withSuccessHandler(function (products) {
-            const productDropdowns = document.querySelectorAll('.productDropdown');
-            // Vérification de l'existence des éléments .productDropdown
-            if (productDropdowns.length === 0) {
-                console.error("Aucun élément .productDropdown trouvé. Assurez-vous que les éléments existent avant d'appeler Select2.");
-                return;
-            }
-            // Trier les produits par ordre alphabétique
-            products.sort((a, b) => a.name.localeCompare(b.name));
-            // Mise à jour de chaque dropdown produit
-            productDropdowns.forEach(dropdown => {
-                // Réinitialiser le contenu du dropdown
-                dropdown.innerHTML = '<option value="">-- Sélectionnez un produit --</option>';
-                // Ajouter chaque produit dans la liste déroulante
-                products.forEach(product => {
-                    dropdown.innerHTML += `<option value="${product.name}">${product.name}</option>`;
-                });
-                // Détruire Select2 pour éviter la double initialisation s'il est déjà appliqué
-                if ($(dropdown).hasClass("select2-hidden-accessible")) {
-                    $(dropdown).select2('destroy');
-                }
-                // Initialiser Select2 sur chaque dropdown de produit
-                $(dropdown).select2({
-                    placeholder: "-- Sélectionnez un produit --",
-                    minimumResultsForSearch: 0, // Affiche la barre de recherche sans restriction
-                    allowClear: true,
-                    width: '100%',// Adapter à la largeur du conteneur
-                    matcher: function (params, data) {
-                        // Si l'élément est une correspondance exacte, retourner l'élément
-                        if ($.trim(params.term) === '') {
-                            return data;
-                        }
-                        // Convertir le terme de recherche en tableau de mots
-                        var searchWords = params.term.toLowerCase().split(/\s+/);
-                        // Récupérer le texte de l'option (fournisseur)
-                        var dataText = data.text.toLowerCase();
-                        // Vérifier si tous les mots de la recherche sont présents dans le texte de l'option
-                        var match = searchWords.every(function (word) {
-                            return dataText.includes(word);
-                        }).on('select2:open', () => {
-                            document.querySelector('.select2-search__field').focus(); // Force le focus dans le champ de recherche
-                        });
-                        // Si tous les mots sont trouvés, renvoyer l'élément pour qu'il soit affiché
-                        if (match) {
-                            return data;
-                        }
-                        // Si aucun mot ne correspond, retourner null (ne pas afficher l'élément)
-                        return null;
-                    },
-                });
-            });
-            // Ajouter la première ligne si aucune ligne n'est encore présente
-            const receptionTableBody = document.querySelector('#receptionTable tbody');
-            if (receptionTableBody.children.length === 0) {
-                addNewLine();
-            }
-        })
-            .withFailureHandler(function (error) {
-                console.error("Erreur lors de la récupération des produits : ", error);
-                alert("Erreur lors de la récupération des produits. Veuillez réessayer.");
-            })
-            .receptionGetProductsBySupplier(supplier);
-    }
-    // Fonction pour surveiller l'apparition des éléments .productDropdown
-    function waitForProductDropdowns() {
-        const observer = new MutationObserver((mutations, obs) => {
-            const productDropdowns = document.querySelectorAll('.productDropdown');
-            if (productDropdowns.length > 0) {
-                // Appeler updateProductDropdown et arrêter l'observateur
-                updateProductDropdown();
-                obs.disconnect();
-            }
-        });
-        // Observer les changements dans le corps de la page
-        observer.observe(document.body, { childList: true, subtree: true });
-    }
-    // Appeler la fonction d'attente au chargement de la page
-    document.addEventListener("DOMContentLoaded", waitForProductDropdowns);
-    // Exemple d'appel de la fonction pour ajouter une ligne lors de la sélection d'un fournisseur
-    document.getElementById('supplierDropdown').addEventListener('change', function () {
-        addNewLine(); // Ajouter une première ligne avec .productDropdown lors de la sélection du fournisseur
-    });
-
-    function updatePriceAndStock(selectElement) {
-        const row = selectElement.closest('tr');
-        const selectedProduct = selectElement.value;
-        google.script.run.withSuccessHandler(function (product) {
-            if (product) {
-                row.querySelector('.currentPrice').textContent = product.price;
-                row.querySelector('.currentStock').textContent = product.stock;
-                updateTotalAmount(row.querySelector('.receivedQuantity')); // Met à jour le montant total avec la quantité saisie
-            } else {
-                row.querySelector('.currentPrice').textContent = '';
-                row.querySelector('.currentStock').textContent = '';
-                row.querySelector('.totalAmount').textContent = ''; // Réinitialiser le montant total
-            }
-        }).withFailureHandler(function (error) {
-            alert("Erreur lors de la récupération des détails du produit : " + error.message);
-        }).receptionGetProductDetails(selectedProduct);
-    }
-
-    function updateTotalAmount(element) {
-        const row = element.closest('tr');
-        const receivedQuantity = row.querySelector('.receivedQuantity').value;
-        const priceUpdate = row.querySelector('.priceUpdate').value || row.querySelector('.currentPrice').textContent;
-        const stockUpdate = row.querySelector('.stockUpdate').value || row.querySelector('.currentStock').textContent;
-
-        // Calcul du montant total
-        const totalAmount = parseFloat(receivedQuantity) * parseFloat(priceUpdate);
-        row.querySelector('.totalAmount').textContent = totalAmount.toFixed(2) + ' €';
-
-        // Recalculer le total général de la réception
-        updateReceptionTotal();
-    }
-
-    function updateReceptionTotal() {
-        let total = 0;
-        const rows = document.querySelectorAll('#receptionTable tbody tr');
-        rows.forEach(row => {
-            const totalAmount = row.querySelector('.totalAmount').textContent;
-            total += parseFloat(totalAmount.replace(' €', '') || 0);
-        });
-        document.getElementById('totalAmount').textContent = 'Total Réception : ' + total.toFixed(2) + ' €';
-    }
-
-    function validateReception() {
-        showLoader();
-        const rows = document.querySelectorAll('#receptionTable tbody tr');
-        const receptions = [];
-        const errors = []; // Tableau pour collecter les erreurs
-        let isValid = true;
-
-        rows.forEach((row, index) => {
-            const productSelect = row.querySelector('.productDropdown');
-            const productName = productSelect.value.trim();
-
-            if (productName) {
-                const priceUpdate = row.querySelector('.priceUpdate').value.trim() || null;
-                const stockUpdate = row.querySelector('.stockUpdate').value.trim() || null;
-                const receivedQuantity = row.querySelector('.receivedQuantity').value.trim() || "0";
-
-                // Vérifier si le produit est de type "unite"
-                if (productName.toLowerCase().includes("unite")) {
-                    if (stockUpdate && isDecimal(stockUpdate)) {
-                        errors.push(`Ligne ${index + 1}: Le stock ne peut pas être une valeur décimale pour le produit "${productName}".`);
-                    }
-                    if (receivedQuantity && isDecimal(receivedQuantity)) {
-                        errors.push(`Ligne ${index + 1}: La quantité reçue ne peut pas être une valeur décimale pour le produit "${productName}".`);
-                    }
-                }
-
-                // Convertir les valeurs si elles sont valides
-                const updatedStock = stockUpdate ? parseFloat(stockUpdate) : null;
-                const quantityReceived = parseFloat(receivedQuantity);
-
-                // Vérification des champs non remplis
-                if (!quantityReceived || isNaN(quantityReceived) || quantityReceived <= 0) {
-                    errors.push(`Ligne ${index + 1}: La quantité reçue doit être un nombre valide supérieur à 0 pour le produit "${productName}".`);
-                }
-
-                // Ajouter les données si tout est valide
-                receptions.push({
-                    productName,
-                    priceUpdate,
-                    stockUpdate: updatedStock,
-                    receivedQuantity: quantityReceived
-                });
-            } else {
-                errors.push(`Ligne ${index + 1}: Aucun produit sélectionné.`);
-            }
-        });
-
-        if (errors.length > 0) {
-            isValid = false;
-            alert(errors.join('\n')); // Afficher toutes les erreurs en une seule alerte
-        }
-
-        if (isValid) {
-            google.script.run.receptionValidateReception(receptions);
-            alert('Réception enregistrée avec succès !');
-            resetFormReception();
-            hideLoader();
-            loadContent('home'); // Revenir à la page d'accueil
-        } else {
-            hideLoader(); // Masquer le loader si des erreurs sont détectées
-        }
-    }
-
-    // Fonction utilitaire pour vérifier si une valeur est décimale
-    function isDecimal(value) {
-        return value.includes('.') && !Number.isInteger(parseFloat(value));
-    }
-
-
-    function resetFormReception() {
-        document.getElementById('supplierDropdown').value = '';
-        const rows = document.querySelectorAll('#receptionTable tbody tr');
-        rows.forEach(row => row.remove()); // Supprimer toutes les lignes
-
-    }
-    let selectedSupplier = "";  // Variable pour stocker le fournisseur sélectionné
-    // Fonction appelée à chaque changement dans la liste déroulante des fournisseurs
-    function handleSupplierChange() {
-        const supplierDropdown = document.getElementById('supplierDropdown');
-        const errorMessage = document.getElementById('error-message-reception');
-        const createProductButton = document.getElementById('createProductButton');
-        selectedSupplier = supplierDropdown.value;  // Stocker le fournisseur sélectionné
-        if (selectedSupplier === "") {
-            // Aucune sélection de fournisseur, afficher le message d'erreur
-            errorMessage.style.display = 'block';
-            createProductButton.disabled = true;  // Désactiver le bouton de création de produit
-        } else {
-            // Fournisseur sélectionné, masquer le message d'erreur et activer le bouton
-            errorMessage.style.display = 'none';
-            createProductButton.disabled = false;  // Activer le bouton de création de produit
-        }
-    }
-    // Fonction pour ouvrir le popup de création de produit
-    function createNewProduct() {
-        if (selectedSupplier === "") {
-            alert("Sélectionnez d'abord un fournisseur");
-            return;
-        }
-
-        // Ouvrir la popup pour créer un nouveau produit
-        openCreateProductPopup();
-    }
-    // Fonction pour ouvrir la popup de création de produit
-    function openCreateProductPopup() {
-        const supplierSelect = document.getElementById("supplierDropdown");
-
-        const popupHtml = `
-      <div class="popup-overlay">
-        <div class="popup-content">
-          <h2>Créer un nouveau produit</h2>
-          <form id="createProductForm">
-            <label>Nom du produit</label>
-            <input type="text" id="productName" required><br><br>
-           
-            <label>Code-barres</label>
-            <input type="text" id="productBarcode"><br><br>
-            <label>Unité de mesure</label>
-            <select id="productUnit" required>
-              <option value="">Sélectionnez une unité</option>
-              <option value="Kilo">Kilo</option>
-              <option value="unite">unite</option>
-              <option value="Litre">Litre</option>
-            </select><br><br>
-            <label>Prix</label>
-            <input type="number" id="productPrice" step="0.01" required><br><br>
-            <label>Quantité reçue</label>
-            <input type="number" id="productQuantity" step="0.01" required><br><br>
-            <button type="button" onclick="saveNewProduct()">Valider</button>
-            <button type="button" onclick="closePopup()">Annuler</button>
-          </form>
-        </div>
-      </div>
-    `;
-        document.body.insertAdjacentHTML('beforeend', popupHtml);
-    }
-    // Fonction pour fermer la popup
-    function closePopup() {
-        const overlay = document.querySelector('.popup-overlay');
-        if (overlay) overlay.remove();
-    }
-    // Fonction pour enregistrer un nouveau produit
-    function saveNewProduct() {
-        const productData = {
-            name: document.getElementById('productName').value,
-            barcode: document.getElementById('productBarcode').value,
-            unit: document.getElementById('productUnit').value,
-            price: parseFloat(document.getElementById('productPrice').value),
-            quantity: parseFloat(document.getElementById('productQuantity').value),
-            supplier: selectedSupplier  // Ajouter le fournisseur sélectionné
-        };
-        // Vérifier que tous les champs obligatoires sont remplis
-        if (!productData.name || !productData.unit || !productData.price || !productData.quantity) {
-            alert("Veuillez remplir tous les champs obligatoires.");
-            return;
-        }
-        // Appel à Google Apps Script pour enregistrer le produit avec le fournisseur
-        google.script.run.withSuccessHandler(response => {
-            alert(response);
-            closePopup();
-            loadContent('home'); // Revenir à la page d'accueil
-        }).receptionCreateProduct(productData);  // Passer toutes les données, y compris le fournisseur
-    }
-
-
-    ///////FOURNISEEUR/////////////////
-    function getfournisseur() {// Affiche le loader pendant le chargement
-        showLoader(true);  // Appel à votre fonction showLoader pour afficher le loader
-
-        // Appel à Google Apps Script pour récupérer les fournisseurs
-        google.script.run.withSuccessHandler(function (suppliers) {
-            // Une fois les données récupérées, affiche les fournisseurs
-            displaySuppliers(suppliers);
-        }).getSuppliers();  // Appel de la fonction `getSuppliers`
-    }
-
-    // Charge les fournisseurs lorsque la page est prête
-    document.addEventListener("DOMContentLoaded", function () {
-        loadSuppliers();  // Charge les fournisseurs au chargement de la page
-    });
-
-    // Fonction pour afficher les fournisseurs dans le tableau
-    function displaySuppliers(suppliers) {
-        const supplierTableBody = document.getElementById('supplierTableBody');
-        supplierTableBody.innerHTML = ''; // Réinitialiser le tableau avant de remplir
-        suppliers.forEach(supplier => {
-            const row = document.createElement('tr');
-
-            const supplierNameCell = document.createElement('td');
-            supplierNameCell.textContent = supplier.name;
-            row.appendChild(supplierNameCell);
-
-            const emailCell = document.createElement('td');
-            emailCell.textContent = supplier.email;
-            row.appendChild(emailCell);
-
-            const phoneCell = document.createElement('td');
-            phoneCell.textContent = supplier.phone;
-            row.appendChild(phoneCell);
-
-            const addressCell = document.createElement('td');
-            addressCell.textContent = supplier.address;
-            row.appendChild(addressCell);
-            const codePostalCell = document.createElement('td');
-            codePostalCell.textContent = supplier.codePostal;
-            row.appendChild(codePostalCell);
-            const villeCell = document.createElement('td');
-            villeCell.textContent = supplier.ville;
-            row.appendChild(villeCell);
-
-            const referentCell = document.createElement('td');
-            referentCell.textContent = supplier.referent;
-            row.appendChild(referentCell);
-
-            supplierTableBody.appendChild(row);
-        });
-        // Masque le loader après avoir affiché les fournisseurs
-        hideLoader();
-    }
-
-    // Fonction pour charger les référents dans le menu déroulant
-    function loadReferents() {
-        google.script.run.withSuccessHandler(function (referents) {
-            const referentSelect = document.getElementById('supplierReferent');
-            referents.forEach(function (referent) {
-                const option = document.createElement('option');
-                option.value = referent[0];  // Utiliser la valeur du référent
-                option.textContent = referent[0];  // Afficher le nom du référent
-                referentSelect.appendChild(option);
-            });
-        }).getReferents();
-    }
-
-    // Fonction pour ouvrir la popup de création de fournisseur
-    function openCreateSupplierPopup() {
-        const popupHtml = `
-      <div class="popup-overlay">
-        <div class="popup-content">
-          <h2>Créer un nouveau fournisseur</h2>
-          <form id="createSupplierForm">
-            <label>Nom du fournisseur</label>
-            <input type="text" id="supplierName" required><br><br>
-           
-            <label>Téléphone</label>
-            <input type="text" id="supplierPhone" required><br><br>
-           
-            <label>Email</label>
-            <input type="email" id="supplierEmail" required><br><br>
-           
-            <label>Adresse</label>
-            <input type="text" id="supplierAddress" required><br><br>
-           
-            <label>Référent</label>
-            <select id="supplierReferent" required>
-                <option value="">Sélectionnez un référent</option>
-                <!-- Les options des référents seront ajoutées ici -->
-            </select><br><br>
-
-
-            <button type="button" onclick="saveNewSupplier(event)">Valider</button>
-            <button type="button" onclick="closePopup()">Annuler</button>
-          </form>
-        </div>
-      </div>
-    `;
-        document.body.insertAdjacentHTML('beforeend', popupHtml);
-        loadReferents();  // Charger les référents après ouverture de la popup
-    }
-
-    // Fonction pour fermer la popup
-    function closePopup() {
-        const overlay = document.querySelector('.popup-overlay');
-        if (overlay) overlay.remove();
-    }
-
-    // Fonction pour enregistrer un nouveau fournisseur
-    function saveNewSupplier(event) {
-        const supplierData = {
-            name: document.getElementById('supplierName') ? document.getElementById('supplierName').value : '',
-            email: document.getElementById('supplierEmail') ? document.getElementById('supplierEmail').value : '',
-            phone: document.getElementById('supplierPhone') ? document.getElementById('supplierPhone').value : '',
-            address: document.getElementById('supplierAddress') ? document.getElementById('supplierAddress').value : '',
-            codePostal: document.getElementById('suppliercodePostal') ? document.getElementById('suppliercodePostal').value : '',
-            ville: document.getElementById('supplierville') ? document.getElementById('supplierville').value : '',
-            referent: document.getElementById('supplierReferent') ? document.getElementById('supplierReferent').value : ''
-        };
-
-
-        // Vérifier que tous les champs obligatoires sont remplis
-        if (!supplierData.name || !supplierData.referent) {
-            alert("Veuillez renseigner au minuimum le nom et le référent.");
-            return;
-        }
-        // Afficher le loader pendant l'enregistrement
-        showLoader(true);
-        // Appel à Google Apps Script pour enregistrer le fournisseur
-        // Appel à Google Apps Script pour enregistrer le fournisseur
-        google.script.run.withSuccessHandler(function (response) {
-            alert(response); // Afficher la réponse du serveur (succès)
-            closePopup(); // Fermer la popup
-            getfournisseur(); // Recharger la liste des fournisseurs
-            hideLoader();  // Masquer le loader après l'enregistrement
-        }).createSupplier(supplierData);  // Passer toutes les données du fournisseur
-    }
-
-
-    ///////////////INVENTAIRE//////////////////
-    let products = [];  // Liste des produits
-    let isProductsLoaded = false;  // Indicateur pour vérifier si les produits sont chargés
-
-
-    // Mettre à jour les données d'une ligne avec la date d'inventaire
-    function updateRowData(row, productName) {
-        const product = products.find(p => p.name === productName);
-        if (product) {
-            // Mettre à jour le prix et le stock
-            row.querySelector('.price-cell').textContent = product.price.toFixed(2); // Prix
-            row.querySelector('.stock-cell').textContent = product.stock; // Stock actuel
-
-            // Assurer que la date d'inventaire existe
-            const inventoryDate = product.stockDate || 'Aucune date'; // Si pas de date, afficher 'Aucune date'
-            console.log("Mise à jour de la date d'inventaire pour", product.name, inventoryDate);
-
-            // Sélectionner la cellule pour la date et y insérer la date d'inventaire
-            const dateCell = row.querySelector('.last-delivery-date');
-            if (dateCell) {
-                dateCell.textContent = inventoryDate; // Afficher la date
-            } else {
-                console.error('La cellule de la date n\'a pas été trouvée.');
-            }
-
-        }
-    }
-
-    // Fonction d'ajout d'une ligne dans le tableau avec Select2
-    function addRowInventaire() {
-        const template = document.getElementById('rowTemplate');
-        const productRows = document.getElementById('productRows');
-        const clone = template.content.cloneNode(true); // Cloner le template
-        const selectElement = clone.querySelector('.product-select');
-
-        // Ajouter une option vide pour le placeholder
-        const emptyOption = document.createElement('option');
-        emptyOption.value = '';  // Valeur vide
-        emptyOption.textContent = 'Sélectionnez un produit';  // Texte du placeholder
-        selectElement.appendChild(emptyOption);  // Ajouter cette option au <select>
-
-        // Configurer Select2 une seule fois si les produits sont chargés
-        if (isProductsLoaded) {
-            $(selectElement)
-                .select2({
-                    data: products.map(product => ({ id: product.name, text: product.name })),
-                    placeholder: "Sélectionnez un produit",
-                    allowClear: true,
-                    width: '100%', matcher: function (params, data) {
-                        if ($.trim(params.term) === '') {
-                            return data; // Retourner tous les résultats si aucun terme n'est fourni
-                        }
-                        const terms = params.term
-                            .toLowerCase()
-                            .split(' ')
-                            .map(term => term.replace(/s$/, '')); // Supprimer "s" à la fin des mots
-                        const text = data.text.toLowerCase().replace(/s$/, ''); // Supprimer "s" du texte du produit
-                        const allMatch = terms.every(term => text.includes(term)); // Vérifier chaque mot
-                        return allMatch ? data : null;
-                    }
-                })
-                .on('change', function () {
-                    const selectedProductName = this.value;
-                    if (selectedProductName) {
-                        updateRowData(this.closest('tr'), selectedProductName);
-                        addRowInventaire(); // Ajouter une nouvelle ligne après sélection
-                    }
-                })
-                .on('select2:open', function () {
-                    // Mettre le focus sur la zone de recherche après ouverture du Select2
-                    const searchInput = document.querySelector('.select2-search__field');
-                    if (searchInput) {
-                        searchInput.focus();
-                    }
-                })
-                .val('');
-
-            productRows.appendChild(clone); // Ajouter la ligne au tableau
-        }
-    }
-
-    // Charger les produits depuis Google Sheets et préparer l'affichage
-    function getProductsFromSheet() {
-        showLoader(); // Afficher le loader pendant le chargement
-        google.script.run.withSuccessHandler(function (data) {
-            console.log('Données produits:', data); // Afficher les produits récupérés
-            products = data.map(product => {
-                // Assurer que stockDate existe ou est défini
-                return {
-                    name: product.name,
-                    price: product.price,
-                    stock: product.stock,
-                    stockDate: product.stockDate || 'Aucune date' // Valeur par défaut si stockDate est vide
-                };
-            });
-            isProductsLoaded = true;
-            addRowInventaire(); // Ajouter la première ligne automatiquement
-            hideLoader(); // Cacher le loader une fois terminé
-        }).getProducts();
-    }
-
-    // Fonction pour enregistrer l'inventaire
-    function saveInventory() {
-        showLoader();  // Afficher le loader pendant le processus de sauvegarde
-
-        const today = new Date();
-        const formattedDate = today.toLocaleDateString('fr-FR'); // Format JJ/MM/AAAA
-
-        const productRows = document.querySelectorAll('#productRows tr');
-        const updatedProducts = [];
-
-        // Préparer les données pour l'enregistrement
-        productRows.forEach(row => {
-            const productSelect = row.querySelector('.product-select');
-            const stockUpdateInput = row.querySelector('.stock-update');
-            const productName = productSelect.value;
-            const newStock = stockUpdateInput.value ? parseFloat(stockUpdateInput.value) : 0;
-
-            if (productName) {
-                const product = products.find(p => p.name === productName);
-
-                if (product) {
-                    updatedProducts.push({
-                        name: productName,
-                        price: product.price,
-                        stock: newStock,
-                        date: formattedDate
-                    });
-                } else {
-                    console.error('Produit non trouvé :', productName);
-                }
-            }
-        });
-
-        if (updatedProducts.length > 0) {
-            // Étape 1 : Enregistrer les données dans Google Sheets
-            google.script.run.withSuccessHandler(function () {
-                console.log('Données enregistrées avec succès.');
-
-                // Étape 2 : Calculer le total des produits avec la date d'aujourd'hui
-                calculateTotalForToday(formattedDate);
-
-            }).updateInventory(updatedProducts);
-        } else {
-            hideLoader();
-            alert('Aucun produit sélectionné pour l\'enregistrement.');
-        }
-    }
-
-    function calculateTotalForToday(formattedDate) {
-        // Appeler la fonction côté serveur pour récupérer les données filtrées et calculer le total
-        google.script.run.withSuccessHandler(function (total) {
-            console.log('Total calculé :', total);
-
-            // Étape 3 : Envoyer un email avec le montant total
-            google.script.run.sendInventoryEmail(formattedDate, total);
-
-            alert(`Inventaire enregistré avec succès. Total : ${total}€`);
-            hideLoader();
-
-            // Revenir à la page d'accueil
-            loadContent('home');
-        }).getTotalForDate(formattedDate);
-    }
-
-    // Initialisation
-    document.addEventListener('DOMContentLoaded', function () {
-        getProductsFromSheet(); // Charger les produits au démarrage
-    });
-    // Charger les produits et les adhérents lors du chargement de la page
-    $(document).ready(function () {
-
-    });
-</script>
-
 
 </html>

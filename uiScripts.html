@@ -56,7 +56,7 @@ Scripts côté client (logiciel, interactions utilisateur)
                   getProducts();
 					break;
             case 'etiquettes':
-                headerTitle.textContent = 'Gestion des pertes';
+                headerTitle.textContent = 'Générer des étiquettes';
                 getProducts();
                 addRowEtiquettes();
 					  
@@ -483,8 +483,9 @@ Scripts côté client (logiciel, interactions utilisateur)
           option.dataset.price = product.price;
           option.dataset.stock = product.stock;
           option.dataset.name = product.name;
-        option.dataset.shortName = product.shortName;
-        option.dataset.barcode = product.barcode;													 
+          option.dataset.shortName = product.shortName;
+          option.dataset.barcode = product.barcode;													 
+          option.dataset.currentUnit = product.unit;													 
 		 
           option.textContent = product.name;
 	   
@@ -555,9 +556,9 @@ Scripts côté client (logiciel, interactions utilisateur)
               } else {
                   stockText = parseFloat(selectedOption.dataset.stock).toFixed(2);
               }
-              // Condition pour afficher "litres" ou "unités"
-              if (selectedOption.dataset.name.toLowerCase().includes("litres")) {
-                  cell3.innerText = `${stockText} litres`;
+              // Condition pour afficher "Litre" ou "unités"
+              if (selectedOption.dataset.name.toLowerCase().includes("Litre")) {
+                  cell3.innerText = `${stockText} Litre`;
               } else if (selectedOption.dataset.name.toLowerCase().includes("unite")) {
                   cell3.innerText = `${stockText} unités`;
               } else if (selectedOption.dataset.name.toLowerCase().includes("kilo")) {
@@ -948,28 +949,22 @@ Scripts côté client (logiciel, interactions utilisateur)
     // Recalculer le total de la ligne et le total général
     calculateRowTotal(row);
 }
-  
- function openStockPopup(selectedOption) {
+  function openStockPopup(selectedOption) {
     if (!selectedOption) {
         alert("Veuillez sélectionner un produit avant de modifier le stock.");
         return;
     }
-
-																							
-																				
-																			 
-  
     const productName = selectedOption.dataset.name;
     const shortName = selectedOption.dataset.shortName;
     const barcode = selectedOption.dataset.barcode;
     const currentStock = selectedOption.dataset.stock;
     const currentPrice = selectedOption.dataset.price;
     const priceType = selectedOption.dataset.priceType || 'TTC'; // Récupérer le type de prix actuel
+    const currentUnit = selectedOption.dataset.unit || ''; // Récupérer l'unité de mesure actuelle
 
     // Création de la structure HTML de la popup
     const popup = document.createElement('div');
     popup.classList.add('popup-overlay'); // Utilisation de votre classe CSS existante
-
     // Mise à jour du contenu de la popup
     popup.innerHTML = `
         <div class="popup-content">
@@ -992,6 +987,13 @@ Scripts côté client (logiciel, interactions utilisateur)
                     <option value="HT20" ${priceType === 'HT20' ? 'selected' : ''}>HT à 20%</option>
                 </select>
             </p>
+            <p><label for="unitType">Unité de mesure :</label>
+                <select id="unitType">
+                    <option value="Unite" ${currentUnit === 'Unite' ? 'selected' : ''}>Unité</option>
+                    <option value="Kilo" ${currentUnit === 'Kilo' ? 'selected' : ''}>Kilo</option>
+                    <option value="Litre" ${currentUnit === 'Litre' ? 'selected' : ''}>Litre</option>
+                </select>
+            </p>
             <div class="popup-buttons">
                 <md-filled-tonal-button id="saveStockButton" class="btn-save">Enregistrer</md-filled-tonal-button>
                 <div></div>
@@ -999,23 +1001,19 @@ Scripts côté client (logiciel, interactions utilisateur)
             </div>
         </div>
     `;
-  
     // Ajouter la popup au DOM
     document.body.appendChild(popup);
-
     // Enregistrer les nouvelles valeurs de stock, prix, shortName, barcode et type de prix
     document.getElementById('saveStockButton').onclick = function () {
         const newStock = parseInt(document.getElementById('newStock').value, 10);
         const newPrice = parseFloat(document.getElementById('newPrice').value);
-														  
         const newShortName = document.getElementById('shortNameInput').value;
         const newBarcode = document.getElementById('barcodeInput').value;
         const newPriceType = document.getElementById('priceType').value;
-        
+        const newUnit = document.getElementById('unitType').value; // Récupérer l'unité sélectionnée
+
         // Calcul des prix TTC et HT en fonction du type de prix
-													   
         let finalPrice = newPrice;
-        
         if (newPriceType === 'TTC') {
             // Si le prix est TTC, calculer le HT pour 5.5% ou 20%
             const priceHT5_5 = newPrice / 1.055;
@@ -1029,34 +1027,29 @@ Scripts côté client (logiciel, interactions utilisateur)
             // Si le prix est HT à 20%, calculer le TTC
             finalPrice = newPrice * 1.20;
         }
-        
         // Mise à jour des données dans l'option sélectionnée
-												
-													  
         selectedOption.dataset.stock = newStock;
         selectedOption.dataset.price = finalPrice;
         selectedOption.dataset.shortName = newShortName;
         selectedOption.dataset.barcode = newBarcode;
         selectedOption.dataset.priceType = newPriceType;
+        selectedOption.dataset.unit = newUnit; // Mettre à jour l'unité de mesure
 
         // Mise à jour de l'affichage dans la ligne du tableau
         updateStockInRow(selectedOption);
         updateProductPrice(selectedOption, finalPrice, newPriceType);
-
         // Fermer la popup
         document.body.removeChild(popup);
-
         // Mise à jour dans Google Sheets
-        updateSingleProductStockAndPrice(productName, newStock, finalPrice, newShortName, newBarcode, newPriceType);
+        updateSingleProductStockAndPrice(productName, newStock, finalPrice, newShortName, newBarcode, newUnit);
     };
-
     // Annuler et fermer la popup
     document.getElementById('cancelButton').onclick = function () {
         document.body.removeChild(popup);
     };
 }
-  
-		   
+
+
 	 
   function updateStockInRow(selectedOption) {
       const rows = document.querySelectorAll('#productList tbody tr');
@@ -1070,12 +1063,12 @@ Scripts côté client (logiciel, interactions utilisateur)
       });
   }
   
-    function updateSingleProductStockAndPrice(productName, newStock, newPrice, newShortName, newBarcode) {
+    function updateSingleProductStockAndPrice(productName, newStock, newPrice, newShortName, newBarcode, newUnit) {
         google.script.run.withSuccessHandler((result) => {
             alert(result); // Confirmation de mise à jour
         }).withFailureHandler((error) => {
             alert("Erreur lors de la mise à jour : " + error.message);
-        }).updateProductDetails(productName, newStock, newPrice, newShortName, newBarcode);
+        }).updateProductDetails(productName, newStock, newPrice, newShortName, newBarcode, newUnit);
     }
   
   ///////////////////////////////////////////////
@@ -1187,48 +1180,7 @@ function addNewLine() {
     }
 }
   
-  /*
-  function openModifyPopup(button) {
-      const row = button.closest('tr');
-      const price = row.querySelector('.currentPrice').textContent || '';
-      const stock = row.querySelector('.currentStock').textContent || '';
   
-      // Créer la pop-up avec les champs pour modifier le prix et le stock
-      const popupHtml = `
-          <div class="popup-overlay">
-              <div class="popup-content">
-                  <h2>Modifier le Prix et le Stock</h2>
-                  <label>Prix Actuel</label>
-                  <input type="number" id="modifyPrice" value="${price}" step="0.01"><br><br>
-                  <label>Stock Actuel</label>
-                  <input type="number" id="modifyStock" value="${stock}" step="0.01"><br><br>
-                  <button type="button" onclick="saveModification('${row.rowIndex}')">Valider</button>
-                  <button type="button" onclick="closePopup()">Annuler</button>
-              </div>
-          </div>
-      `;
-      document.body.insertAdjacentHTML('beforeend', popupHtml);
-  }
-  
-  function saveModification(rowIndex) {
-    const price = document.getElementById('modifyPrice').value;
-    const stock = document.getElementById('modifyStock').value;
-  
-    // Mettre à jour les valeurs dans la ligne correspondante
-    const row = document.getElementById('receptionTable').rows[rowIndex];
-    row.querySelector('.currentPrice').textContent = price;
-    row.querySelector('.currentStock').textContent = stock;
-  
-    closePopup();
-  }
-  
-  function closePopup() {
-    const popup = document.querySelector('.popup-overlay');
-    if (popup) {
-        popup.remove();
-    }
-  }
-  */
   function deleteReceptionRow(element) {
       const row = element.closest('tr');
       row.parentNode.removeChild(row); // Supprime la ligne
@@ -1270,24 +1222,6 @@ function addNewLine() {
                       if ($.trim(params.term) === '') {
                             return data;
                         }
-								
-				  
-
-																																						 
-			 
-
-																																														
-																	
-
-																			 
-									   
-		 
- 
-												 
-																										
-		   
-				   
-	
                         const searchWords = params.term.toLowerCase().split(/\s+/).map(word => removeAccents(word));
                         const dataText = removeAccents(data.text.toLowerCase());
 															   
@@ -1497,55 +1431,78 @@ function updateReceptionTotal() {
   }
   
   // Fonction pour ouvrir la popup de création de produit
-  function openCreateProductPopup() {
-      const supplierSelect = document.getElementById("supplierDropdown");
-     
-      const popupHtml = `
-        <div class="popup-overlay">
-          <div class="popup-content">
-            <h2>Créer un nouveau produit</h2>
-            <form id="createProductForm">
-              <label>Nom du produit</label>
-              <input type="text" id="productName" required><br><br>
-             
-              <label>Code-barres</label>
-              <input type="text" id="productBarcode"><br><br>
-              <label>Unité de mesure</label>
-              <select id="productUnit" required>
-                <option value="">Sélectionnez une unité</option>
-                <option value="Kilo">Kilo</option>
-                <option value="unite">unite</option>
-                <option value="Litre">Litre</option>
-              </select><br><br>
-              <label>Prix</label>
-              <input type="number" id="productPrice" step="0.01" required><br><br>
-              <label>Quantité reçue</label>
-              <input type="number" id="productQuantity" step="0.01" required><br><br>
-              <button type="button" onclick="saveNewProduct()">Valider</button>
-              <button type="button" onclick="closePopup()">Annuler</button>
-            </form>
-          </div>
+ function openCreateProductPopup() {
+    const supplierSelect = document.getElementById("supplierDropdown");
+    const popupHtml = `
+      <div class="popup-overlay">
+        <div class="popup-content">
+          <h2>Créer un nouveau produit</h2>
+          <form id="createProductForm">
+            <label>Nom du produit</label>
+            <input type="text" id="productName" required><br><br>
+            <label>Code-barres</label>
+            <input type="text" id="productBarcode"><br><br>
+            <label>Unité de mesure</label>
+            <select id="productUnit" required>
+              <option value="">Sélectionnez une unité</option>
+              <option value="Kilo">Kilo</option>
+              <option value="unite">Unité</option>
+              <option value="Litre">Litre</option>
+            </select><br><br>
+            <label>Type de prix</label>
+            <select id="productPriceType" required>
+              <option value="TTC">TTC</option>
+              <option value="HT5.5">HT à 5.5%</option>
+              <option value="HT20">HT à 20%</option>
+            </select><br><br>
+            <label>Prix</label>
+            <input type="number" id="productPrice" step="0.01" required><br><br>
+            <label>Quantité reçue</label>
+            <input type="number" id="productQuantity" step="0.01" required><br><br>
+            <button type="button" onclick="saveNewProduct()">Valider</button>
+            <button type="button" onclick="closePopup()">Annuler</button>
+          </form>
         </div>
-      `;
-      document.body.insertAdjacentHTML('beforeend', popupHtml);
-  }
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', popupHtml);
+}
+
   
   // Fonction pour enregistrer un nouveau produit
   function saveNewProduct() {
-      const productData = {
-          name: document.getElementById('productName').value,
-          barcode: document.getElementById('productBarcode').value,
-          unit: document.getElementById('productUnit').value,
-          price: parseFloat(document.getElementById('productPrice').value),
-          quantity: parseFloat(document.getElementById('productQuantity').value),
-          supplier: selectedSupplier  // Ajouter le fournisseur sélectionné
-      };
+    const productName = document.getElementById('productName').value.trim();
+    const productBarcode = document.getElementById('productBarcode').value.trim();
+    const productUnit = document.getElementById('productUnit').value;
+    const productPriceType = document.getElementById('productPriceType').value;
+    let productPrice = parseFloat(document.getElementById('productPrice').value);
+    const productQuantity = parseFloat(document.getElementById('productQuantity').value);
+
   
-      // Vérifier que tous les champs obligatoires sont remplis
-      if (!productData.name || !productData.unit || !productData.price || !productData.quantity) {
-          alert("Veuillez remplir tous les champs obligatoires.");
-          return;
-      }
+
+    // Conversion du prix si HT est sélectionné
+    if (productPriceType === 'HT5.5') {
+        productPrice *= 1.055;
+    } else if (productPriceType === 'HT20') {
+        productPrice *= 1.20;
+    }
+
+
+    if (!productName || !productUnit || isNaN(productPrice) || isNaN(productQuantity) || productQuantity <= 0) {
+        alert('Veuillez remplir tous les champs correctement.');
+        return;
+    }
+
+
+     const productData = {
+        name: productName,
+        barcode: productBarcode,
+        unit: productUnit,
+        price: productPrice.toFixed(2), // Convertir le prix en TTC si nécessaire
+        quantity: productQuantity,
+        supplier: selectedSupplier,
+    };
+
   
       // Appel à Google Apps Script pour enregistrer le produit avec le fournisseur
       google.script.run.withSuccessHandler(response => {
@@ -1829,9 +1786,9 @@ function updateReceptionTotal() {
             if (!selectedOption.dataset.name.toLowerCase().includes("unite")) {
                 stockText = parseFloat(selectedOption.dataset.stock).toFixed(2);
             }
-            // Condition pour afficher "litres" ou "unités"
-            if (selectedOption.dataset.name.toLowerCase().includes("litres")) {
-                cell3.innerText = `${stockText} litres`;
+            // Condition pour afficher "Litre" ou "unités"
+            if (selectedOption.dataset.name.toLowerCase().includes("Litre")) {
+                cell3.innerText = `${stockText} Litre`;
             } else if (selectedOption.dataset.name.toLowerCase().includes("unite")) {
                 cell3.innerText = `${stockText} unités`;
             } else if (selectedOption.dataset.name.toLowerCase().includes("kilo")) {
@@ -2430,8 +2387,6 @@ function openPreviewWindow(content) {
     margin-right: 0; /* Supprimer la marge si pas de code barre */
 }
 
-
-
     `;
 
     // Contenu HTML à injecter
@@ -2541,297 +2496,6 @@ function createEtiquettesHTML(rows) {
     html += `</div>`; // Fermeture du conteneur principal
     return html;
 }
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
-																	  
 																	  
       // Initialisation
       document.addEventListener('DOMContentLoaded', function () {

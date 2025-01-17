@@ -34,6 +34,7 @@ function getProducts() {
       price: price,       // Prix unitaire
       stock: row[8],      // Stock actuel
       barcode: row[2],    // Code barre (colonne 3)
+      unit: row[4],    // Code barre (colonne 3)
       stockDate: formattedDate  // Date de la dernière réception, formatée si elle existe
     };
   }).filter(Boolean); // Supprimer les entrées null
@@ -168,12 +169,22 @@ function saveSale(adherent, paymentMethod, total, dateTime, purchases) {
   const salesSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('ventes');
   salesSheet.appendRow([dateTime, adherent, formattedTotal, paymentMethod]);
 }
-function updateProductDetails(productName, newStock, newPrice, newShortName, newBarcode) {
+function updateProductDetails(productName, newStock, newPrice, newShortName, newBarcode, newUnit) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('produits');
   const data = sheet.getDataRange().getValues();
 
   newStock = parseFloat(newStock); // S'assurer que le stock est un nombre décimal
   newPrice = parseFloat(newPrice); // S'assurer que le prix est un nombre décimal
+
+  // Affichage des données dans les logs pour vérifier les valeurs
+  Logger.log("Mise à jour du produit :", {
+    productName, 
+    newStock, 
+    newPrice, 
+    newShortName, 
+    newBarcode, 
+    newUnit
+  });
 
   for (let i = 1; i < data.length; i++) {
     if (data[i][0] === productName) { // Nom du produit dans la colonne 0
@@ -181,12 +192,14 @@ function updateProductDetails(productName, newStock, newPrice, newShortName, new
       sheet.getRange(i + 1, 8).setValue(newPrice);    // Colonne 8 : Prix
       sheet.getRange(i + 1, 2).setValue(newShortName); // Colonne 2 : Nom court
       sheet.getRange(i + 1, 3).setValue(newBarcode);   // Colonne 3 : Code-barre
+      sheet.getRange(i + 1, 5).setValue(newUnit); // Colonne 4 : Unité
       return `Produit "${productName}" mis à jour avec succès.`;
     }
   }
 
   return `Produit "${productName}" non trouvé.`;
 }
+
 
 //Envoi de la facture par mail
 function sendInvoiceToAdherent(invoiceData) {
@@ -424,6 +437,11 @@ function receptionValidateReception(receptions) {
 //Créer un nouveau produit depuis la réception
 function receptionCreateProduct(productData) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('produits');
+  // Formatter les champs price et quantity pour utiliser des virgules
+  const formattedPrice = String(productData.price).replace('.', ',');
+  const formattedQuantity = String(productData.quantity).replace('.', ',');
+
+  // Ajouter une nouvelle ligne au tableau
   sheet.appendRow([
     '', // Colonne A (vide)
     productData.name,     // Colonne B: Nom du produit
@@ -431,9 +449,10 @@ function receptionCreateProduct(productData) {
     productData.supplier, // Colonne D: Fournisseur
     productData.unit,     // Colonne E: Unité de mesure
     '', '',               // Colonnes F et G (vides)
-    productData.price,    // Colonne H: Prix
-    productData.quantity  // Colonne I: Quantité reçue
+    formattedPrice,    // Colonne H: Prix
+    formattedQuantity  // Colonne I: Quantité reçue
   ]);
+
   return `Le produit ${productData.name} a été ajouté avec succès.`;
 }
 
